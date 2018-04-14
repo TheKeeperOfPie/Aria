@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.2.40-eap-51'
+    ext.kotlin_version = '1.2.40-eap-62'
     repositories {
         google()
         jcenter()
