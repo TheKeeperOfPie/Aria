@@ -40,7 +40,7 @@ abstract class BaseFragment<DaggerComponent> : Fragment(),
 
     private val viewScopedVariables by lazy { ArrayList<ViewScoped<*>>() }
 
-    private lateinit var loader: FragmentLoader<DaggerComponent>
+    lateinit var loader: FragmentLoader<DaggerComponent>
 
     override fun onBackStackChanged() {
     }

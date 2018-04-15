@@ -25,7 +25,7 @@ inline fun <reified T : Any?> Fragment.arg(arg: FragmentInitializer<*>.Arg<T?>):
 
 abstract class FragmentInitializer<out FragmentType : Fragment>(private val fragment: () -> FragmentType) {
 
-    private val argumentsMap = HashMap<String, Any?>()
+    private val argumentsMap = mutableMapOf<String, Any?>()
 
     fun buildFragment() = fragment().apply {
         arguments = (arguments ?: Bundle()).putExtras()

@@ -26,13 +26,19 @@ class ArtworkExtractor @Inject constructor(
         }
     }
 
+    private val knownEmptyFolders = mutableSetOf<File>()
+
     fun getArtwork(file: File, cache: MutableMap<String?, Bitmap?>): Bitmap? {
         return searchCache(file, cache)
                 ?: searchEmbedded(file, cache)
                 ?: searchMediaStore(file, cache)
-                ?: searchFolder(file, cache)
-                ?: searchFolder(file.parentFile, cache)
-                ?: searchFolder(file.parentFile?.parentFile, cache)
+                ?: searchFolderForCover(file, cache)
+                ?: searchFolderForCover(file.parentFile, cache)
+                ?: searchFolderForCover(file.parentFile?.parentFile, cache)
+    }
+
+    fun getArtworkWithFileDepthSearch(file: File, cache: MutableMap<String?, Bitmap?>): Bitmap? {
+        return getArtwork(file, cache) ?: searchFolderForFirst(file, cache)
     }
 
     private fun <T> failsafeTry(block: () -> T) = try {
@@ -90,21 +96,7 @@ class ArtworkExtractor @Inject constructor(
         }
     }
 
-    private fun cacheArtwork(
-            file: File,
-            cache: MutableMap<String?, Bitmap?>,
-            key: String?,
-            bitmapGenerator: () -> Bitmap
-    ): Bitmap? {
-        cache[key]?.let { return it }
-        return bitmapGenerator()
-                .also {
-                    cache[file.absolutePath] = it
-                    cache[key] = it
-                }
-    }
-
-    private fun searchFolder(file: File?, cache: MutableMap<String?, Bitmap?>) = failsafeTry {
+    private fun searchFolderForCover(file: File?, cache: MutableMap<String?, Bitmap?>) = failsafeTry {
         if (file?.isDirectory != true) {
             return@failsafeTry null
         }
@@ -122,5 +114,36 @@ class ArtworkExtractor @Inject constructor(
                 Picasso.get().load(Uri.fromFile(coverImage)).get()
             }
         }
+    }
+
+    private fun searchFolderForFirst(file: File?, cache: MutableMap<String?, Bitmap?>) = failsafeTry {
+        if (file?.isDirectory != true) {
+            return@failsafeTry null
+        }
+
+        val bitmap = file.walkTopDown()
+                .onEnter { !knownEmptyFolders.contains(it) }
+                .onLeave { knownEmptyFolders.add(it) }
+                .find { !it.isDirectory && getArtwork(it, cache) != null }
+                ?.let { searchCache(it, cache) }
+                ?: return@failsafeTry null
+
+        cacheArtwork(file, cache, file.absolutePath) {
+            bitmap
+        }
+    }
+
+    private fun cacheArtwork(
+            file: File,
+            cache: MutableMap<String?, Bitmap?>,
+            key: String?,
+            bitmapGenerator: () -> Bitmap
+    ): Bitmap? {
+        cache[key]?.let { return it }
+        return bitmapGenerator()
+                .also {
+                    cache[file.absolutePath] = it
+                    cache[key] = it
+                }
     }
 }

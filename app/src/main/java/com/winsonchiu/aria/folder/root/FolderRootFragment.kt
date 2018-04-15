@@ -23,10 +23,8 @@ class FolderRootFragment : BaseFragment<FolderRootFragmentDaggerComponent>() {
 
         if (!childFragmentManager.hasFragment(R.id.folder_root_fragment_container)) {
             val fragment = FolderFragment.Builder().build()
-//            fragment.exitTransition = SlideAndFade(overlayMode = GhostViewOverlay.OverlayMode.FRAMEWORK_VISIBILITY).forSupport()
-//            fragment.reenterTransition = SlideAndFade(overlayMode = GhostViewOverlay.OverlayMode.FRAMEWORK_VISIBILITY).forSupport()
-            fragment.exitTransition = DoNothingAsOverlay().forSupport()
-            fragment.reenterTransition = DoNothingAsOverlay().forSupport()
+            fragment.exitTransition = DoNothingAsOverlay.forSupport()
+            fragment.reenterTransition = DoNothingAsOverlay.forSupport()
 
             childFragmentManager.beginTransaction()
                     .replace(R.id.folder_root_fragment_container, fragment)

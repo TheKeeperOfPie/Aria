@@ -6,4 +6,7 @@ import javax.inject.Scope
 annotation class ApplicationScope
 
 @Scope
+annotation class RootFragmentScreenScope
+
+@Scope
 annotation class FragmentScreenScope

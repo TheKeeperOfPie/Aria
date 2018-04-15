@@ -8,7 +8,7 @@ import android.view.ViewGroup
 /**
  * Used to keep a view onscreen during a Fragment exit transition.
  */
-class DoNothingAsOverlay : GhostViewOverlay(
+object DoNothingAsOverlay : GhostViewOverlay(
         overlayMode = OverlayMode.FRAMEWORK_VISIBILITY
 ) {
 

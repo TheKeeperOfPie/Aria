@@ -10,7 +10,8 @@ import com.winsonchiu.aria.dagger.FragmentScreenScope
 import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.folder.util.FileFilters
 import com.winsonchiu.aria.folder.util.FileSorter
-import com.winsonchiu.aria.folder.util.and
+import com.winsonchiu.aria.folder.util.withFolders
+import com.winsonchiu.aria.music.artwork.ArtworkCache
 import com.winsonchiu.aria.music.artwork.ArtworkExtractor
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
@@ -19,7 +20,8 @@ import javax.inject.Inject
 
 @FragmentScreenScope
 class FolderController @Inject constructor(
-        private val artworkExtractor: ArtworkExtractor
+        private val artworkExtractor: ArtworkExtractor,
+        private val artworkCache: ArtworkCache
 ) : FragmentLifecycleBoundComponent() {
 
     val folderContents = BehaviorRelay.create<List<FileModel>>()
@@ -27,30 +29,39 @@ class FolderController @Inject constructor(
 
     private val folder by arg(FolderFragment.Args.folder)
 
-    private val bitmapCache = HashMap<String?, Bitmap?>()
+    private val files = Single.fromCallable {
+        if (folder.isNullOrBlank()) {
+            Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+        } else {
+            File(folder)
+        }
+    }
+            .map {
+                it.listFiles(FileFilters.AUDIO.withFolders())
+                        .toList()
+                        .let { FileSorter.sort(it, FileSorter.Method.BY_NAME) }
+                        .map { FileModel(it, null) }
+            }
+            .cache()
 
+    private val filesWithArtwork = files.map { it.map { it.copy(image = artworkExtractor.getArtwork(it.file, artworkCache)) } }
+
+    private val filesWithArtworkAndDepthSearch = filesWithArtwork.map { it.map { it.copy(image = artworkExtractor.getArtworkWithFileDepthSearch(it.file, artworkCache)) } }
+
+    @SuppressLint("CheckResult")
     override fun onFirstInitialize(fragment: Fragment) {
         super.onFirstInitialize(fragment)
-        refresh()
+        files.mergeWith(filesWithArtwork)
+                .mergeWith(filesWithArtworkAndDepthSearch)
+                .subscribeOn(Schedulers.io())
+                .doOnSubscribe { state.accept(RequestState.LOADING) }
+                .doFinally { state.accept(RequestState.DONE) }
+                .subscribe(folderContents)
     }
 
     @SuppressLint("CheckResult")
     fun refresh() {
-        Single.fromCallable {
-            if (folder.isNullOrBlank()) {
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-            } else {
-                File(folder)
-            }
-        }
-                .map {
-                    it.listFiles(FileFilters.AUDIO and FileFilters.FOLDERS)
-                            .toList()
-                            .let { FileSorter.sort(it, FileSorter.Method.BY_NAME) }
-                            .map {
-                                FileModel(it, artworkExtractor.getArtwork(it, bitmapCache))
-                            }
-                }
+        filesWithArtwork.mergeWith(filesWithArtworkAndDepthSearch)
                 .subscribeOn(Schedulers.io())
                 .doOnSubscribe { state.accept(RequestState.LOADING) }
                 .doFinally { state.accept(RequestState.DONE) }

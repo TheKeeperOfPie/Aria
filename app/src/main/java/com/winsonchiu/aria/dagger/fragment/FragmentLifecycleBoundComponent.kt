@@ -48,12 +48,13 @@ abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, Fragm
             There is no hook for when a Fragment is popped off the back stack, so track all changes
             until the attached Fragment is no longer in the back stack.
          */
-        val fragment = fragmentReference?.get()
-        val backStackNesting = Fragment::class.java.getDeclaredField("mBackStackNesting")
-                .apply { isAccessible = true }
-                .getInt(fragment)
+        fragmentReference?.get()?.let {
+            val backStackNesting = Fragment::class.java.getDeclaredField("mBackStackNesting")
+                    .apply { isAccessible = true }
+                    .getInt(it)
 
-        isInBackStack = backStackNesting > 0
+            isInBackStack = backStackNesting > 0
+        }
     }
 
     @CallSuper

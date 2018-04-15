@@ -7,10 +7,12 @@ import androidx.core.view.postDelayed
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.async.RequestState
 import com.winsonchiu.aria.dagger.ActivityComponent
+import com.winsonchiu.aria.folder.root.FolderRootFragmentDaggerComponent
 import com.winsonchiu.aria.fragment.BaseFragment
 import com.winsonchiu.aria.fragment.FragmentInitializer
 import com.winsonchiu.aria.fragment.arg
 import com.winsonchiu.aria.fragment.build
+import com.winsonchiu.aria.util.animation.transition.DoNothingAsOverlay
 import com.winsonchiu.aria.util.animation.transition.GhostViewOverlay
 import com.winsonchiu.aria.util.animation.transition.SlideAndFade
 import com.winsonchiu.aria.util.setDataForView
@@ -22,7 +24,10 @@ import javax.inject.Inject
 
 class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
 
-    override fun makeComponent(activityComponent: ActivityComponent) = activityComponent.folderFragmentComponent()
+    @Suppress("UNCHECKED_CAST")
+    override fun makeComponent(activityComponent: ActivityComponent): FolderFragmentDaggerComponent {
+        return (parentFragment as BaseFragment<FolderRootFragmentDaggerComponent>).loader.fragmentComponent!!.folderFragmentComponent()
+    }
 
     override fun injectSelf(component: FolderFragmentDaggerComponent) = component.inject(this)
 
@@ -56,6 +61,8 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
                             slideFractionToY = 1f,
                             overlayMode = GhostViewOverlay.OverlayMode.FRAMEWORK_VISIBILITY
                     ).forSupport()
+                    newFragment.exitTransition = DoNothingAsOverlay.forSupport()
+                    newFragment.reenterTransition = DoNothingAsOverlay.forSupport()
 
                     beginTransaction().setReorderingAllowed(true)
                             .replace(id, newFragment)
@@ -86,7 +93,8 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
         super.onStart()
 
         folderController.state
-                .debounce(150, TimeUnit.MILLISECONDS)
+                .startWith(RequestState.NONE)
+                .debounce(500, TimeUnit.MILLISECONDS)
                 .map {
                     when (it) {
                         RequestState.NONE, RequestState.DONE -> false
