@@ -3,6 +3,7 @@ package com.winsonchiu.aria.folder
 import android.content.Context
 import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
+import androidx.core.view.isVisible
 import butterknife.OnClick
 import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
@@ -14,6 +15,7 @@ import com.winsonchiu.aria.util.textOrGone
 import kotlinx.android.synthetic.main.folder_file_item_view.view.fileDescriptionText
 import kotlinx.android.synthetic.main.folder_file_item_view.view.fileImage
 import kotlinx.android.synthetic.main.folder_file_item_view.view.fileNameText
+import kotlinx.android.synthetic.main.folder_file_item_view.view.folderOverlayImage
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class FolderFileItemView @JvmOverloads constructor(
@@ -40,6 +42,7 @@ class FolderFileItemView @JvmOverloads constructor(
         fileNameText.text = file.name
         fileDescriptionText.textOrGone("")
         fileImage.setImageBitmap(image)
+        folderOverlayImage.isVisible = file.isDirectory
     }
 
     @OnClick()

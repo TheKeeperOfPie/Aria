@@ -9,16 +9,36 @@
     tools:parentTag="android.support.constraint.ConstraintLayout"
     >
 
-    <ImageView
+    <com.winsonchiu.aria.view.RoundedCornerImageView
         android:id="@+id/fileImage"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
         android:layout_marginStart="16dp"
+        android:scaleType="centerCrop"
+        app:cornerRadius="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <com.winsonchiu.aria.view.RoundedForegroundImageView
+        android:id="@+id/folderOverlayImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@color/folderOverlayGray"
+        android:scaleType="center"
+        android:tint="@color/folderOverlayIcon"
+        android:tintMode="src_in"
+        android:visibility="gone"
+        app:cornerRadius="4dp"
+        app:layout_constraintBottom_toBottomOf="@id/fileImage"
+        app:layout_constraintEnd_toEndOf="@id/fileImage"
+        app:layout_constraintStart_toStartOf="@id/fileImage"
+        app:layout_constraintTop_toTopOf="@id/fileImage"
+        app:srcCompat="@drawable/ic_folder_24dp"
+        tools:visibility="visible"
         />
 
     <TextView

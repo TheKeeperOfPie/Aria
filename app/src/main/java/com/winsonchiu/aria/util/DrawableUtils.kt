@@ -12,12 +12,12 @@ object DrawableUtils {
     fun getDefaultRipple(context: Context, borderless: Boolean): Drawable {
         val attribute = if (borderless) R.attr.selectableItemBackgroundBorderless else R.attr.selectableItemBackground
         return context.obtainStyledAttributes(intArrayOf(attribute)).use {
-            getDrawableCompat(it, 0, context)!!
+            it.getDrawableCompat(0, context)!!
         }
     }
+}
 
-    fun getDrawableCompat(typedArray: TypedArray, index: Int, context: Context): Drawable? {
-        val resourceId = typedArray.getResourceId(index, -1)
-        return if (resourceId == -1) null else AppCompatResources.getDrawable(context, resourceId)
-    }
+fun TypedArray.getDrawableCompat(index: Int, context: Context): Drawable? {
+    val resourceId = getResourceId(index, -1)
+    return if (resourceId == -1) null else AppCompatResources.getDrawable(context, resourceId)
 }
