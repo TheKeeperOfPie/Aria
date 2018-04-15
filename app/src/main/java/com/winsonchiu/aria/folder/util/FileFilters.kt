@@ -26,7 +26,7 @@ object FileFilters {
     }
 
     fun foldersRecursiveNonEmpty(fileFilter: FileFilter) = and(FOLDERS, FileFilter { rootFile ->
-        rootFile.walkBottomUp().fold(false) { matches, file -> matches || fileFilter.accept(file) }
+        rootFile.walkTopDown().fold(false) { matches, file -> matches || fileFilter.accept(file) }
     })
 
     fun or(vararg fileFilter: FileFilter) = FileFilter { file ->

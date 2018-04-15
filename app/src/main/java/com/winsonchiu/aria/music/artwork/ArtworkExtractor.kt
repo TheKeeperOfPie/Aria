@@ -122,6 +122,7 @@ class ArtworkExtractor @Inject constructor(
         }
 
         val bitmap = file.walkTopDown()
+                .maxDepth(2)
                 .onEnter { !knownEmptyFolders.contains(it) }
                 .onLeave { knownEmptyFolders.add(it) }
                 .find { !it.isDirectory && getArtwork(it, cache) != null }

@@ -32,7 +32,26 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
     override fun injectSelf(component: FolderFragmentDaggerComponent) = component.inject(this)
 
     object Args : Builder()
-    open class Builder : FragmentInitializer<FolderFragment>({ FolderFragment() }) {
+    open class Builder : FragmentInitializer<FolderFragment>({
+        FolderFragment().apply {
+            enterTransition = SlideAndFade(
+                    slideFractionFromY = 0.5f,
+                    slideFractionToY = 0f,
+                    fadeFrom = 0f,
+                    fadeTo = 1f,
+                    overlayMode = GhostViewOverlay.OverlayMode.GHOST
+            ).forSupport()
+            returnTransition = SlideAndFade(
+                    slideFractionFromY = 0f,
+                    slideFractionToY = 0.5f,
+                    fadeFrom = 1f,
+                    fadeTo = 0f,
+                    overlayMode = GhostViewOverlay.OverlayMode.FRAMEWORK_VISIBILITY
+            ).forSupport()
+            exitTransition = DoNothingAsOverlay.forSupport()
+            reenterTransition = DoNothingAsOverlay.forSupport()
+        }
+    }) {
         val folder = string("folder")
     }
 
@@ -51,18 +70,8 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
             if (file.isDirectory) {
                 fragmentManager?.run {
                     val newFragment = Builder().build { folder put file.absolutePath }
-                    newFragment.enterTransition = SlideAndFade(
-                            slideFractionFromY = 1f,
-                            slideFractionToY = 0f,
-                            overlayMode = GhostViewOverlay.OverlayMode.GHOST
-                    ).forSupport()
-                    newFragment.returnTransition = SlideAndFade(
-                            slideFractionFromY = 0f,
-                            slideFractionToY = 1f,
-                            overlayMode = GhostViewOverlay.OverlayMode.FRAMEWORK_VISIBILITY
-                    ).forSupport()
-                    newFragment.exitTransition = DoNothingAsOverlay.forSupport()
-                    newFragment.reenterTransition = DoNothingAsOverlay.forSupport()
+                    exitTransition = DoNothingAsOverlay.forSupport()
+                    reenterTransition = DoNothingAsOverlay.forSupport()
 
                     beginTransaction().setReorderingAllowed(true)
                             .replace(id, newFragment)

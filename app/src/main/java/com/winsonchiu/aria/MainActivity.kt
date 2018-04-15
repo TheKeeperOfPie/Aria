@@ -51,15 +51,4 @@ class MainActivity : AppCompatActivity() {
         ActivityComponent::class.java -> ACTIVITY_COMPONENT
         else -> super.getSystemServiceName(serviceClass)
     }
-
-    override fun onBackPressed() {
-//        val fragment = supportFragmentManager.findFragmentById(R.id.main_activity_fragment_container)
-//        if (fragment is BaseFragment<*>) {
-//            if (fragment.onBackPressed()) {
-//                return
-//            }
-//        }
-
-        super.onBackPressed()
-    }
 }

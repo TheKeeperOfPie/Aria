@@ -37,7 +37,7 @@ class FolderController @Inject constructor(
         }
     }
             .map {
-                it.listFiles(FileFilters.AUDIO.withFolders())
+                (it.listFiles(FileFilters.AUDIO.withFolders()) ?: emptyArray())
                         .toList()
                         .let { FileSorter.sort(it, FileSorter.Method.BY_NAME) }
                         .map { FileModel(it, null) }
