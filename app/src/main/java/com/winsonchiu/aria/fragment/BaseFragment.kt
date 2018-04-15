@@ -5,18 +5,35 @@ import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.annotation.LayoutRes
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import butterknife.ButterKnife
 import butterknife.Unbinder
+import com.uber.autodispose.AutoDispose
+import com.uber.autodispose.ObservableSubscribeProxy
+import com.uber.autodispose.SingleSubscribeProxy
+import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
 import com.winsonchiu.aria.MainActivity
 import com.winsonchiu.aria.dagger.ActivityComponent
+import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
+import io.reactivex.Observable
+import io.reactivex.Single
+import javax.inject.Inject
 import kotlin.reflect.KProperty
 
 abstract class BaseFragment<DaggerComponent> : Fragment(), InjectableFragment<DaggerComponent> {
 
-    @get:LayoutRes abstract val layoutId: Int
+    companion object {
+        val TAG = BaseFragment::class.java.canonicalName
+    }
+
+    @get:LayoutRes
+    abstract val layoutId: Int
+
+    @Inject
+    lateinit var lifecycleBoundComponents: Set<@JvmSuppressWildcards FragmentLifecycleBoundComponent>
 
     private lateinit var unbinder: Unbinder
 
@@ -34,28 +51,51 @@ abstract class BaseFragment<DaggerComponent> : Fragment(), InjectableFragment<Da
             val activityComponent = context.getSystemService(MainActivity.ACTIVITY_COMPONENT) as ActivityComponent
             loader.fragmentComponent = makeComponent(activityComponent)
         }
+
+        injectSelf(loader.fragmentComponent!!)
+
+        lifecycleBoundComponents.forEach {
+            lifecycle.addObserver(it)
+            arguments?.let(it::initialize)
+        }
     }
 
-    final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    final override fun onCreateView(
+            inflater: LayoutInflater,
+            container: ViewGroup?,
+            savedInstanceState: Bundle?
+    ): View? {
+        Log.d(TAG, "onCreateView() called with ${toString()}")
         return inflater.inflate(layoutId, container, false)
     }
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        viewScopedVariables.forEach { it.onCreate() }
         unbinder = ButterKnife.bind(this, view)
     }
 
     @CallSuper
     override fun onDestroyView() {
-        viewScopedVariables.forEach { it.clear() }
+        viewScopedVariables.forEach { it.onDestroy() }
         unbinder.unbind()
         super.onDestroyView()
     }
 
+    fun <T> Single<T>.bindToLifecycle(): SingleSubscribeProxy<T> {
+        return `as`(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this@BaseFragment)))
+    }
+
+    fun <T> Observable<T>.bindToLifecycle(): ObservableSubscribeProxy<T> {
+        return `as`(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this@BaseFragment)))
+    }
+
     inner class ViewScoped<Type>(
-            private var value: Type? = null
+            private var initialValue: () -> Type? = { null }
     ) {
+        private var value: Type? = null
+
         init {
             viewScopedVariables += this
         }
@@ -69,7 +109,11 @@ abstract class BaseFragment<DaggerComponent> : Fragment(), InjectableFragment<Da
             this.value = value
         }
 
-        fun clear() {
+        fun onCreate() {
+            value = initialValue()
+        }
+
+        fun onDestroy() {
             value = null
         }
     }

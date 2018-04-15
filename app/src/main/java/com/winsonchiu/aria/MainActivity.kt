@@ -2,6 +2,7 @@ package com.winsonchiu.aria
 
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import com.winsonchiu.aria.application.AriaApplication
 import com.winsonchiu.aria.dagger.ActivityComponent
 import com.winsonchiu.aria.dagger.ApplicationComponent
 import com.winsonchiu.aria.home.HomeFragment
@@ -23,8 +24,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         if (!supportFragmentManager.hasFragment(R.id.main_activity_fragment_container)) {
+            val homeFragment = HomeFragment()
             supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_activity_fragment_container, HomeFragment())
+                    .replace(R.id.main_activity_fragment_container, homeFragment)
+                    .setPrimaryNavigationFragment(homeFragment)
                     .commitNow()
         }
     }
@@ -47,5 +50,16 @@ class MainActivity : AppCompatActivity() {
     override fun getSystemServiceName(serviceClass: Class<*>?) = when (serviceClass) {
         ActivityComponent::class.java -> ACTIVITY_COMPONENT
         else -> super.getSystemServiceName(serviceClass)
+    }
+
+    override fun onBackPressed() {
+//        val fragment = supportFragmentManager.findFragmentById(R.id.main_activity_fragment_container)
+//        if (fragment is BaseFragment<*>) {
+//            if (fragment.onBackPressed()) {
+//                return
+//            }
+//        }
+
+        super.onBackPressed()
     }
 }

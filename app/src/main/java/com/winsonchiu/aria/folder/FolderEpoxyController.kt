@@ -6,10 +6,10 @@ import com.airbnb.epoxy.TypedEpoxyController
 class FolderEpoxyController : TypedEpoxyController<FolderEpoxyController.Model>() {
 
     override fun buildModels(data: Model) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        data.models.forEach { it.addTo(this) }
     }
 
     data class Model(
-            private val models: EpoxyModel<*>
+            val models: List<EpoxyModel<*>>
     )
 }

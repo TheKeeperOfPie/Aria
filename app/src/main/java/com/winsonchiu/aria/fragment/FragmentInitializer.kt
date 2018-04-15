@@ -14,6 +14,11 @@ inline fun <FragmentType : Fragment, T : FragmentInitializer<FragmentType>> T.bu
     return buildFragment()
 }
 
+@Suppress("UNCHECKED_CAST")
+fun <FragmentType : Fragment, T : FragmentInitializer<FragmentType>> T.build(): FragmentType {
+    return buildFragment()
+}
+
 inline fun <reified T : Any?> Fragment.arg(arg: FragmentInitializer<*>.Arg<T?>): Lazy<T?> {
     return lazy { arguments?.get(arg.key) as T? }
 }

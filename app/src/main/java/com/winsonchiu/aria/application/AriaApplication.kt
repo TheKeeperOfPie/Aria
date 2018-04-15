@@ -1,10 +1,9 @@
-package com.winsonchiu.aria
+package com.winsonchiu.aria.application
 
-import android.app.Application
 import com.winsonchiu.aria.dagger.ApplicationComponent
 import com.winsonchiu.aria.dagger.DaggerApplicationComponent
 
-class AriaApplication : Application() {
+class AriaApplication : LeakCanaryApplication() {
 
     companion object {
         val APPLICATION_COMPONENT = "${AriaApplication::class.java.canonicalName}.APPLICATION_COMPONENT"

@@ -4,6 +4,7 @@
     <excluded-names>
       <name>android.app.LoaderManager</name>
       <name>android.content.Loader</name>
+      <name>android.transition</name>
     </excluded-names>
   </component>
 </project>
