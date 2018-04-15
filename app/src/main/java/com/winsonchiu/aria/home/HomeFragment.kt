@@ -41,7 +41,7 @@ class HomePagerAdapter(
         super.setPrimaryItem(container, position, item)
         fragmentManager.beginTransaction()
                 .setPrimaryNavigationFragment(item as Fragment)
-                .commit()
+                .commitAllowingStateLoss()
     }
 
     @Suppress("HasPlatformType")

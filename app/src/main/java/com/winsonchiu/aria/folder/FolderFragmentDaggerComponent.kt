@@ -20,10 +20,6 @@ interface FolderFragmentDaggerComponent {
 class FolderFragmentModule {
 
     @Provides
-    @FragmentScreenScope
-    fun provideFolderController() = FolderController()
-
-    @Provides
     @IntoSet
     @FragmentScreenScope
     fun bindFolderController(folderController: FolderController): FragmentLifecycleBoundComponent = folderController

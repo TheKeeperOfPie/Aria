@@ -1,6 +1,7 @@
 package com.winsonchiu.aria.application
 
 import com.winsonchiu.aria.dagger.ApplicationComponent
+import com.winsonchiu.aria.dagger.ApplicationModule
 import com.winsonchiu.aria.dagger.DaggerApplicationComponent
 
 class AriaApplication : LeakCanaryApplication() {
@@ -9,7 +10,9 @@ class AriaApplication : LeakCanaryApplication() {
         val APPLICATION_COMPONENT = "${AriaApplication::class.java.canonicalName}.APPLICATION_COMPONENT"
     }
 
-    private val applicationComponent = DaggerApplicationComponent.create()
+    private val applicationComponent = DaggerApplicationComponent.builder()
+            .applicationModule(ApplicationModule(this))
+            .build()
 
     @Suppress("HasPlatformType")
     override fun getSystemService(name: String?) = when (name) {

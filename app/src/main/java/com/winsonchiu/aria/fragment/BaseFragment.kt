@@ -5,7 +5,7 @@ import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.annotation.LayoutRes
 import android.support.v4.app.Fragment
-import android.util.Log
+import android.support.v4.app.FragmentManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,8 +23,9 @@ import io.reactivex.Single
 import javax.inject.Inject
 import kotlin.reflect.KProperty
 
-abstract class BaseFragment<DaggerComponent> : Fragment(), InjectableFragment<DaggerComponent> {
-
+abstract class BaseFragment<DaggerComponent> : Fragment(),
+    InjectableFragment<DaggerComponent>,
+    FragmentManager.OnBackStackChangedListener {
     companion object {
         val TAG = BaseFragment::class.java.canonicalName
     }
@@ -41,6 +42,9 @@ abstract class BaseFragment<DaggerComponent> : Fragment(), InjectableFragment<Da
 
     private lateinit var loader: FragmentLoader<DaggerComponent>
 
+    override fun onBackStackChanged() {
+    }
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
 
@@ -56,18 +60,17 @@ abstract class BaseFragment<DaggerComponent> : Fragment(), InjectableFragment<Da
 
         lifecycleBoundComponents.forEach {
             lifecycle.addObserver(it)
-            arguments?.let(it::initialize)
+            it.initialize(this)
         }
+
+        fragmentManager?.addOnBackStackChangedListener(this)
     }
 
     final override fun onCreateView(
             inflater: LayoutInflater,
             container: ViewGroup?,
             savedInstanceState: Bundle?
-    ): View? {
-        Log.d(TAG, "onCreateView() called with ${toString()}")
-        return inflater.inflate(layoutId, container, false)
-    }
+    ) = inflater.inflate(layoutId, container, false)
 
     @CallSuper
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

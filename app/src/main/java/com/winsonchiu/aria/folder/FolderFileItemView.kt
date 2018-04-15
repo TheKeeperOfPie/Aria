@@ -8,9 +8,12 @@ import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.winsonchiu.aria.R
+import com.winsonchiu.aria.util.DrawableUtils
 import com.winsonchiu.aria.util.initialize
+import com.winsonchiu.aria.util.textOrGone
+import kotlinx.android.synthetic.main.folder_file_item_view.view.fileDescriptionText
+import kotlinx.android.synthetic.main.folder_file_item_view.view.fileImage
 import kotlinx.android.synthetic.main.folder_file_item_view.view.fileNameText
-import java.io.File
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class FolderFileItemView @JvmOverloads constructor(
@@ -19,7 +22,7 @@ class FolderFileItemView @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    lateinit var file: File
+    lateinit var fileModel: FolderController.FileModel
         @ModelProp set
 
     var listener: Listener? = null
@@ -27,19 +30,24 @@ class FolderFileItemView @JvmOverloads constructor(
 
     init {
         initialize(R.layout.folder_file_item_view)
+
+        background = DrawableUtils.getDefaultRipple(context, false)
     }
 
     @AfterPropsSet
     fun onChanged() {
-        fileNameText.text = file.nameWithoutExtension
+        val (file, image) = fileModel
+        fileNameText.text = file.name
+        fileDescriptionText.textOrGone("")
+        fileImage.setImageBitmap(image)
     }
 
     @OnClick()
     fun onClick() {
-        listener?.onClick(file)
+        listener?.onClick(fileModel)
     }
 
     interface Listener {
-        fun onClick(file: File)
+        fun onClick(fileModel: FolderController.FileModel)
     }
 }

@@ -4,6 +4,7 @@ import android.support.annotation.LayoutRes
 import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import android.widget.TextView
 import butterknife.ButterKnife
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.epoxy.TypedEpoxyController
@@ -24,5 +25,14 @@ fun <T> TypedEpoxyController<T>.setDataForView(recyclerView: RecyclerView, data:
     setData(data)
     if (recyclerView.adapter != adapter) {
         recyclerView.adapter = adapter
+    }
+}
+
+fun TextView.textOrGone(text: CharSequence?) {
+    this.text = text
+    visibility = if (text.isNullOrBlank()) {
+        View.GONE
+    } else {
+        View.VISIBLE
     }
 }

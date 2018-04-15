@@ -17,7 +17,6 @@ import com.winsonchiu.aria.util.setDataForView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.folder_fragment.folderRecyclerView
 import kotlinx.android.synthetic.main.folder_fragment.folderSwipeRefresh
-import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -42,10 +41,10 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
     private var epoxyController = FolderEpoxyController()
 
     private val listener = object : FolderFileItemView.Listener {
-        override fun onClick(file: File) {
+        override fun onClick(fileModel: FolderController.FileModel) {
+            val (file, _) = fileModel
             if (file.isDirectory) {
                 fragmentManager?.run {
-                    val containerId = (view!!.parent as View).id
                     val newFragment = Builder().build { folder put file.absolutePath }
                     newFragment.enterTransition = SlideAndFade(
                             slideFractionFromY = 1f,
@@ -59,7 +58,7 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
                     ).forSupport()
 
                     beginTransaction().setReorderingAllowed(true)
-                            .replace(containerId, newFragment)
+                            .replace(id, newFragment)
                             .addToBackStack(null)
                             .commit()
                 }
@@ -102,8 +101,8 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
                 .map {
                     it.map {
                         FolderFileItemViewModel_()
-                                .id(it.name)
-                                .file(it)
+                                .id(it.file.name)
+                                .fileModel(it)
                                 .listener(listener)
                     }
                 }
