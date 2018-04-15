@@ -1,18 +1,18 @@
-package com.winsonchiu.aria.folder.root
+package com.winsonchiu.aria.folders.root
 
 import android.os.Bundle
 import android.os.Environment
 import android.view.View
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.dagger.ActivityComponent
-import com.winsonchiu.aria.folder.FolderFragment
-import com.winsonchiu.aria.fragment.BaseFragment
+import com.winsonchiu.aria.folders.folder.FolderFragment
 import com.winsonchiu.aria.fragment.build
+import com.winsonchiu.aria.fragment.subclass.BaseFragment
+import com.winsonchiu.aria.home.HomeFragmentDaggerComponent
 import com.winsonchiu.aria.util.hasFragment
 
-class FolderRootFragment : BaseFragment<FolderRootFragmentDaggerComponent>() {
+class FolderRootFragment : BaseFragment<HomeFragmentDaggerComponent, FolderRootFragmentDaggerComponent>() {
 
-    override fun makeComponent(activityComponent: ActivityComponent) = activityComponent.folderRootFragmentComponent()
+    override fun makeComponent(parentComponent: HomeFragmentDaggerComponent) = parentComponent.folderRootFragmentComponent()
 
     override fun injectSelf(component: FolderRootFragmentDaggerComponent) = component.inject(this)
 

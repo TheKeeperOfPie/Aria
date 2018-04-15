@@ -1,17 +1,49 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.v4.widget.SwipeRefreshLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/folderSwipeRefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@android:color/black"
     >
 
-    <!--<com.airbnb.epoxy.EpoxyRecyclerView-->
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/folderRecyclerView"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        />
+        >
+
+        <TextView
+            android:id="@+id/folderTitleText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:paddingStart="16dp"
+            android:paddingEnd="16dp"
+            android:ellipsize="start"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Caption"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            />
+
+        <com.airbnb.epoxy.EpoxyRecyclerView
+            android:id="@+id/folderRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:fastScrollEnabled="true"
+            app:fastScrollHorizontalThumbDrawable="@drawable/folder_fast_scroll_thumb_drawable"
+            app:fastScrollHorizontalTrackDrawable="@drawable/folder_fast_scroll_track_drawable"
+            app:fastScrollVerticalThumbDrawable="@drawable/folder_fast_scroll_thumb_drawable"
+            app:fastScrollVerticalTrackDrawable="@drawable/folder_fast_scroll_track_drawable"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/folderTitleText"
+            />
+
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.v4.widget.SwipeRefreshLayout>

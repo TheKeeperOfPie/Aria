@@ -1,6 +1,6 @@
-package com.winsonchiu.aria.folder.util
+package com.winsonchiu.aria.folders.util
 
-import com.winsonchiu.aria.folder.util.FileFilters.foldersRecursiveNonEmpty
+import com.winsonchiu.aria.folders.util.FileFilters.foldersRecursiveNonEmpty
 import java.io.File
 import java.io.FileFilter
 import java.net.URLConnection

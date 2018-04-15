@@ -1,14 +1,30 @@
 package com.winsonchiu.aria.home
 
-import com.winsonchiu.aria.dagger.FragmentScreenScope
+import com.winsonchiu.aria.dagger.HomeFragmentScreenScope
 import com.winsonchiu.aria.dagger.fragment.FragmentDefaultBoundModule
+import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
+import com.winsonchiu.aria.folders.root.FolderRootFragmentDaggerComponent
+import dagger.Module
+import dagger.Provides
 import dagger.Subcomponent
+import dagger.multibindings.IntoSet
 
-@FragmentScreenScope
+@HomeFragmentScreenScope
 @Subcomponent(
-        modules = [FragmentDefaultBoundModule::class]
+        modules = [HomeFragmentModule::class]
 )
 interface HomeFragmentDaggerComponent {
 
+    fun folderRootFragmentComponent(): FolderRootFragmentDaggerComponent
+
     fun inject(homeFragment: HomeFragment)
+}
+
+@Module
+class HomeFragmentModule {
+
+    @Provides
+    @IntoSet
+    @HomeFragmentScreenScope
+    fun provideDefaultBoundComponent(): FragmentLifecycleBoundComponent = FragmentDefaultBoundModule.DefaultBoundComponent
 }

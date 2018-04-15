@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.folder
+package com.winsonchiu.aria.folders.folder
 
 import com.winsonchiu.aria.dagger.FragmentScreenScope
 import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent

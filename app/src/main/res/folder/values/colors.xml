@@ -4,4 +4,7 @@
     <color name="folderOverlayGray">#55000000</color>
     <color name="folderOverlayIcon">#AAFFFFFF</color>
 
+    <color name="folderFastScrollTrackBackground">#00FFFFFF</color>
+    <color name="folderFastScrollThumbBackground">#55FFFFFF</color>
+
 </resources>

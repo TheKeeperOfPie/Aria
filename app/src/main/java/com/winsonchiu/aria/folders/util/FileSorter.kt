@@ -1,7 +1,7 @@
-package com.winsonchiu.aria.folder.util
+package com.winsonchiu.aria.folders.util
 
-import com.winsonchiu.aria.folder.util.FileSorter.Method.BY_NAME
-import com.winsonchiu.aria.folder.util.FileSorter.Method.DEFAULT
+import com.winsonchiu.aria.folders.util.FileSorter.Method.BY_NAME
+import com.winsonchiu.aria.folders.util.FileSorter.Method.DEFAULT
 import java.io.File
 
 object FileSorter {

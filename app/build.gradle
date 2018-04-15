@@ -5,6 +5,7 @@ apply plugin: "kotlin-kapt"
 
 android {
     compileSdkVersion 27
+
     defaultConfig {
         applicationId "com.winsonchiu.aria"
         minSdkVersion 27
@@ -16,7 +17,14 @@ android {
 
         vectorDrawables.useSupportLibrary = true
     }
+
     buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            crunchPngs false
+        }
+
         release {
             minifyEnabled true
             shrinkResources true
@@ -24,6 +32,11 @@ android {
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
     }
+
+    dexOptions {
+        preDexLibraries true
+    }
+
     sourceSets {
         main {
             res.srcDirs = [
@@ -42,6 +55,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+}
+
+kapt {
+    useBuildCache = true
 }
 
 dependencies {

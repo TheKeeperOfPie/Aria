@@ -1,32 +1,33 @@
-package com.winsonchiu.aria.folder
+package com.winsonchiu.aria.folders.folder
 
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import androidx.core.view.postDelayed
+import com.airbnb.epoxy.SimpleEpoxyController
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.async.RequestState
-import com.winsonchiu.aria.dagger.ActivityComponent
-import com.winsonchiu.aria.folder.root.FolderRootFragmentDaggerComponent
-import com.winsonchiu.aria.fragment.BaseFragment
+import com.winsonchiu.aria.folders.root.FolderRootFragmentDaggerComponent
 import com.winsonchiu.aria.fragment.FragmentInitializer
 import com.winsonchiu.aria.fragment.arg
 import com.winsonchiu.aria.fragment.build
+import com.winsonchiu.aria.fragment.subclass.BaseFragment
 import com.winsonchiu.aria.util.animation.transition.DoNothingAsOverlay
 import com.winsonchiu.aria.util.animation.transition.GhostViewOverlay
 import com.winsonchiu.aria.util.animation.transition.SlideAndFade
+import com.winsonchiu.aria.util.dpToPx
 import com.winsonchiu.aria.util.setDataForView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.folder_fragment.folderRecyclerView
 import kotlinx.android.synthetic.main.folder_fragment.folderSwipeRefresh
+import kotlinx.android.synthetic.main.folder_fragment.folderTitleText
+import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
-class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
+class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFragmentDaggerComponent>() {
 
-    @Suppress("UNCHECKED_CAST")
-    override fun makeComponent(activityComponent: ActivityComponent): FolderFragmentDaggerComponent {
-        return (parentFragment as BaseFragment<FolderRootFragmentDaggerComponent>).loader.fragmentComponent!!.folderFragmentComponent()
+    override fun makeComponent(parentComponent: FolderRootFragmentDaggerComponent): FolderFragmentDaggerComponent {
+        return parentComponent.folderFragmentComponent()
     }
 
     override fun injectSelf(component: FolderFragmentDaggerComponent) = component.inject(this)
@@ -62,11 +63,10 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
     @Inject
     lateinit var folderController: FolderController
 
-    private var epoxyController = FolderEpoxyController()
+    private var epoxyController = SimpleEpoxyController()
 
-    private val listener = object : FolderFileItemView.Listener {
-        override fun onClick(fileModel: FolderController.FileModel) {
-            val (file, _) = fileModel
+    private val listener = object : FileItemView.Listener {
+        override fun onClick(file: File) {
             if (file.isDirectory) {
                 fragmentManager?.run {
                     val newFragment = Builder().build { folder put file.absolutePath }
@@ -82,20 +82,13 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
         }
     }
 
-    override fun toString() = "${super.toString()} ${folder.value}"
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         folderSwipeRefresh.setOnRefreshListener { folderController.refresh() }
+        folderSwipeRefresh.setDistanceToTriggerSync(150.dpToPx(view))
 
         folderRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         folderRecyclerView.setHasFixedSize(true)
-
-        postponeEnterTransition()
-
-        view.postDelayed(150) {
-            startPostponedEnterTransition()
-        }
     }
 
     override fun onStart() {
@@ -115,16 +108,12 @@ class FolderFragment : BaseFragment<FolderFragmentDaggerComponent>() {
                 .subscribe { folderSwipeRefresh.isRefreshing = it }
 
         folderController.folderContents
-                .map {
-                    it.map {
-                        FolderFileItemViewModel_()
-                                .id(it.file.name)
-                                .fileModel(it)
-                                .listener(listener)
-                    }
-                }
+                .map { FolderViewModelTransformer.transform(context!!, listener, it) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .bindToLifecycle()
-                .subscribe { epoxyController.setDataForView(folderRecyclerView, FolderEpoxyController.Model(it)) }
+                .subscribe {
+                    folderTitleText.text = it.folderTitle
+                    epoxyController.setDataForView(folderRecyclerView, it.models)
+                }
     }
 }
