@@ -5,6 +5,7 @@ import android.view.View
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.dagger.ActivityComponent
 import com.winsonchiu.aria.fragment.subclass.BaseFragment
+import kotlinx.android.synthetic.main.home_fragment.homeTabLayout
 import kotlinx.android.synthetic.main.home_fragment.pager
 
 class HomeFragment : BaseFragment<ActivityComponent, HomeFragmentDaggerComponent>() {
@@ -19,5 +20,6 @@ class HomeFragment : BaseFragment<ActivityComponent, HomeFragmentDaggerComponent
         super.onViewCreated(view, savedInstanceState)
 
         pager.adapter = HomePagerAdapter(view.context, childFragmentManager)
+        homeTabLayout.setupWithViewPager(pager, true)
     }
 }

@@ -14,12 +14,10 @@ class MainActivity : AppCompatActivity() {
         val ACTIVITY_COMPONENT = "${MainActivity::class.java.canonicalName}.ACTIVITY_COMPONENT"
     }
 
-    lateinit var activityComponent: ActivityComponent
+    private val activityComponent by lazy { makeActivityComponent() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        initializeActivityComponent()
 
         setContentView(R.layout.activity_main)
 
@@ -32,10 +30,10 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun initializeActivityComponent() {
+    private fun makeActivityComponent() : ActivityComponent {
         val applicationComponent = application.getSystemService(AriaApplication.APPLICATION_COMPONENT) as ApplicationComponent
         val lastActivityComponent = lastCustomNonConfigurationInstance as ActivityComponent?
-        activityComponent = lastActivityComponent ?: applicationComponent.activityComponent()
+        return lastActivityComponent ?: applicationComponent.activityComponent()
     }
 
     override fun onRetainCustomNonConfigurationInstance() = activityComponent

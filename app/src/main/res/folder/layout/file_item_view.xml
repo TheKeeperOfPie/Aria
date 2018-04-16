@@ -9,36 +9,31 @@
     tools:parentTag="android.support.constraint.ConstraintLayout"
     >
 
-    <com.winsonchiu.aria.view.RoundedCornerImageView
+    <com.winsonchiu.aria.view.MaskedImageView
         android:id="@+id/fileImage"
         android:layout_width="48dp"
         android:layout_height="48dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
         android:layout_marginStart="16dp"
+        android:background="@color/folderFileDefaultBackground"
         android:scaleType="centerCrop"
-        app:cornerRadius="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:radius="4dp"
         />
 
-    <com.winsonchiu.aria.view.RoundedForegroundImageView
-        android:id="@+id/folderOverlayImage"
+    <com.winsonchiu.aria.view.MaskedImageView
+        android:id="@+id/fileImageOverlay"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/folderOverlayGray"
-        android:scaleType="center"
-        android:tint="@color/folderOverlayIcon"
-        android:tintMode="src_in"
-        android:visibility="gone"
-        app:cornerRadius="4dp"
+        android:background="@drawable/folder_file_image_directory"
         app:layout_constraintBottom_toBottomOf="@id/fileImage"
         app:layout_constraintEnd_toEndOf="@id/fileImage"
         app:layout_constraintStart_toStartOf="@id/fileImage"
         app:layout_constraintTop_toTopOf="@id/fileImage"
-        app:srcCompat="@drawable/ic_folder_24dp"
-        tools:visibility="visible"
+        app:radius="4dp"
         />
 
     <TextView

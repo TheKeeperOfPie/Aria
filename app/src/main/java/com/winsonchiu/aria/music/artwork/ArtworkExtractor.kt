@@ -9,14 +9,14 @@ import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
 import com.squareup.picasso.Picasso
-import com.winsonchiu.aria.dagger.ApplicationScope
+import com.winsonchiu.aria.dagger.HomeFragmentScreenScope
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileFilters.COVER_IMAGE_REGEX
 import java.io.File
 import java.util.Arrays
 import javax.inject.Inject
 
-@ApplicationScope
+@HomeFragmentScreenScope
 class ArtworkExtractor @Inject constructor(
         private val application: Application
 ) {
@@ -28,23 +28,26 @@ class ArtworkExtractor @Inject constructor(
 
     private val knownEmptyFolders = mutableSetOf<File>()
 
-    fun getArtworkForFile(file: File, cache: ArtworkCache): Bitmap? {
-        cache[file.absolutePath]?.let { return it.bitmap }
+    fun getArtworkForFile(file: File, cache: ArtworkCache): ArtworkCache.Metadata? {
+        cache[file.absolutePath]?.let { return it }
 
-        return (searchEmbedded(file, cache)
+        val metadata = (searchEmbedded(file, cache)
                 ?: searchMediaStore(file, cache)
                 ?: searchFolderForCover(file, cache)
                 ?: searchFolderForCover(file.parentFile, cache)
                 ?: searchFolderForCover(file.parentFile?.parentFile, cache))
-                .also {
-                    if (it == null) {
-                        cache[file.absolutePath] = ArtworkCache.EMPTY
-                    }
-                }
+
+        if (metadata == null && !file.isDirectory) {
+            return cache.getOrPut(file.absolutePath) { ArtworkCache.EMPTY }
+        }
+
+        return metadata
     }
 
-    fun getArtworkWithFileDepthSearch(file: File, cache: ArtworkCache): Bitmap? {
-        return getArtworkForFile(file, cache) ?: searchFolderForFirst(file, cache)
+    fun getArtworkWithFileDepthSearch(file: File, cache: ArtworkCache): ArtworkCache.Metadata? {
+        return getArtworkForFile(file, cache)
+                ?: searchFolderForFirst(file, cache)
+                ?: cache.getOrPut(file.absolutePath) { ArtworkCache.EMPTY }
     }
 
     private fun <T> failsafeTry(block: () -> T) = try {
@@ -127,7 +130,7 @@ class ArtworkExtractor @Inject constructor(
                 .maxDepth(3)
                 .onEnter { !knownEmptyFolders.contains(it) }
                 .onLeave { knownEmptyFolders.add(it) }
-                .find { !it.isDirectory && getArtworkForFile(it, cache) != null }
+                .find { !it.isDirectory && getArtworkForFile(it, cache)?.bitmap != null }
                 ?.let { cache[it.absolutePath]?.bitmap }
                 ?: return@failsafeTry null
 
@@ -141,14 +144,18 @@ class ArtworkExtractor @Inject constructor(
             cache: ArtworkCache,
             key: String?,
             bitmapGenerator: () -> Bitmap
-    ): Bitmap? {
-        cache[key]?.bitmap?.let { return it }
+    ): ArtworkCache.Metadata? {
+        val cached = cache[key]
+        if (cached?.bitmap != null) {
+            return cached
+        }
 
         return bitmapGenerator()
-                .also {
+                .let {
                     val metadata = ArtworkCache.Metadata(it)
                     cache[file.absolutePath] = metadata
                     cache[key] = metadata
+                    metadata
                 }
     }
 }

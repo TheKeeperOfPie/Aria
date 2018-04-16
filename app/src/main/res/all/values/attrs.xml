@@ -22,4 +22,8 @@
         <attr name="cornersRounded" />
     </declare-styleable>
 
+    <declare-styleable name="MaskedImageView">
+        <attr name="radius" format="dimension" />
+    </declare-styleable>
+
 </resources>

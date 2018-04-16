@@ -1,7 +1,6 @@
 package com.winsonchiu.aria.folders.folder
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
 import android.os.Environment
 import android.support.v4.app.Fragment
 import com.jakewharton.rxrelay2.BehaviorRelay
@@ -102,7 +101,7 @@ class FolderController @Inject constructor(
 
     data class FileMetadata(
             val file: File,
-            val image: Bitmap?,
+            val image: ArtworkCache.Metadata?,
             val metadata: MetadataExtractor.Metadata?
     )
 }

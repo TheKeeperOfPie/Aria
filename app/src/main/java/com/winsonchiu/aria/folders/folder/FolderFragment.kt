@@ -87,8 +87,11 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
         folderSwipeRefresh.setOnRefreshListener { folderController.refresh() }
         folderSwipeRefresh.setDistanceToTriggerSync(150.dpToPx(view))
 
+        folderRecyclerView.itemAnimator = FolderItemAnimator()
         folderRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
         folderRecyclerView.setHasFixedSize(true)
+
+        postponeEnterTransition(150)
     }
 
     override fun onStart() {
