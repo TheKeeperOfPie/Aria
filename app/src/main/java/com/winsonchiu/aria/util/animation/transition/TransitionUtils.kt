@@ -147,16 +147,18 @@ class TransitionUtils {
 
             block(transaction)
 
-            fragmentManager.executePendingTransactions()
+//            fragmentManager.executePendingTransactions()
 
             /*
                 To prevent the system from using low res snapshots, we can remove them
                 from the hierarchy.
             */
-            (viewGroup.childCount - 1 downTo 0)
-                    .map(viewGroup::getChildAt)
-                    .filterNot(excludedViews::contains)
-                    .forEach(viewGroup::removeView)
+//            viewGroup.postDelayed(1) {
+//                (viewGroup.childCount - 1 downTo 0)
+//                        .map(viewGroup::getChildAt)
+//                        .filterNot(excludedViews::contains)
+//                        .forEach(viewGroup::removeView)
+//            }
         }
     }
 }

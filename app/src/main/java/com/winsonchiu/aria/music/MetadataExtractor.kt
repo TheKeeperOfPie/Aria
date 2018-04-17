@@ -90,3 +90,7 @@ class MetadataExtractor @Inject constructor() {
             val captureFrameRate: String? = null
     )
 }
+
+fun MetadataExtractor.Metadata?.artistDisplayValue(): String? {
+    return (this ?: return null).artist ?: albumArtist ?: author
+}

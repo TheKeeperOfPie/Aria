@@ -4,10 +4,12 @@ import android.content.Context
 import android.support.annotation.LayoutRes
 import android.support.v7.widget.RecyclerView
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.children
 import butterknife.ButterKnife
 import com.airbnb.epoxy.EpoxyModel
 import com.airbnb.epoxy.EpoxyRecyclerView
@@ -57,3 +59,19 @@ fun Int.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(Typed
 fun Float.dpToPx(view: View) = dpToPx(view.context)
 fun Float.dpToPx(context: Context) = dpToPx(context.resources.displayMetrics)
 fun Float.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, displayMetrics)
+
+
+fun ViewGroup.findChild(block: (child: View) -> Boolean): View? {
+    children.forEach {
+        Log.d("ViewUtils", "findChild called with child = $it, transitionName = ${it.transitionName}")
+        if (it is ViewGroup) {
+            it.findChild(block)?.let { return it }
+        }
+
+        if (block(it)) {
+            return it
+        }
+    }
+
+    return null
+}

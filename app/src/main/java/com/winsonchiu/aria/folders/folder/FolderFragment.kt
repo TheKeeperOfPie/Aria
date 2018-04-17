@@ -43,6 +43,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                 fragmentManager?.run {
                     val newFragment = Builder().build { folder put file.absolutePath }
                     FolderToFolderTransition.applyToFragment(newFragment)
+                    FolderToFolderTransition.applyToFragment(this@FolderFragment)
 
                     beginTransaction().setReorderingAllowed(true)
                             .replace(id, newFragment)
@@ -67,8 +68,8 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
         postponeEnterTransition(150)
 
         val folderSwipeRefresh = folderSwipeRefresh
-        val folderTitleText = folderTitleText
-        val folderRecyclerView = folderRecyclerView
+        val folderTitleText = folderTitleText.apply { transitionName = uniqueTransitionName + id }
+        val folderRecyclerView = folderRecyclerView.apply { transitionName = uniqueTransitionName + id }
 
         folderController.state
                 .map {

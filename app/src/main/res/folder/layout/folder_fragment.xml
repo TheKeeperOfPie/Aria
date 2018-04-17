@@ -5,7 +5,7 @@
     android:id="@+id/folderSwipeRefresh"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/black"
+    android:transitionGroup="true"
     >
 
     <android.support.constraint.ConstraintLayout
@@ -21,6 +21,7 @@
             android:paddingBottom="10dp"
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
+            android:background="@android:color/black"
             android:ellipsize="start"
             android:singleLine="true"
             android:textAppearance="@style/TextAppearance.AppCompat.Caption"
@@ -33,6 +34,7 @@
             android:id="@+id/folderRecyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
+            android:background="@android:color/black"
             app:fastScrollEnabled="true"
             app:fastScrollHorizontalThumbDrawable="@drawable/folder_fast_scroll_thumb_drawable"
             app:fastScrollHorizontalTrackDrawable="@drawable/folder_fast_scroll_track_drawable"

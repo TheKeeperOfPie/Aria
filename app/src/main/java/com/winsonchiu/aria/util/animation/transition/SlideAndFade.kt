@@ -2,11 +2,14 @@ package com.winsonchiu.aria.util.animation.transition
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.graphics.Color
 import android.support.transition.Fade
 import android.support.transition.Slide
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import com.winsonchiu.aria.util.animation.AnimationUtils
+import com.winsonchiu.aria.util.findChild
 
 /**
  * The do everything transition. Handles customizable equivalents for [Slide] and [Fade] plus
@@ -52,6 +55,10 @@ open class SlideAndFade(
         private val slideRawToY: Float? = null,
 
         private val onlyEndView: Boolean = false,
+
+        private val target: String? = null,
+
+        private val test: Boolean = false,
 
         forceVisible: Boolean = true,
 
@@ -104,7 +111,19 @@ open class SlideAndFade(
             }
         }
 
-        val view = (endView ?: startView) ?: return null
+        val view = if (target != null) {
+            Log.d("SlideAndFade", "onCreateAnimator called with target = $target, endView = $endView, startView = $startView")
+            val viewGroup = (endView ?: startView) as? ViewGroup ?: return null
+            viewGroup.findChild {
+                it.transitionName == target
+            }
+        } else {
+            endView ?: startView ?: return null
+        } ?: return null
+
+        if (test) {
+            view.setBackgroundColor(Color.RED)
+        }
 
         val startTranslationX = slideRawFromX ?: slideFractionFromX * sceneRoot.width
         val endTranslationX = slideRawToX ?: slideFractionToX * sceneRoot.width

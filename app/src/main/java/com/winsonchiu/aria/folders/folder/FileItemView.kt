@@ -32,6 +32,9 @@ class FileItemView @JvmOverloads constructor(
     var image: ArtworkCache.Metadata? = null
         @ModelProp set
 
+    var title: String? = null
+        @ModelProp set
+
     var description: String? = null
         @ModelProp set
 
@@ -55,7 +58,7 @@ class FileItemView @JvmOverloads constructor(
 
     @AfterPropsSet
     fun onChanged() {
-        fileNameText.text = file.name
+        fileNameText.text = title
 
         fileDescriptionText.textOrGone(description)
 

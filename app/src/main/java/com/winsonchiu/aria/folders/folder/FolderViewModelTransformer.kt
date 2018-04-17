@@ -4,7 +4,11 @@ import android.content.Context
 import android.support.annotation.WorkerThread
 import com.airbnb.epoxy.EpoxyModel
 import com.winsonchiu.aria.R
+import com.winsonchiu.aria.folders.util.FileDisplayAndSortMetadata
+import com.winsonchiu.aria.folders.util.FileSorter
+import com.winsonchiu.aria.folders.util.FileSorter.sortFileItemViewModels
 import com.winsonchiu.aria.music.MetadataExtractor
+import com.winsonchiu.aria.music.artistDisplayValue
 import java.io.File
 
 object FolderViewModelTransformer {
@@ -22,77 +26,151 @@ object FolderViewModelTransformer {
             return FileViewModel(
                     folder,
                     folderTitle,
-                    null,
                     emptyList()
             )
         }
 
-        val firstDescription = getFileDescription(context, files.first().metadata)
-        val areDescriptionsEqual = files.asSequence()
+        val firstMetadata = files.first().metadata
+        val firstArtist = firstMetadata.artistDisplayValue()
+        val firstAlbum = firstMetadata?.album
+        val areArtistsEqual = !firstArtist.isNullOrBlank() && files.asSequence()
                 .fold(true) { matches, it ->
-                    matches && firstDescription == getFileDescription(
-                            context,
-                            it.metadata
-                    )
+                    matches && firstArtist == it.metadata.artistDisplayValue()
+                }
+        val areAlbumsEqual = !firstAlbum.isNullOrBlank() && files.asSequence()
+                .fold(true) { matches, it ->
+                    matches && firstAlbum == it.metadata?.album
                 }
 
         val epoxyModels = mutableListOf<EpoxyModel<*>>()
 
-        if (!firstDescription.isNullOrBlank() && areDescriptionsEqual) {
+        val headerText = when {
+            areArtistsEqual && areAlbumsEqual -> context.getString(
+                    R.string.fileDescriptionFormatArtistAndAlbum,
+                    firstArtist,
+                    firstAlbum
+            )
+            areArtistsEqual -> context.getString(R.string.fileDescriptionFormatArtist, firstArtist)
+            areAlbumsEqual -> context.getString(R.string.fileDescriptionFormatAlbum, firstAlbum)
+            else -> null
+        }
+
+        if (!headerText.isNullOrBlank()) {
             epoxyModels += FileSectionHeaderViewModel_()
                     .id(-1)
-                    .text(firstDescription!!)
+                    .text(headerText!!)
         }
 
-        epoxyModels += files.map {
-            FileItemViewModel_()
-                    .id(it.file.name)
-                    .file(it.file)
-                    .image(it.image)
-                    .listener(listener)
-                    .apply {
-                        if (!areDescriptionsEqual) {
-                            description(
+        files.map(::getFileDisplayAndSortMetadata)
+
+        epoxyModels += files
+                .map(::getFileDisplayAndSortMetadata)
+                .toList()
+                .let { sortFileItemViewModels(it, FileSorter.Method.BY_NAME, false) }
+                .map {
+                    val (fileMetadata, displayTitle, sortKey) = it
+                    val (file, image, metadata) = fileMetadata
+                    FileItemViewModel_()
+                            .id(file.name)
+                            .file(file)
+                            .image(image)
+                            .listener(listener)
+                            .title(displayTitle)
+                            .description(
                                     getFileDescription(
                                             context,
-                                            it.metadata
+                                            metadata,
+                                            !areArtistsEqual,
+                                            !areAlbumsEqual
                                     )
                             )
-                        }
-                    }
-        }
-
-        val folderDescription = if (areDescriptionsEqual) null else firstDescription
+                }
+                .toList()
 
         return FileViewModel(
                 folder,
                 folderTitle,
-                folderDescription,
                 epoxyModels
         )
     }
 
+    private fun getFileDisplayAndSortMetadata(it: FolderController.FileMetadata): FileDisplayAndSortMetadata {
+        val fileSortKey = getFileSortKey(it.file)
+        val fileDisplayTitle = getFileDisplayTitle(fileSortKey)
+        return FileDisplayAndSortMetadata(it, fileDisplayTitle, fileSortKey)
+    }
+
     private fun getFolderTitle(folder: File) = folder.invariantSeparatorsPath
 
-    private fun getFileDescription(context: Context, metadata: MetadataExtractor.Metadata?): String? {
+    private fun getFileSortKey(file: File): String? {
+        val tags = mutableListOf<Char>()
+        val remaining = mutableListOf<Char>()
+        var insideBracket = false
+        var finished = false
+        file.name.forEach {
+            if (finished) {
+                remaining += it
+            } else {
+                when (it) {
+                    '[' -> insideBracket = true
+                    ']' -> insideBracket = false
+                }
+
+                when {
+                    it == '[' || it == ']' || insideBracket -> tags += it
+                    else -> {
+                        remaining += it
+                        if (!it.isWhitespace() && !it.isDigit() && it != '-') {
+                            finished = true
+                        }
+                    }
+                }
+            }
+        }
+
+        return String(remaining.toCharArray()).trim()
+    }
+
+    private fun getFileDisplayTitle(fileSortKey: String?): String? {
+        fileSortKey ?: return null
+        val startIndex = fileSortKey.indexOfFirst {
+            when (it) {
+                '-', '.' -> return@indexOfFirst false
+            }
+
+            !it.isDigit() && !it.isWhitespace()
+        }
+
+        return fileSortKey.drop(startIndex)
+    }
+
+    private fun getFileDescription(
+            context: Context,
+            metadata: MetadataExtractor.Metadata?,
+            showArtist: Boolean,
+            showAlbum: Boolean
+    ): String? {
         metadata ?: return null
 
         val resources = context.resources
-        val author = metadata.author
+        val artist = metadata.artistDisplayValue()
         val album = metadata.album
 
         fun String?.isShowable() = !isNullOrBlank()
                 && !equals("unknown", ignoreCase = true)
                 && !equals("null", ignoreCase = true)
 
+        val artistShowable = artist.isShowable() && showArtist
+        val albumShowable = album.isShowable() && showAlbum
+
         return when {
-            author.isShowable() && album.isShowable() -> resources.getString(
-                    R.string.fileDescriptionFormatAuthorAlbum,
-                    author,
+            artistShowable && albumShowable -> resources.getString(
+                    R.string.fileDescriptionFormatArtistAndAlbum,
+                    artist,
                     album
             )
-            author.isShowable() -> resources.getString(R.string.fileDescriptionFormatAuthor, author)
-            album.isShowable() -> resources.getString(R.string.fileDescriptionFormatAlbum, album)
+            artistShowable -> resources.getString(R.string.fileDescriptionFormatArtist, artist)
+            albumShowable -> resources.getString(R.string.fileDescriptionFormatAlbum, album)
             else -> null
         }
     }
@@ -100,7 +178,6 @@ object FolderViewModelTransformer {
     data class FileViewModel(
             val folder: File,
             val folderTitle: String?,
-            val folderDescription: String?,
             val models: List<EpoxyModel<*>>
     )
 }
