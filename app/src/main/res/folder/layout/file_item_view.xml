@@ -17,23 +17,12 @@
         android:layout_marginBottom="4dp"
         android:layout_marginStart="16dp"
         android:background="@color/folderFileDefaultBackground"
+        android:foreground="@drawable/folder_file_image_directory"
         android:scaleType="centerCrop"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="4dp"
-        />
-
-    <com.winsonchiu.aria.view.MaskedImageView
-        android:id="@+id/fileImageOverlay"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:background="@drawable/folder_file_image_directory"
-        app:layout_constraintBottom_toBottomOf="@id/fileImage"
-        app:layout_constraintEnd_toEndOf="@id/fileImage"
-        app:layout_constraintStart_toStartOf="@id/fileImage"
-        app:layout_constraintTop_toTopOf="@id/fileImage"
-        app:radius="4dp"
+        app:radius="6dp"
         />
 
     <TextView

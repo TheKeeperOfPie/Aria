@@ -1,13 +1,22 @@
 package com.winsonchiu.aria.util
 
-import com.winsonchiu.aria.BuildConfig
-
 object Failsafe {
+
+    private const val PRINT_TRACE = false
+
+    fun <T> orNull(block: () -> T) = try {
+        block()
+    } catch (e: Exception) {
+        if (PRINT_TRACE) {
+            e.printStackTrace()
+        }
+        null
+    }
 
     fun <T> withDefault(default: T, block: () -> T) = try {
         block()
     } catch (e: Exception) {
-        if (BuildConfig.DEBUG) {
+        if (PRINT_TRACE) {
             e.printStackTrace()
         }
         default
@@ -16,7 +25,7 @@ object Failsafe {
     fun <T> withDefault(default: () -> T, block: () -> T) = try {
         block()
     } catch (e: Exception) {
-        if (BuildConfig.DEBUG) {
+        if (PRINT_TRACE) {
             e.printStackTrace()
         }
         default

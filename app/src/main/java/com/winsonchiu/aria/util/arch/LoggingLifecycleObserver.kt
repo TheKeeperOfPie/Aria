@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.util
+package com.winsonchiu.aria.util.arch
 
 import android.arch.lifecycle.DefaultLifecycleObserver
 import android.arch.lifecycle.LifecycleOwner

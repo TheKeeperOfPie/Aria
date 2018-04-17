@@ -5,12 +5,21 @@ import android.os.Bundle
 import android.support.annotation.CallSuper
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
+import com.jakewharton.rxrelay2.PublishRelay
+import com.uber.autodispose.AutoDispose
+import com.uber.autodispose.FlowableSubscribeProxy
+import com.uber.autodispose.ObservableSubscribeProxy
+import com.uber.autodispose.ScopeProvider
+import com.uber.autodispose.SingleSubscribeProxy
 import com.winsonchiu.aria.fragment.FragmentInitializer
-import com.winsonchiu.aria.util.LoggingLifecycleObserver
+import com.winsonchiu.aria.util.arch.LoggingLifecycleObserver
+import io.reactivex.Flowable
+import io.reactivex.Observable
+import io.reactivex.Single
 import java.lang.ref.WeakReference
 import kotlin.reflect.KProperty
 
-abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, FragmentManager.OnBackStackChangedListener {
+abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, FragmentManager.OnBackStackChangedListener, ScopeProvider {
 
     private val args = mutableListOf<ArgumentDelegate<*>>()
 
@@ -19,6 +28,8 @@ abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, Fragm
     private var isInBackStack = false
 
     private var fragmentReference: WeakReference<Fragment>? = null
+
+    private var onFinalDestroyRelay = PublishRelay.create<Unit>()
 
     @CallSuper
     fun initialize(fragment: Fragment) {
@@ -40,14 +51,13 @@ abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, Fragm
 
     @CallSuper
     protected open fun onFinalDestroy(fragment: Fragment) {
-
+        onFinalDestroyRelay.accept(Unit)
     }
 
+    override fun requestScope() = onFinalDestroyRelay.firstElement()
+
     override fun onBackStackChanged() {
-        /*
-            There is no hook for when a Fragment is popped off the back stack, so track all changes
-            until the attached Fragment is no longer in the back stack.
-         */
+        // TODO: See if ViewModel.onCleared is a better solution
         fragmentReference?.get()?.let {
             val backStackNesting = Fragment::class.java.getDeclaredField("mBackStackNesting")
                     .apply { isAccessible = true }
@@ -84,6 +94,18 @@ abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, Fragm
 
     fun <T : Any?> arg(arg: FragmentInitializer<*>.Arg<T?>) = ArgumentDelegate(arg).also {
         args.add(it)
+    }
+
+    fun <T> Single<T>.bindToLifecycle(): SingleSubscribeProxy<T> {
+        return `as`(AutoDispose.autoDisposable(this@FragmentLifecycleBoundComponent))
+    }
+
+    fun <T> Flowable<T>.bindToLifecycle(): FlowableSubscribeProxy<T> {
+        return `as`(AutoDispose.autoDisposable(this@FragmentLifecycleBoundComponent))
+    }
+
+    fun <T> Observable<T>.bindToLifecycle(): ObservableSubscribeProxy<T> {
+        return `as`(AutoDispose.autoDisposable(this@FragmentLifecycleBoundComponent))
     }
 
     class ArgumentDelegate<Type>(

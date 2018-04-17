@@ -5,6 +5,7 @@ import android.os.Environment
 import android.view.View
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.folders.folder.FolderFragment
+import com.winsonchiu.aria.folders.folder.FolderToFolderTransition
 import com.winsonchiu.aria.fragment.build
 import com.winsonchiu.aria.fragment.subclass.BaseFragment
 import com.winsonchiu.aria.home.HomeFragmentDaggerComponent
@@ -22,35 +23,36 @@ class FolderRootFragment : BaseFragment<HomeFragmentDaggerComponent, FolderRootF
         super.onViewCreated(view, savedInstanceState)
 
         if (!childFragmentManager.hasFragment(R.id.folder_root_fragment_container)) {
-            val musicDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
-            val directories = mutableListOf(musicDirectory)
+            buildAndCommitInitialBackStack()
+        }
+    }
 
-            var currentFile = musicDirectory.parentFile
-            while (currentFile?.canRead() == true) {
-                directories.add(currentFile)
-                currentFile = currentFile.parentFile
-            }
+    private fun buildAndCommitInitialBackStack() {
+        val musicDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_MUSIC)
+        val directories = mutableListOf(musicDirectory)
 
-            var hasAddedFirst = false
+        var currentFile = musicDirectory.parentFile
+        while (currentFile?.canRead() == true) {
+            directories.add(currentFile)
+            currentFile = currentFile.parentFile
+        }
 
-            directories.reversed()
-                    .forEach {
-                        val fragment = FolderFragment.Builder().build {
-                            folder put it.absolutePath
-                        }
-
-                        childFragmentManager.beginTransaction()
-                                .replace(R.id.folder_root_fragment_container, fragment)
-                                .apply {
-                                    if (hasAddedFirst) {
-                                        addToBackStack(null)
-                                    }
-                                }
-                                .commit()
-
-                        hasAddedFirst = true
+        directories.reversed()
+                .forEachIndexed { index, file ->
+                    val fragment = FolderFragment.Builder().build {
+                        folder put file.absolutePath
                     }
 
-        }
+                    FolderToFolderTransition.applyToFragment(fragment)
+
+                    childFragmentManager.beginTransaction()
+                            .replace(R.id.folder_root_fragment_container, fragment)
+                            .apply {
+                                if (index > 0) {
+                                    addToBackStack(file.absolutePath)
+                                }
+                            }
+                            .commit()
+                }
     }
 }

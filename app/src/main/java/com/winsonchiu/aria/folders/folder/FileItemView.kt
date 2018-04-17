@@ -16,7 +16,6 @@ import com.winsonchiu.aria.util.initialize
 import com.winsonchiu.aria.util.textOrGone
 import kotlinx.android.synthetic.main.file_item_view.view.fileDescriptionText
 import kotlinx.android.synthetic.main.file_item_view.view.fileImage
-import kotlinx.android.synthetic.main.file_item_view.view.fileImageOverlay
 import kotlinx.android.synthetic.main.file_item_view.view.fileNameText
 import java.io.File
 
@@ -40,10 +39,13 @@ class FileItemView @JvmOverloads constructor(
         @ModelProp(ModelProp.Option.DoNotHash) set
 
     @BindDrawable(R.drawable.folder_file_image_directory)
-    lateinit var fileImageForeground: Drawable
+    lateinit var overlayImageDirectory: Drawable
 
     @BindDrawable(R.drawable.folder_file_image_music)
-    lateinit var imageMusic: Drawable
+    lateinit var overlayImageMusic: Drawable
+
+    @BindDrawable(R.color.folderOverlayGray)
+    lateinit var overlayColor: Drawable
 
     init {
         initialize(R.layout.file_item_view)
@@ -60,10 +62,10 @@ class FileItemView @JvmOverloads constructor(
         val image = image
 
         fileImage.setImageBitmap(image?.bitmap)
-
-        fileImageOverlay.background = when {
-            file.isDirectory -> fileImageForeground
-            image != null && image.bitmap == null -> imageMusic
+        fileImage.foreground = when {
+            file.isDirectory -> overlayImageDirectory
+            image != null && image.bitmap == null -> overlayImageMusic
+            image == null -> overlayColor
             else -> null
         }
     }

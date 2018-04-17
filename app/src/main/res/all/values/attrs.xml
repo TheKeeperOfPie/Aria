@@ -1,27 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <declare-styleable name="ForegroundImageView">
-        <attr name="android:foreground" />
-        <attr name="android:background" />
-    </declare-styleable>
-
-    <declare-styleable name="RoundedView">
-        <attr name="cornerRadius" />
-        <attr name="cornerRadiusX" />
-        <attr name="cornerRadiusY" />
-        <attr name="cornersRounded" />
-    </declare-styleable>
-
-    <declare-styleable name="RoundedForegroundImageView">
-        <attr name="android:foreground" />
-        <attr name="android:background" />
-        <attr name="cornerRadius" />
-        <attr name="cornerRadiusX" />
-        <attr name="cornerRadiusY" />
-        <attr name="cornersRounded" />
-    </declare-styleable>
-
     <declare-styleable name="MaskedImageView">
         <attr name="radius" format="dimension" />
     </declare-styleable>

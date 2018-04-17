@@ -8,10 +8,13 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
+import android.support.annotation.WorkerThread
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.dagger.HomeFragmentScreenScope
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileFilters.COVER_IMAGE_REGEX
+import com.winsonchiu.aria.util.Failsafe
+import com.winsonchiu.aria.util.dpToPx
 import java.io.File
 import java.util.Arrays
 import javax.inject.Inject
@@ -28,39 +31,34 @@ class ArtworkExtractor @Inject constructor(
 
     private val knownEmptyFolders = mutableSetOf<File>()
 
+    private val targetSize by lazy { 40.dpToPx(application) }
+
+    @WorkerThread
     fun getArtworkForFile(file: File, cache: ArtworkCache): ArtworkCache.Metadata? {
         cache[file.absolutePath]?.let { return it }
 
         val metadata = (searchEmbedded(file, cache)
                 ?: searchMediaStore(file, cache)
-                ?: searchFolderForCover(file, cache)
-                ?: searchFolderForCover(file.parentFile, cache)
-                ?: searchFolderForCover(file.parentFile?.parentFile, cache))
+                ?: searchFolderForCover(file, file, cache)
+                ?: searchFolderForCover(file, file.parentFile, cache)
+                ?: searchFolderForCover(file, file.parentFile?.parentFile, cache))
 
         if (metadata == null && !file.isDirectory) {
+            // If we're found nothing and this isn't a directory, we know for sure there's no image
             return cache.getOrPut(file.absolutePath) { ArtworkCache.EMPTY }
         }
 
         return metadata
     }
 
+    @WorkerThread
     fun getArtworkWithFileDepthSearch(file: File, cache: ArtworkCache): ArtworkCache.Metadata? {
         return getArtworkForFile(file, cache)
                 ?: searchFolderForFirst(file, cache)
                 ?: cache.getOrPut(file.absolutePath) { ArtworkCache.EMPTY }
     }
 
-    private fun <T> failsafeTry(block: () -> T) = try {
-        block()
-    } catch (e: Exception) {
-        null
-    }
-
-    private fun searchEmbedded(file: File, cache: ArtworkCache) = failsafeTry {
-        if (file.isDirectory) {
-            return@failsafeTry null
-        }
-
+    private fun searchEmbedded(file: File, cache: ArtworkCache) = Failsafe.orNull {
         mediaMetadataRetriever.get().run {
             setDataSource(file.absolutePath)
             embeddedPicture?.let {
@@ -71,11 +69,7 @@ class ArtworkExtractor @Inject constructor(
         }
     }
 
-    private fun searchMediaStore(file: File, cache: ArtworkCache) = failsafeTry {
-        if (file.isDirectory) {
-            return@failsafeTry null
-        }
-
+    private fun searchMediaStore(file: File, cache: ArtworkCache) = Failsafe.orNull {
         val mediaStoreUri = MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
         val columns = arrayOf(MediaStore.Audio.Media.ALBUM_ID)
         val where = "${MediaStore.Audio.Media.IS_MUSIC} = ? AND ${MediaStore.Audio.Media.DATA} = ?"
@@ -90,49 +84,32 @@ class ArtworkExtractor @Inject constructor(
             val albumId = it.getLong(it.getColumnIndexOrThrow(MediaStore.Audio.Media.ALBUM_ID))
             val artworkUri = Uri.parse("content://media/external/audio/albumart")
             ContentUris.withAppendedId(artworkUri, albumId)
-        }
+        } ?: return@orNull null
 
-        if (uri == null) {
-            null
-        } else {
-            cacheArtwork(file, cache, uri.toString()) {
-                Picasso.get().load(uri).get()
-            }
+        cacheArtwork(file, cache, uri.toString()) {
+            Picasso.get().load(uri).resize(targetSize, targetSize).get()
         }
     }
 
-    private fun searchFolderForCover(file: File?, cache: ArtworkCache) = failsafeTry {
-        if (file?.isDirectory != true) {
-            return@failsafeTry null
-        }
-
-        val coverImage = file.listFiles(FileFilters.IMAGES)
-                .asSequence()
-                .find {
+    private fun searchFolderForCover(sourceFile: File, folderToSearch: File?, cache: ArtworkCache) = Failsafe.orNull {
+        val coverImage = folderToSearch?.listFiles(FileFilters.IMAGES)
+                ?.find {
                     it.name.matches(COVER_IMAGE_REGEX)
-                }
+                } ?: return@orNull null
 
-        if (coverImage == null) {
-            null
-        } else {
-            cacheArtwork(file, cache, coverImage.absolutePath) {
-                Picasso.get().load(Uri.fromFile(coverImage)).get()
-            }
+        cacheArtwork(sourceFile, cache, coverImage.absolutePath) {
+            Picasso.get().load(Uri.fromFile(coverImage)).resize(targetSize, targetSize).get()
         }
     }
 
-    private fun searchFolderForFirst(file: File?, cache: ArtworkCache) = failsafeTry {
-        if (file?.isDirectory != true) {
-            return@failsafeTry null
-        }
-
-        val bitmap = file.walkTopDown()
-                .maxDepth(3)
-                .onEnter { !knownEmptyFolders.contains(it) }
-                .onLeave { knownEmptyFolders.add(it) }
-                .find { !it.isDirectory && getArtworkForFile(it, cache)?.bitmap != null }
+    private fun searchFolderForFirst(file: File?, cache: ArtworkCache) = Failsafe.orNull {
+        val bitmap = file?.walkTopDown()
+                ?.maxDepth(3)
+                ?.onEnter { !knownEmptyFolders.contains(it) }
+                ?.onLeave { knownEmptyFolders.add(it) }
+                ?.find { !it.isDirectory && getArtworkForFile(it, cache)?.bitmap != null }
                 ?.let { cache[it.absolutePath]?.bitmap }
-                ?: return@failsafeTry null
+                ?: return@orNull null
 
         cacheArtwork(file, cache, file.absolutePath) {
             bitmap
@@ -151,11 +128,20 @@ class ArtworkExtractor @Inject constructor(
         }
 
         return bitmapGenerator()
+                .let(::scaleIfNecessary)
                 .let {
                     val metadata = ArtworkCache.Metadata(it)
                     cache[file.absolutePath] = metadata
                     cache[key] = metadata
                     metadata
                 }
+    }
+
+    private fun scaleIfNecessary(bitmap: Bitmap): Bitmap {
+        return if (bitmap.width != targetSize || bitmap.height != targetSize) {
+            Bitmap.createScaledBitmap(bitmap, targetSize, targetSize, true)
+        } else {
+            bitmap
+        }
     }
 }

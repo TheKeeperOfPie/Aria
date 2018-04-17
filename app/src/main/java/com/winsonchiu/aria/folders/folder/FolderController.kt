@@ -17,6 +17,7 @@ import io.reactivex.Single
 import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
 import java.io.File
+import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @FragmentScreenScope
@@ -29,6 +30,8 @@ class FolderController @Inject constructor(
     val folderContents = BehaviorRelay.create<Model>()
     val state = BehaviorRelay.createDefault<RequestState>(RequestState.NONE)
 
+    private val stateChange = BehaviorRelay.createDefault<RequestState>(RequestState.NONE)
+
     private val folder by arg(FolderFragment.Args.folder)
 
     private val folderFile = Single.fromCallable {
@@ -39,23 +42,22 @@ class FolderController @Inject constructor(
         }
     }.cache()
 
-    private val files = folderFile
-            .map {
-                (it.listFiles(FileFilters.AUDIO.withFolders()) ?: emptyArray())
-                        .toList()
-                        .let { FileSorter.sort(it, FileSorter.Method.BY_NAME) }
-                        .map {
-                            FileMetadata(
-                                    it,
-                                    null,
-                                    metadataExtractor.extract(it)
-                            )
-                        }
-            }
-            .cache()
+    private val files = folderFile.map {
+        (it.listFiles(FileFilters.AUDIO.withFolders()) ?: emptyArray())
+                .toList()
+                .let { FileSorter.sort(it, FileSorter.Method.BY_NAME) }
+                .map {
+                    FileMetadata(
+                            it,
+                            null,
+                            metadataExtractor.extract(it)
+                    )
+                }
+    }.cache()
 
-    private val filesWithArtwork =
-            files.map { it.map { it.copy(image = artworkExtractor.getArtworkForFile(it.file, artworkCache)) } }
+    private val filesWithArtwork = files.map {
+        it.map { it.copy(image = artworkExtractor.getArtworkForFile(it.file, artworkCache)) }
+    }
 
     private val filesWithArtworkAndDepthSearch = filesWithArtwork.map {
         it.map {
@@ -68,17 +70,23 @@ class FolderController @Inject constructor(
         }
     }
 
+    init {
+        stateChange.debounce(500, TimeUnit.MILLISECONDS)
+                .subscribe(state)
+    }
+
     @SuppressLint("CheckResult")
     override fun onFirstInitialize(fragment: Fragment) {
         super.onFirstInitialize(fragment)
         files.mergeWith(filesWithArtwork)
                 .mergeWith(filesWithArtworkAndDepthSearch)
                 .subscribeOn(Schedulers.io())
-                .doOnSubscribe { state.accept(RequestState.LOADING) }
-                .doFinally { state.accept(RequestState.DONE) }
+                .doOnSubscribe { stateChange.accept(RequestState.LOADING) }
+                .doFinally { stateChange.accept(RequestState.DONE) }
                 .withLatestFrom(folderFile.toFlowable(), BiFunction<List<FileMetadata>, File, Model> { it, folderFile ->
                     Model(folderFile, it)
                 })
+                .bindToLifecycle()
                 .subscribe(folderContents)
     }
 
@@ -86,11 +94,12 @@ class FolderController @Inject constructor(
     fun refresh() {
         filesWithArtwork.mergeWith(filesWithArtworkAndDepthSearch)
                 .subscribeOn(Schedulers.io())
-                .doOnSubscribe { state.accept(RequestState.LOADING) }
-                .doFinally { state.accept(RequestState.DONE) }
+                .doOnSubscribe { stateChange.accept(RequestState.LOADING) }
+                .doFinally { stateChange.accept(RequestState.DONE) }
                 .withLatestFrom(folderFile.toFlowable(), BiFunction<List<FileMetadata>, File, Model> { it, folderFile ->
                     Model(folderFile, it)
                 })
+                .bindToLifecycle()
                 .subscribe(folderContents)
     }
 
