@@ -42,7 +42,8 @@ android {
             res.srcDirs = [
                     "/src/main/res/all",
                     "/src/main/res/folder",
-                    "/src/main/res/home"
+                    "/src/main/res/home",
+                    "/src/main/res/media"
             ]
         }
     }
@@ -130,6 +131,8 @@ dependencies {
     implementation "com.uber.autodispose:autodispose-android:$autoDisposeVersion"
     implementation "com.uber.autodispose:autodispose-kotlin:$autoDisposeVersion"
     implementation "com.uber.autodispose:autodispose:$autoDisposeVersion"
+
+    implementation 'com.google.android.exoplayer:exoplayer-core:2.7.3'
 }
 
 dependencies {

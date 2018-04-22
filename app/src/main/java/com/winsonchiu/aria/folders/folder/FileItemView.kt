@@ -17,7 +17,6 @@ import com.winsonchiu.aria.util.textOrGone
 import kotlinx.android.synthetic.main.file_item_view.view.fileDescriptionText
 import kotlinx.android.synthetic.main.file_item_view.view.fileImage
 import kotlinx.android.synthetic.main.file_item_view.view.fileNameText
-import java.io.File
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class FileItemView @JvmOverloads constructor(
@@ -26,7 +25,7 @@ class FileItemView @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
-    lateinit var file: File
+    lateinit var fileMetadata: FolderController.FileMetadata
         @ModelProp set
 
     var image: ArtworkCache.Metadata? = null
@@ -66,7 +65,7 @@ class FileItemView @JvmOverloads constructor(
 
         fileImage.setImageBitmap(image?.bitmap)
         fileImage.foreground = when {
-            file.isDirectory -> overlayImageDirectory
+            fileMetadata.file.isDirectory -> overlayImageDirectory
             image != null && image.bitmap == null -> overlayImageMusic
             image == null -> overlayColor
             else -> null
@@ -75,10 +74,10 @@ class FileItemView @JvmOverloads constructor(
 
     @OnClick()
     fun onClick() {
-        listener?.onClick(file)
+        listener?.onClick(fileMetadata)
     }
 
     interface Listener {
-        fun onClick(file: File)
+        fun onClick(fileMetadata: FolderController.FileMetadata)
     }
 }

@@ -6,6 +6,7 @@ import android.database.DatabaseUtils
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
+import android.media.ThumbnailUtils
 import android.net.Uri
 import android.provider.MediaStore
 import android.support.annotation.WorkerThread
@@ -31,7 +32,7 @@ class ArtworkExtractor @Inject constructor(
 
     private val knownEmptyFolders = mutableSetOf<File>()
 
-    private val targetSize by lazy { 40.dpToPx(application) }
+    private val targetSize by lazy { 60.dpToPx(application) }
 
     @WorkerThread
     fun getArtworkForFile(file: File, cache: ArtworkCache): ArtworkCache.Metadata? {
@@ -87,7 +88,12 @@ class ArtworkExtractor @Inject constructor(
         } ?: return@orNull null
 
         cacheArtwork(file, cache, uri.toString()) {
-            Picasso.get().load(uri).resize(targetSize, targetSize).get()
+            Picasso.get()
+                    .load(uri)
+                    .centerCrop()
+                    .resize(targetSize, targetSize)
+                    .onlyScaleDown()
+                    .get()
         }
     }
 
@@ -98,7 +104,12 @@ class ArtworkExtractor @Inject constructor(
                 } ?: return@orNull null
 
         cacheArtwork(sourceFile, cache, coverImage.absolutePath) {
-            Picasso.get().load(Uri.fromFile(coverImage)).resize(targetSize, targetSize).get()
+            Picasso.get()
+                    .load(Uri.fromFile(coverImage))
+                    .centerCrop()
+                    .resize(targetSize, targetSize)
+                    .onlyScaleDown()
+                    .get()
         }
     }
 
@@ -139,7 +150,7 @@ class ArtworkExtractor @Inject constructor(
 
     private fun scaleIfNecessary(bitmap: Bitmap): Bitmap {
         return if (bitmap.width != targetSize || bitmap.height != targetSize) {
-            Bitmap.createScaledBitmap(bitmap, targetSize, targetSize, true)
+            ThumbnailUtils.extractThumbnail(bitmap, targetSize, targetSize, ThumbnailUtils.OPTIONS_RECYCLE_INPUT)
         } else {
             bitmap
         }

@@ -2,8 +2,8 @@ package com.winsonchiu.aria.folders.folder
 
 import com.winsonchiu.aria.dagger.FragmentScreenScope
 import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
+import dagger.Binds
 import dagger.Module
-import dagger.Provides
 import dagger.Subcomponent
 import dagger.multibindings.IntoSet
 
@@ -17,10 +17,10 @@ interface FolderFragmentDaggerComponent {
 }
 
 @Module
-class FolderFragmentModule {
+abstract class FolderFragmentModule {
 
-    @Provides
+    @Binds
     @IntoSet
     @FragmentScreenScope
-    fun bindFolderController(folderController: FolderController): FragmentLifecycleBoundComponent = folderController
+    abstract fun bindFolderController(folderController: FolderController): FragmentLifecycleBoundComponent
 }

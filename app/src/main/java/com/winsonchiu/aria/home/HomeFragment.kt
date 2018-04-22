@@ -3,7 +3,7 @@ package com.winsonchiu.aria.home
 import android.os.Bundle
 import android.view.View
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.dagger.ActivityComponent
+import com.winsonchiu.aria.dagger.activity.ActivityComponent
 import com.winsonchiu.aria.fragment.subclass.BaseFragment
 import kotlinx.android.synthetic.main.home_fragment.homeTabLayout
 import kotlinx.android.synthetic.main.home_fragment.pager

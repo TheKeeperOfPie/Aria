@@ -4,7 +4,6 @@ import android.content.Context
 import android.support.annotation.LayoutRes
 import android.support.v7.widget.RecyclerView
 import android.util.DisplayMetrics
-import android.util.Log
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
@@ -63,7 +62,6 @@ fun Float.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(Typ
 
 fun ViewGroup.findChild(block: (child: View) -> Boolean): View? {
     children.forEach {
-        Log.d("ViewUtils", "findChild called with child = $it, transitionName = ${it.transitionName}")
         if (it is ViewGroup) {
             it.findChild(block)?.let { return it }
         }

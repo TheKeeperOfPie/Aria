@@ -10,13 +10,14 @@ import com.winsonchiu.aria.folders.root.FolderRootFragmentDaggerComponent
 import com.winsonchiu.aria.fragment.FragmentInitializer
 import com.winsonchiu.aria.fragment.build
 import com.winsonchiu.aria.fragment.subclass.BaseFragment
+import com.winsonchiu.aria.media.MediaBrowserConnection
+import com.winsonchiu.aria.media.MediaDelegate
 import com.winsonchiu.aria.util.dpToPx
 import com.winsonchiu.aria.util.setDataForView
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.folder_fragment.folderRecyclerView
 import kotlinx.android.synthetic.main.folder_fragment.folderSwipeRefresh
 import kotlinx.android.synthetic.main.folder_fragment.folderTitleText
-import java.io.File
 import javax.inject.Inject
 
 class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFragmentDaggerComponent>() {
@@ -37,8 +38,15 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
     @Inject
     lateinit var folderController: FolderController
 
+    @Inject
+    lateinit var mediaDelegate: MediaDelegate
+
+    @Inject
+    lateinit var mediaBrowserConnection: MediaBrowserConnection
+
     private val listener = object : FileItemView.Listener {
-        override fun onClick(file: File) {
+        override fun onClick(fileMetadata: FolderController.FileMetadata) {
+            val file = fileMetadata.file
             if (file.isDirectory) {
                 fragmentManager?.run {
                     val newFragment = Builder().build { folder put file.absolutePath }
@@ -50,6 +58,9 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                             .addToBackStack(null)
                             .commit()
                 }
+            } else {
+                folderController.playFolder()
+                mediaBrowserConnection.mediaController.transportControls.play()
             }
         }
     }

@@ -72,7 +72,7 @@ object FolderViewModelTransformer {
                     val (file, image, metadata) = fileMetadata
                     FileItemViewModel_()
                             .id(file.name)
-                            .file(file)
+                            .fileMetadata(fileMetadata)
                             .image(image)
                             .listener(listener)
                             .title(displayTitle)

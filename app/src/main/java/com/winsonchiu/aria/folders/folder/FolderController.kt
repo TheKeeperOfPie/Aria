@@ -10,6 +10,7 @@ import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileSorter
 import com.winsonchiu.aria.folders.util.withFolders
+import com.winsonchiu.aria.media.MediaQueue
 import com.winsonchiu.aria.music.MetadataExtractor
 import com.winsonchiu.aria.music.artwork.ArtworkCache
 import com.winsonchiu.aria.music.artwork.ArtworkExtractor
@@ -24,7 +25,8 @@ import javax.inject.Inject
 class FolderController @Inject constructor(
         private val metadataExtractor: MetadataExtractor,
         private val artworkExtractor: ArtworkExtractor,
-        private val artworkCache: ArtworkCache
+        private val artworkCache: ArtworkCache,
+        private val mediaQueue: MediaQueue
 ) : FragmentLifecycleBoundComponent() {
 
     val folderContents = BehaviorRelay.create<Model>()
@@ -101,6 +103,13 @@ class FolderController @Inject constructor(
                 })
                 .bindToLifecycle()
                 .subscribe(folderContents)
+    }
+
+    fun playFolder() {
+        folderContents.value.files.map {
+            MediaQueue.QueueItem(it.file, it.metadata)
+        }
+                .also { mediaQueue.set(it, 0) }
     }
 
     data class Model(

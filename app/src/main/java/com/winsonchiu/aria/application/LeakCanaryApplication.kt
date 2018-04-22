@@ -6,7 +6,7 @@ import android.os.StrictMode
 import android.support.annotation.CallSuper
 import com.squareup.leakcanary.LeakCanary
 import com.winsonchiu.aria.BuildConfig
-import com.winsonchiu.aria.MainActivity
+import com.winsonchiu.aria.activity.MainActivity
 
 @SuppressLint("Registered")
 abstract class LeakCanaryApplication : Application() {

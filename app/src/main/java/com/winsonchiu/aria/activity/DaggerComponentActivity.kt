@@ -1,14 +1,13 @@
-package com.winsonchiu.aria
+package com.winsonchiu.aria.activity
 
 import android.os.Bundle
+import android.support.annotation.CallSuper
 import android.support.v7.app.AppCompatActivity
 import com.winsonchiu.aria.application.AriaApplication
-import com.winsonchiu.aria.dagger.ActivityComponent
 import com.winsonchiu.aria.dagger.ApplicationComponent
-import com.winsonchiu.aria.home.HomeFragment
-import com.winsonchiu.aria.util.hasFragment
+import com.winsonchiu.aria.dagger.activity.ActivityComponent
 
-class MainActivity : AppCompatActivity() {
+abstract class DaggerComponentActivity : AppCompatActivity() {
 
     companion object {
         val ACTIVITY_COMPONENT = "${MainActivity::class.java.canonicalName}.ACTIVITY_COMPONENT"
@@ -18,17 +17,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        setContentView(R.layout.activity_main)
-
-        if (!supportFragmentManager.hasFragment(R.id.main_activity_fragment_container)) {
-            val homeFragment = HomeFragment()
-            supportFragmentManager.beginTransaction()
-                    .replace(R.id.main_activity_fragment_container, homeFragment)
-                    .setPrimaryNavigationFragment(homeFragment)
-                    .commitNow()
-        }
+        injectSelf(activityComponent)
     }
+
+    abstract fun injectSelf(activityComponent: ActivityComponent)
 
     private fun makeActivityComponent() : ActivityComponent {
         val applicationComponent = application.getSystemService(AriaApplication.APPLICATION_COMPONENT) as ApplicationComponent
@@ -36,14 +28,16 @@ class MainActivity : AppCompatActivity() {
         return lastActivityComponent ?: applicationComponent.activityComponent()
     }
 
-    override fun onRetainCustomNonConfigurationInstance() = activityComponent
+    final override fun onRetainCustomNonConfigurationInstance() = activityComponent
 
+    @CallSuper
     @Suppress("HasPlatformType")
     override fun getSystemService(name: String?) = when (name) {
         ACTIVITY_COMPONENT -> activityComponent
         else -> super.getSystemService(name)
     }
 
+    @CallSuper
     @Suppress("HasPlatformType")
     override fun getSystemServiceName(serviceClass: Class<*>?) = when (serviceClass) {
         ActivityComponent::class.java -> ACTIVITY_COMPONENT

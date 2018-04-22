@@ -1,5 +1,8 @@
 package com.winsonchiu.aria.dagger
 
+import com.winsonchiu.aria.dagger.activity.ActivityComponent
+import com.winsonchiu.aria.media.MediaPlayer
+import com.winsonchiu.aria.media.MediaService
 import dagger.Component
 
 @ApplicationScope
@@ -19,4 +22,8 @@ interface ApplicationComponent {
     }
 
     fun activityComponent(): ActivityComponent
+
+    fun inject(mediaService: MediaService)
+
+    fun inject(mediaPlayer: MediaPlayer)
 }

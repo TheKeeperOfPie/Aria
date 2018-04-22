@@ -2,7 +2,7 @@ package com.winsonchiu.aria.fragment.subclass
 
 import android.content.Context
 import android.support.v4.app.Fragment
-import com.winsonchiu.aria.MainActivity
+import com.winsonchiu.aria.activity.DaggerComponentActivity
 import com.winsonchiu.aria.fragment.FragmentLoader
 import com.winsonchiu.aria.fragment.FragmentLoaderCallback
 
@@ -22,7 +22,7 @@ abstract class InjectingFragment<in ParentComponent, ChildComponent> : Fragment(
 
         if (loader.fragmentComponent == null) {
             val parentComponent = (parentFragment as? InjectingFragment<*, *>)?.loader?.fragmentComponent
-                    ?: context.getSystemService(MainActivity.ACTIVITY_COMPONENT)
+                    ?: context.getSystemService(DaggerComponentActivity.ACTIVITY_COMPONENT)
 
             loader.fragmentComponent = makeComponent(parentComponent as ParentComponent)
         }

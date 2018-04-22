@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="folderOverlayGray">#55000000</color>
-    <color name="folderOverlayIcon">#99FFFFFF</color>
-    <color name="folderFileDefaultBackground">#66FFFFFF</color>
+    <color name="folderOverlayGray">#33000000</color>
+    <color name="folderOverlayIcon">#CCFFFFFF</color>
+    <color name="folderFileDefaultBackground">#44FFFFFF</color>
 
     <color name="folderFastScrollTrackBackground">#00FFFFFF</color>
     <color name="folderFastScrollThumbBackground">#55FFFFFF</color>
