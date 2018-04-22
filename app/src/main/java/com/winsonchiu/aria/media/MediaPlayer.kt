@@ -1,46 +1,36 @@
 package com.winsonchiu.aria.media
 
-import android.content.Intent
-import android.net.Uri
-import android.support.v4.content.ContextCompat
-import android.support.v4.media.AudioAttributesCompat.CONTENT_TYPE_MUSIC
+import android.media.AudioAttributes
+import android.media.AudioAttributes.CONTENT_TYPE_MUSIC
+import android.media.AudioAttributes.USAGE_MEDIA
+import android.media.MediaPlayer
+import android.os.SystemClock
 import android.support.v4.media.session.PlaybackStateCompat
-import com.google.android.exoplayer2.C.USAGE_MEDIA
-import com.google.android.exoplayer2.ExoPlayerFactory
-import com.google.android.exoplayer2.Player
-import com.google.android.exoplayer2.audio.AudioAttributes
-import com.google.android.exoplayer2.source.ExtractorMediaSource
-import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
-import com.google.android.exoplayer2.upstream.DefaultDataSourceFactory
-import com.google.android.exoplayer2.util.Util
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
-import com.winsonchiu.aria.R
 import com.winsonchiu.aria.application.AriaApplication
 import com.winsonchiu.aria.dagger.ApplicationComponent
 import com.winsonchiu.aria.media.util.LoggingMediaSessionCallback
-import com.winsonchiu.aria.media.util.toMediaMetadata
 import com.winsonchiu.aria.util.arch.LoggingLifecycleObserver
 import javax.inject.Inject
 
-class MediaPlayer(
-        val service: MediaService,
-        private val mediaNotificationManager: MediaNotificationManager
-) : LoggingLifecycleObserver, LoggingMediaSessionCallback() {
+class MediaPlayer(service: MediaService) : LoggingLifecycleObserver, LoggingMediaSessionCallback() {
 
     @Inject
     lateinit var mediaQueue: MediaQueue
 
-    private val player = ExoPlayerFactory.newSimpleInstance(service, DefaultTrackSelector())
+    var listener: Listener? = null
 
-    private val extractorFactory = ExtractorMediaSource.Factory(
-            DefaultDataSourceFactory(
-                    service,
-                    Util.getUserAgent(service, service.getString(R.string.app_name))
-            )
-    )
+    private val player = MediaPlayer()
 
-    private var isStarted = false
+    private val playbackStateBuilder = PlaybackStateCompat.Builder()
+
+    private var lastItem: MediaQueue.QueueItem? = null
+
+    private var seekWhileNotPlaying = 0L
+
+    @PlaybackStateCompat.State
+    private var currentState = PlaybackStateCompat.STATE_STOPPED
 
     init {
         service.lifecycle.addObserver(this)
@@ -52,101 +42,105 @@ class MediaPlayer(
                 .`as`(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(service)))
                 .subscribe { onPlay() }
 
-        player.addListener(object : Player.DefaultEventListener() {
-            override fun onPlayerStateChanged(playWhenReady: Boolean, playbackState: Int) {
-                super.onPlayerStateChanged(playWhenReady, playbackState)
-
-                service.mediaSession.setPlaybackState(PlaybackStateCompat.Builder()
-                        .setActions(PlaybackStateCompat.ACTION_PLAY or PlaybackStateCompat.ACTION_PAUSE or PlaybackStateCompat.ACTION_SKIP_TO_NEXT or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS)
-                        .setState(PlaybackStateCompat.STATE_PLAYING, player.currentPosition, player.playbackParameters.speed)
-                        .build())
-
-                mediaQueue.currentItem()?.toMediaMetadata()?.let {
-                    val isPlaying = getState() == PlaybackStateCompat.STATE_PLAYING
-                    val notification = mediaNotificationManager.buildNotification(
-                            it.description,
-                            isPlaying,
-                            service.sessionToken
-                    )
-
-                    when (getState()) {
-                        PlaybackStateCompat.STATE_PLAYING -> {
-                            if (!isStarted) {
-                                ContextCompat.startForegroundService(
-                                        service,
-                                        Intent(service, MediaService::class.java)
-                                )
-                                isStarted = true
-                            }
-
-                            service.startForeground(
-                                    MediaNotificationManager.NOTIFICATION_ID,
-                                    notification
-                            )
-                        }
-                        PlaybackStateCompat.STATE_PAUSED -> {
-                            service.stopForeground(false)
-                            mediaNotificationManager.updateNotification(it.description, isPlaying, service.sessionToken)
-                        }
-                        PlaybackStateCompat.STATE_STOPPED -> {
-                            service.stopForeground(true)
-                            service.stopSelf()
-                            isStarted = false
-                        }
-                    }
-                }
-
-                if (playbackState == Player.STATE_ENDED) {
-                    onSkipToNext()
-                }
-            }
-        })
+        player.setOnCompletionListener {
+            onNewState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
+            onSkipToNext()
+        }
     }
 
     private fun play(queueItem: MediaQueue.QueueItem) {
-        player.audioAttributes = AudioAttributes.Builder()
-                .setContentType(CONTENT_TYPE_MUSIC)
-                .setUsage(USAGE_MEDIA)
-                .build()
+        if (lastItem == queueItem) {
+            player.start()
+            return
+        }
 
-        val source = extractorFactory.createMediaSource(Uri.fromFile(queueItem.file))
-        player.prepare(source)
-        player.playWhenReady = true
+        player.reset()
+        player.setDataSource(queueItem.file.absolutePath)
+        player.setAudioAttributes(
+                AudioAttributes.Builder()
+                        .setContentType(CONTENT_TYPE_MUSIC)
+                        .setUsage(USAGE_MEDIA)
+                        .build()
+        )
+
+        player.prepare()
+        player.start()
+        lastItem = queueItem
     }
 
     override fun onPlay() {
         super.onPlay()
         mediaQueue.currentItem()?.run(::play)
+        onNewState(PlaybackStateCompat.STATE_PLAYING)
     }
 
     override fun onPause() {
         super<LoggingMediaSessionCallback>.onPause()
-        player.playWhenReady = false
+        player.pause()
+        onNewState(PlaybackStateCompat.STATE_PAUSED)
     }
 
     override fun onSkipToNext() {
         super.onSkipToNext()
+        onNewState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
         mediaQueue.next()?.let(::play)
+        onNewState(PlaybackStateCompat.STATE_PLAYING)
     }
 
     override fun onSkipToPrevious() {
         super.onSkipToPrevious()
+        onNewState(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS)
         mediaQueue.previous()?.let(::play)
+        onNewState(PlaybackStateCompat.STATE_PLAYING)
     }
 
     override fun onStop() {
         super<LoggingMediaSessionCallback>.onStop()
         player.stop()
+        onNewState(PlaybackStateCompat.STATE_STOPPED)
     }
 
-    private fun getState() = when (player.playbackState) {
-        Player.STATE_IDLE -> PlaybackStateCompat.STATE_PAUSED
-        Player.STATE_BUFFERING -> PlaybackStateCompat.STATE_BUFFERING
-        Player.STATE_READY -> if (player.playWhenReady)
-            PlaybackStateCompat.STATE_PLAYING
-        else
-            PlaybackStateCompat.STATE_PAUSED
-        Player.STATE_ENDED -> PlaybackStateCompat.STATE_PAUSED
-        else -> PlaybackStateCompat.STATE_NONE
+    fun seekTo(position: Long) {
+        if (!player.isPlaying) {
+            seekWhileNotPlaying = position
+        }
+
+        player.seekTo(position, MediaPlayer.SEEK_CLOSEST)
+        onNewState(currentState)
+    }
+
+    private fun onNewState(@PlaybackStateCompat.State newState: Int) {
+        currentState = newState
+
+        // Work around for MediaPlayer.getCurrentPosition() when it changes while not playing.
+        val reportPosition: Long
+        if (seekWhileNotPlaying >= 0L) {
+            reportPosition = seekWhileNotPlaying
+
+            if (currentState == PlaybackStateCompat.STATE_PLAYING) {
+                seekWhileNotPlaying = -1L
+            }
+        } else {
+            reportPosition = player.currentPosition.toLong()
+        }
+
+        playbackStateBuilder.setActions(
+                PlaybackStateCompat.ACTION_PLAY
+                        or PlaybackStateCompat.ACTION_PAUSE
+                        or PlaybackStateCompat.ACTION_SKIP_TO_NEXT
+                        or PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS
+        )
+        playbackStateBuilder.setState(
+                currentState,
+                reportPosition,
+                player.playbackParams.speed,
+                SystemClock.elapsedRealtime()
+        )
+
+        listener?.onPlaybackStateChange(playbackStateBuilder.build())
+    }
+
+    interface Listener {
+        fun onPlaybackStateChange(newState: PlaybackStateCompat)
     }
 }

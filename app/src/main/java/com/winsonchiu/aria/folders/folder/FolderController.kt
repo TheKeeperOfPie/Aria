@@ -105,11 +105,12 @@ class FolderController @Inject constructor(
                 .subscribe(folderContents)
     }
 
-    fun playFolder() {
-        folderContents.value.files.map {
-            MediaQueue.QueueItem(it.file, it.metadata)
+    fun playFolder(selected: FileMetadata) {
+        val metadataList = folderContents.value.files
+        metadataList.map {
+            MediaQueue.QueueItem(it.file, it.image?.bitmap, it.metadata)
         }
-                .also { mediaQueue.set(it, 0) }
+                .also { mediaQueue.set(it, metadataList.indexOf(selected)) }
     }
 
     data class Model(

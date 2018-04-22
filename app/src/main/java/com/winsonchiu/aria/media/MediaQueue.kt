@@ -1,5 +1,6 @@
 package com.winsonchiu.aria.media
 
+import android.graphics.Bitmap
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.winsonchiu.aria.dagger.ApplicationScope
 import com.winsonchiu.aria.music.MetadataExtractor
@@ -22,7 +23,7 @@ class MediaQueue @Inject constructor() {
     fun set(queue: List<QueueItem>, initialIndex: Int) {
         this.queue.clear()
         this.queue.addAll(queue)
-        this.currentIndex = initialIndex
+        this.currentIndex = initialIndex.coerceAtLeast(0)
         queueUpdates.accept(queue)
     }
 
@@ -32,6 +33,7 @@ class MediaQueue @Inject constructor() {
 
     data class QueueItem(
             val file: File,
+            val image: Bitmap?,
             val metadata: MetadataExtractor.Metadata?
     )
 }

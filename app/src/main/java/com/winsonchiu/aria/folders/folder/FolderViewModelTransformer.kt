@@ -96,7 +96,7 @@ object FolderViewModelTransformer {
 
     private fun getFileDisplayAndSortMetadata(it: FolderController.FileMetadata): FileDisplayAndSortMetadata {
         val fileSortKey = getFileSortKey(it.file)
-        val fileDisplayTitle = getFileDisplayTitle(fileSortKey)
+        val fileDisplayTitle = getFileDisplayTitle(fileSortKey?.substringBeforeLast("."))
         return FileDisplayAndSortMetadata(it, fileDisplayTitle, fileSortKey)
     }
 

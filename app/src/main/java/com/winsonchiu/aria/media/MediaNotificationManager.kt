@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.app.Service
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.support.v4.app.NotificationCompat
 import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.media.MediaDescriptionCompat
@@ -15,21 +16,26 @@ import android.support.v4.media.app.NotificationCompat.MediaStyle
 import android.support.v4.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import com.winsonchiu.aria.BuildConfig
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.activity.MainActivity
+import com.winsonchiu.aria.media.util.toMediaMetadata
 
 class MediaNotificationManager(
         private val service: Service
 ) {
 
     companion object {
+        private val TAG = MediaNotificationManager::class.java.canonicalName
+
         private const val CHANNEL_ID = BuildConfig.APPLICATION_ID + ".channel.media_session"
         private const val REQUEST_CODE = 7
         const val NOTIFICATION_ID = 77
     }
 
-    private val systemNotificationManager = service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    private val systemNotificationManager =
+            service.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
     private val notificationManager = NotificationManagerCompat.from(service)
 
     private val intentPlay = MediaButtonReceiver.buildMediaButtonPendingIntent(service, PlaybackStateCompat.ACTION_PLAY)
@@ -78,12 +84,51 @@ class MediaNotificationManager(
         notificationManager.notify(NOTIFICATION_ID, buildNotification(mediaDescription, isPlaying, sessionToken))
     }
 
+    fun updateNotification(
+            queueItem: MediaQueue.QueueItem,
+            isPlaying: Boolean,
+            sessionToken: MediaSessionCompat.Token?
+    ) {
+        notificationManager.notify(NOTIFICATION_ID, buildNotification(queueItem, isPlaying, sessionToken))
+    }
+
     fun buildNotification(
             mediaDescription: MediaDescriptionCompat,
             isPlaying: Boolean,
             sessionToken: MediaSessionCompat.Token?
+    ) = buildNotification(
+            mediaDescription.title,
+            mediaDescription.subtitle,
+            mediaDescription.iconBitmap,
+            isPlaying,
+            sessionToken
+    )
+
+    fun buildNotification(
+            queueItem: MediaQueue.QueueItem,
+            isPlaying: Boolean,
+            sessionToken: MediaSessionCompat.Token?
+    ): Notification {
+        val mediaDescription = queueItem.toMediaMetadata().description
+        return buildNotification(
+                mediaDescription.title,
+                mediaDescription.subtitle,
+                queueItem.image,
+                isPlaying,
+                sessionToken
+        )
+    }
+
+    fun buildNotification(
+            title: CharSequence?,
+            subtitle: CharSequence?,
+            iconBitmap: Bitmap?,
+            isPlaying: Boolean,
+            sessionToken: MediaSessionCompat.Token?
     ): Notification {
         createChannel()
+
+        Log.d("MediaNotificationManager", "buildNotification called with iconBitmap = $iconBitmap", Exception())
 
         return NotificationCompat.Builder(service, CHANNEL_ID)
                 .setStyle(
@@ -93,9 +138,9 @@ class MediaNotificationManager(
                 )
                 .setSmallIcon(R.drawable.ic_music_note_24dp)
                 .setContentIntent(createContentIntent())
-                .setContentTitle(mediaDescription.title)
-                .setContentText(mediaDescription.subtitle)
-                .setLargeIcon(mediaDescription.iconBitmap)
+                .setContentTitle(title)
+                .setContentText(subtitle)
+                .setLargeIcon(iconBitmap)
                 .setDeleteIntent(intentStop)
                 .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
                 .addAction(actionSkipToPrevious)

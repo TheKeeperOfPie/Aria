@@ -30,7 +30,7 @@ abstract class LifecycleMediaBrowserService : MediaBrowserServiceCompat(), Lifec
     }
 
     @CallSuper
-    override fun onStartCommand(intent: Intent, flags: Int, startId: Int): Int {
+    override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         dispatcher.onServicePreSuperOnStart()
         return super.onStartCommand(intent, flags, startId)
     }
@@ -41,7 +41,7 @@ abstract class LifecycleMediaBrowserService : MediaBrowserServiceCompat(), Lifec
         super.onDestroy()
     }
 
-    override fun getLifecycle() = dispatcher.lifecycle
+    final override fun getLifecycle() = dispatcher.lifecycle
 
     fun <T> Single<T>.bindToLifecycle(): SingleSubscribeProxy<T> {
         return `as`(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(this@LifecycleMediaBrowserService)))

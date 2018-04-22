@@ -59,7 +59,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                             .commit()
                 }
             } else {
-                folderController.playFolder()
+                folderController.playFolder(fileMetadata)
                 mediaBrowserConnection.mediaController.transportControls.play()
             }
         }
