@@ -1,11 +1,11 @@
 package com.winsonchiu.aria.queue.view
 
 import android.content.Context
+import android.graphics.drawable.ColorDrawable
 import android.support.constraint.ConstraintLayout
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.MotionEvent
-import android.view.View
 import butterknife.OnClick
 import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
@@ -29,8 +29,18 @@ class QueueItemView @JvmOverloads constructor(
     @set:ModelProp
     var title: String? = null
 
+    @set:ModelProp
+    var showSelected: Boolean = false
+
     @set:ModelProp(ModelProp.Option.DoNotHash)
     var listener: Listener? = null
+
+    val colorHighlight by lazy {
+        TypedValue().let {
+            context.theme.resolveAttribute(R.attr.colorControlHighlight, it, true)
+            it.data
+        }
+    }
 
     init {
         initialize(R.layout.queue_item_view)
@@ -50,6 +60,12 @@ class QueueItemView @JvmOverloads constructor(
     fun onChanged() {
         fileImage.setImageBitmap(queueItem.image?.bitmap)
         fileNameText.text = title
+
+        foreground = if (showSelected) {
+            ColorDrawable(colorHighlight)
+        } else {
+            null
+        }
     }
 
     @OnClick()

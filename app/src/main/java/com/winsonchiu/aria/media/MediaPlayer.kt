@@ -10,8 +10,9 @@ import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
 import com.winsonchiu.aria.framework.application.AriaApplication
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
-import com.winsonchiu.aria.media.util.LoggingMediaSessionCallback
 import com.winsonchiu.aria.framework.util.arch.LoggingLifecycleObserver
+import com.winsonchiu.aria.media.util.LoggingMediaSessionCallback
+import io.reactivex.Maybe
 import javax.inject.Inject
 
 class MediaPlayer(service: MediaService) : LoggingLifecycleObserver, LoggingMediaSessionCallback() {
@@ -38,14 +39,27 @@ class MediaPlayer(service: MediaService) : LoggingLifecycleObserver, LoggingMedi
                 this
         )
 
-        mediaQueue.queueUpdates
+        mediaQueue.playPauseActions
                 .`as`(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(service)))
-                .subscribe { onPlay() }
+                .subscribe {
+                    if (player.isPlaying) {
+                        onPause()
+                    } else {
+                        onPlay()
+                    }
+                }
 
-        player.setOnCompletionListener {
-            onNewState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
-            onSkipToNext()
-        }
+        mediaQueue.queueUpdates
+                .flatMapMaybe { Maybe.fromCallable { it.currentItem } }
+                .distinctUntilChanged()
+                .`as`(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(service)))
+                .subscribe {
+                    if (player.isPlaying) {
+                        onPlay()
+                    }
+                }
+
+        player.setOnCompletionListener { onSkipToNext() }
     }
 
     private fun play(queueItem: MediaQueue.QueueItem) {
@@ -70,7 +84,7 @@ class MediaPlayer(service: MediaService) : LoggingLifecycleObserver, LoggingMedi
 
     override fun onPlay() {
         super.onPlay()
-        mediaQueue.currentItem()?.run(::play)
+        mediaQueue.currentItem()?.run(::play) ?: return
         onNewState(PlaybackStateCompat.STATE_PLAYING)
     }
 
@@ -82,15 +96,15 @@ class MediaPlayer(service: MediaService) : LoggingLifecycleObserver, LoggingMedi
 
     override fun onSkipToNext() {
         super.onSkipToNext()
+        mediaQueue.next()?.let(::play) ?: return
         onNewState(PlaybackStateCompat.STATE_SKIPPING_TO_NEXT)
-        mediaQueue.next()?.let(::play)
         onNewState(PlaybackStateCompat.STATE_PLAYING)
     }
 
     override fun onSkipToPrevious() {
         super.onSkipToPrevious()
+        mediaQueue.previous()?.let(::play) ?: return
         onNewState(PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS)
-        mediaQueue.previous()?.let(::play)
         onNewState(PlaybackStateCompat.STATE_PLAYING)
     }
 

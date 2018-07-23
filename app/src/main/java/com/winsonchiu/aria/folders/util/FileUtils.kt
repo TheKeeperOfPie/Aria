@@ -43,6 +43,6 @@ object FileUtils {
             !it.isDigit() && !it.isWhitespace()
         }
 
-        return fileSortKey.drop(startIndex)
+        return fileSortKey.drop(startIndex.coerceAtLeast(0))
     }
 }

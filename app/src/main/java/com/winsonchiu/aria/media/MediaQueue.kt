@@ -1,47 +1,93 @@
 package com.winsonchiu.aria.media
 
-import android.graphics.Bitmap
 import com.jakewharton.rxrelay2.BehaviorRelay
+import com.jakewharton.rxrelay2.PublishRelay
 import com.winsonchiu.aria.framework.dagger.ApplicationScope
 import com.winsonchiu.aria.music.MetadataExtractor
 import com.winsonchiu.aria.music.artwork.ArtworkCache
 import java.io.File
-import java.util.*
 import javax.inject.Inject
 
 @ApplicationScope
 class MediaQueue @Inject constructor() {
 
-    val queueUpdates = BehaviorRelay.create<List<QueueItem>>()
+    val queueUpdates = BehaviorRelay.create<Model>()
+
+    val playPauseActions = PublishRelay.create<Unit>()
 
     private val queue = mutableListOf<QueueItem>()
+
+    private var currentItem: QueueItem? = null
 
     private var currentIndex = 0
 
     fun set(queue: List<QueueItem>, initialItem: QueueItem? = null) {
-        set(queue, queue.indexOf(initialItem))
-    }
-
-    fun set(queue: List<QueueItem>, initialIndex: Int?) {
         this.queue.clear()
         this.queue.addAll(queue)
-        this.currentIndex = initialIndex?.coerceIn(0, queue.size - 1) ?: currentIndex
-        queueUpdates.accept(queue)
+        setItemAndEmit(initialItem)
     }
 
-    fun swap(positionOne: Int, positionTwo: Int) {
-        val newList = queue.toMutableList()
-        Collections.swap(newList, positionOne, positionTwo)
-        set(queue, currentIndex)
+    fun add(items: List<QueueItem>, currentItem: QueueItem? = null) {
+        this.queue.addAll(items)
+        setItemAndEmit(currentItem)
     }
 
-    fun currentItem() = queue.getOrNull(currentIndex)
-    fun next() = queue.getOrNull(Math.floorMod(++currentIndex, queue.size))
-    fun previous() = queue.getOrNull(Math.floorMod(--currentIndex, queue.size))
+    fun add(item: QueueItem, currentItem: QueueItem? = null) {
+        this.queue.add(item)
+        setItemAndEmit(currentItem)
+    }
+
+    private fun setItemAndEmit(item: QueueItem?) {
+        if (item != null) {
+            val index = queue.indexOf(item)
+            if (index >= 0) {
+                currentIndex = index
+                currentItem = item
+            }
+        } else if (currentItem == null) {
+            currentItem = queue.getOrNull(currentIndex)
+        }
+
+        queueUpdates.accept(Model(queue.toList(), currentItem, currentIndex))
+    }
+
+    fun currentItem() = currentItem
+
+    fun next(): QueueItem? {
+        moveToIndex(currentIndex + 1)
+        return currentItem
+    }
+
+    fun previous(): QueueItem? {
+        moveToIndex(currentIndex - 1)
+        return currentItem
+    }
+
+    private fun moveToIndex(index: Int) {
+        currentIndex = Math.floorMod(index, queue.size)
+        currentItem = queue.getOrNull(currentIndex)
+        queueUpdates.accept(Model(queue.toList(), currentItem, currentIndex))
+    }
+
+    fun setCurrentItem(queueItem: QueueItem) {
+        currentIndex = queue.indexOf(queueItem).coerceAtLeast(0)
+        currentItem = queue.getOrNull(currentIndex)
+        queueUpdates.accept(Model(queue.toList(), queueItem, currentIndex))
+    }
 
     data class QueueItem(
             val file: File,
             val image: ArtworkCache.Metadata?,
-            val metadata: MetadataExtractor.Metadata?
+            val metadata: MetadataExtractor.Metadata?,
+            val timeAddedToQueue: Long = System.currentTimeMillis()
     )
+
+    data class Model(
+            val queue: List<QueueItem> = emptyList(),
+            val currentItem: QueueItem? = null,
+            val currentIndex: Int = 0
+    ) {
+
+        fun copy() = copy(queue = queue.toList(), currentItem = currentItem?.copy(), currentIndex = currentIndex)
+    }
 }

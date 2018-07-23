@@ -11,7 +11,7 @@ object FolderToFolderTransition {
     fun applyToFragment(fragment: FolderFragment) = fragment.apply {
         enterTransition = TransitionSetSupport().apply {
             SlideAndFade(
-                    slideFractionFromY = 0.75f,
+                    slideFractionFromY = 0.35f,
                     slideFractionToY = 0f,
                     fadeFrom = 0f,
                     fadeTo = 1f,
@@ -19,6 +19,7 @@ object FolderToFolderTransition {
                     target = fragment.uniqueTransitionName + R.id.folderRecyclerView
             )
                     .forSupport()
+                    .setDuration(150)
                     .addToSet()
 
             SlideAndFade(
@@ -28,18 +29,20 @@ object FolderToFolderTransition {
                     target = fragment.uniqueTransitionName + R.id.folderTitleText
             )
                     .forSupport()
+                    .setDuration(150)
                     .addToSet()
         }
         returnTransition = TransitionSetSupport().apply {
             SlideAndFade(
                     slideFractionFromY = 0f,
-                    slideFractionToY = 0.75f,
+                    slideFractionToY = 0.35f,
                     fadeFrom = 1f,
                     fadeTo = 0f,
                     overlayMode = GhostViewOverlay.OverlayMode.FRAMEWORK_VISIBILITY,
                     target = fragment.uniqueTransitionName + R.id.folderRecyclerView
             )
                     .forSupport()
+                    .setDuration(150)
                     .addToSet()
 
             // TODO: Fix this by combining Animators

@@ -1,24 +1,22 @@
 package com.winsonchiu.aria.folders.folder
 
 import android.os.Bundle
+import android.support.design.widget.Snackbar
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.airbnb.epoxy.SimpleEpoxyController
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.R.id.*
-import com.winsonchiu.aria.framework.async.RequestState
 import com.winsonchiu.aria.folders.root.FolderRootFragmentDaggerComponent
+import com.winsonchiu.aria.framework.async.RequestState
 import com.winsonchiu.aria.framework.fragment.FragmentInitializer
 import com.winsonchiu.aria.framework.fragment.build
 import com.winsonchiu.aria.framework.fragment.subclass.BaseFragment
-import com.winsonchiu.aria.media.MediaBrowserConnection
-import com.winsonchiu.aria.media.MediaDelegate
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.setDataForView
+import com.winsonchiu.aria.media.MediaBrowserConnection
+import com.winsonchiu.aria.media.MediaQueue
 import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.folder_fragment.folderRecyclerView
-import kotlinx.android.synthetic.main.folder_fragment.folderSwipeRefresh
-import kotlinx.android.synthetic.main.folder_fragment.folderTitleText
+import kotlinx.android.synthetic.main.folder_fragment.*
 import javax.inject.Inject
 
 class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFragmentDaggerComponent>() {
@@ -40,10 +38,10 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
     lateinit var folderController: FolderController
 
     @Inject
-    lateinit var mediaDelegate: MediaDelegate
+    lateinit var mediaBrowserConnection: MediaBrowserConnection
 
     @Inject
-    lateinit var mediaBrowserConnection: MediaBrowserConnection
+    lateinit var mediaQueue: MediaQueue
 
     private val listener = object : FileItemView.Listener {
         override fun onClick(fileMetadata: FolderController.FileMetadata) {
@@ -60,9 +58,18 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                             .commit()
                 }
             } else {
-                folderController.playFolder(fileMetadata)
-                mediaBrowserConnection.mediaController.transportControls.play()
+                mediaQueue.add(MediaQueue.QueueItem(fileMetadata.file, fileMetadata.image, fileMetadata.metadata))
+                view?.run {
+                    Snackbar.make(this, getString(R.string.item_added, fileMetadata.file.name), Snackbar.LENGTH_SHORT).show()
+                }
             }
+        }
+
+        override fun onLongClick(fileMetadata: FolderController.FileMetadata) {
+//                folderController.addFolderToQueue(fileMetadata)
+            val item = MediaQueue.QueueItem(fileMetadata.file, fileMetadata.image, fileMetadata.metadata)
+            mediaQueue.add(item, item)
+            mediaBrowserConnection.mediaController.transportControls.play()
         }
     }
 

@@ -4,12 +4,12 @@ import android.annotation.SuppressLint
 import android.os.Environment
 import android.support.v4.app.Fragment
 import com.jakewharton.rxrelay2.BehaviorRelay
-import com.winsonchiu.aria.framework.async.RequestState
-import com.winsonchiu.aria.framework.dagger.FragmentScreenScope
-import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileSorter
 import com.winsonchiu.aria.folders.util.withFolders
+import com.winsonchiu.aria.framework.async.RequestState
+import com.winsonchiu.aria.framework.dagger.FragmentScreenScope
+import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.media.MediaQueue
 import com.winsonchiu.aria.music.MetadataExtractor
 import com.winsonchiu.aria.music.artwork.ArtworkCache
@@ -105,12 +105,10 @@ class FolderController @Inject constructor(
                 .subscribe(folderContents)
     }
 
-    fun playFolder(selected: FileMetadata) {
-        val metadataList = folderContents.value.files
-        metadataList.map {
-            MediaQueue.QueueItem(it.file, it.image, it.metadata)
-        }
-                .also { mediaQueue.set(it, metadataList.indexOf(selected)) }
+    fun addFolderToQueue(selected: FileMetadata) {
+        folderContents.value.files
+                .map { MediaQueue.QueueItem(it.file, it.image, it.metadata) }
+                .also { mediaQueue.add(it, MediaQueue.QueueItem(selected.file, selected.image, selected.metadata)) }
     }
 
     data class Model(

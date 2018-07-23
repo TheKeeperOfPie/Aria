@@ -5,18 +5,14 @@ import android.graphics.drawable.Drawable
 import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
 import butterknife.BindDrawable
-import butterknife.OnClick
 import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.music.artwork.ArtworkCache
 import com.winsonchiu.aria.framework.util.DrawableUtils
 import com.winsonchiu.aria.framework.util.initialize
 import com.winsonchiu.aria.framework.util.textOrGone
-import kotlinx.android.synthetic.main.file_item_view.view.fileDescriptionText
-import kotlinx.android.synthetic.main.file_item_view.view.fileImage
-import kotlinx.android.synthetic.main.file_item_view.view.fileNameText
+import kotlinx.android.synthetic.main.file_item_view.view.*
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class FileItemView @JvmOverloads constructor(
@@ -50,6 +46,9 @@ class FileItemView @JvmOverloads constructor(
         initialize(R.layout.file_item_view)
 
         background = DrawableUtils.getDefaultRipple(context, false)
+
+        setOnClickListener { listener?.onClick(fileMetadata) }
+        setOnLongClickListener { listener?.onLongClick(fileMetadata); true }
     }
 
     @AfterPropsSet
@@ -69,12 +68,8 @@ class FileItemView @JvmOverloads constructor(
         }
     }
 
-    @OnClick()
-    fun onClick() {
-        listener?.onClick(fileMetadata)
-    }
-
     interface Listener {
         fun onClick(fileMetadata: FolderController.FileMetadata)
+        fun onLongClick(fileMetadata: FolderController.FileMetadata)
     }
 }

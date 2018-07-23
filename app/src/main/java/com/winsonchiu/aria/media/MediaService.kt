@@ -8,6 +8,7 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
+import android.util.Log
 import com.winsonchiu.aria.framework.application.AriaApplication
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.media.util.toMediaMetadata
@@ -43,7 +44,7 @@ class MediaService : LifecycleMediaBrowserService() {
         }
 
         fun onChanged(state: PlaybackStateCompat?, metadata: MediaMetadataCompat?) {
-            if (state != null && metadata != null) {
+            if (state != null && metadata != null && isStarted) {
                 mediaQueue.currentItem()?.let {
                     mediaNotificationManager.updateNotification(
                             it,
@@ -54,9 +55,6 @@ class MediaService : LifecycleMediaBrowserService() {
             }
         }
     }
-
-    @Inject
-    lateinit var mediaDelegate: MediaDelegate
 
     @Inject
     lateinit var mediaQueue: MediaQueue
@@ -116,23 +114,6 @@ class MediaService : LifecycleMediaBrowserService() {
         super.onCreate()
 
         (applicationContext.getSystemService(AriaApplication.APPLICATION_COMPONENT) as ApplicationComponent).inject(this)
-        mediaDelegate.playActions
-                .map {
-                    it.map { it.toMediaMetadata() }
-                            .map {
-                                MediaBrowserCompat.MediaItem(
-                                        it.description,
-                                        MediaBrowserCompat.MediaItem.FLAG_PLAYABLE
-                                )
-                            }
-                }
-                .bindToLifecycle()
-                .subscribe({
-                    musicList.clear()
-                    musicList.addAll(it)
-
-                    notifyChildrenChanged("root")
-                }, { it.printStackTrace() })
 
         super.onCreate()
 

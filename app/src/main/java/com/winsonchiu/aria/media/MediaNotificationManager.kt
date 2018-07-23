@@ -89,6 +89,7 @@ class MediaNotificationManager(
             isPlaying: Boolean,
             sessionToken: MediaSessionCompat.Token?
     ) {
+        Log.d(TAG, "updateNotification called with", Exception())
         notificationManager.notify(NOTIFICATION_ID, buildNotification(queueItem, isPlaying, sessionToken))
     }
 
@@ -127,8 +128,6 @@ class MediaNotificationManager(
             sessionToken: MediaSessionCompat.Token?
     ): Notification {
         createChannel()
-
-        Log.d("MediaNotificationManager", "buildNotification called with iconBitmap = $iconBitmap", Exception())
 
         return NotificationCompat.Builder(service, CHANNEL_ID)
                 .setStyle(

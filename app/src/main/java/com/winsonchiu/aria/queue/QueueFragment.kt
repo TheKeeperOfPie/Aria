@@ -4,11 +4,8 @@ import android.os.Bundle
 import android.support.v7.widget.RecyclerView
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
-import com.airbnb.epoxy.EpoxyModelTouchCallback
-import com.airbnb.epoxy.EpoxyTouchHelper
 import com.airbnb.epoxy.SimpleEpoxyController
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.R.id.queueRecycler
 import com.winsonchiu.aria.folders.util.FileUtils
 import com.winsonchiu.aria.framework.dagger.activity.ActivityComponent
 import com.winsonchiu.aria.framework.fragment.subclass.BaseFragment
@@ -19,7 +16,6 @@ import com.winsonchiu.aria.queue.view.QueueItemViewModel_
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.queue_fragment.*
-import java.util.*
 import javax.inject.Inject
 
 class QueueFragment : BaseFragment<ActivityComponent, QueueFragmentDaggerComponent>() {
@@ -27,49 +23,52 @@ class QueueFragment : BaseFragment<ActivityComponent, QueueFragmentDaggerCompone
     @Inject
     lateinit var mediaQueue: MediaQueue
 
-    private var currentQueue: MutableList<MediaQueue.QueueItem> = mutableListOf()
+    private var currentQueue: MediaQueue.Model = MediaQueue.Model()
 
     private val epoxyController = SimpleEpoxyController()
 
     private val itemTouchHelper: ItemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
 
         override fun getMovementFlags(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?): Int {
-            return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.END)
+            return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.START)
         }
 
         override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
             val queueItem = (viewHolder.itemView as QueueItemView).queueItem
-            val positionOne = currentQueue.indexOf(queueItem)
-            val positionTwo = currentQueue.indexOf((target.itemView as QueueItemView).queueItem)
+            val positionOne = currentQueue.queue.indexOf(queueItem)
+            val positionTwo = currentQueue.queue.indexOf((target.itemView as QueueItemView).queueItem)
 
-            currentQueue = currentQueue.toMutableList().apply {
+            val newList = currentQueue.queue.toMutableList().apply {
                 removeAt(positionOne)
                 add(positionTwo, queueItem)
             }
 
             epoxyController.setModels(currentQueue.toViewModels())
-            mediaQueue.set(currentQueue)
+            mediaQueue.set(newList)
 
             return true
         }
 
-        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
-            val position = currentQueue.indexOf((viewHolder.itemView as QueueItemView).queueItem)
+        override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder?): Float {
+            return 0.3f
+        }
 
-            currentQueue = currentQueue.toMutableList()
-                    .apply {
-                        removeAt(position)
-                    }
+        override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+            val position = currentQueue.queue.indexOf((viewHolder.itemView as QueueItemView).queueItem)
+
+            val newList = currentQueue.queue.toMutableList().apply {
+                removeAt(position)
+            }
 
             epoxyController.setModels(currentQueue.toViewModels())
-            mediaQueue.set(currentQueue)
+            mediaQueue.set(newList)
         }
     })
 
 
     private val listener = object : QueueItemView.Listener {
         override fun onClick(queueItem: MediaQueue.QueueItem) {
-            // TODO
+            mediaQueue.setCurrentItem(queueItem)
         }
 
         override fun onStartDrag(view: QueueItemView) {
@@ -88,6 +87,10 @@ class QueueFragment : BaseFragment<ActivityComponent, QueueFragmentDaggerCompone
         super.onViewCreated(view, savedInstanceState)
 
         itemTouchHelper.attachToRecyclerView(queueRecycler)
+
+        imagePlay.setOnClickListener {
+            mediaQueue.playPauseActions.accept(Unit)
+        }
     }
 
     override fun onDestroyView() {
@@ -110,15 +113,16 @@ class QueueFragment : BaseFragment<ActivityComponent, QueueFragmentDaggerCompone
                 .observeOn(AndroidSchedulers.mainThread())
                 .bindToLifecycle()
                 .subscribe {
-                    currentQueue = it.first.toMutableList()
+                    currentQueue = it.first.copy()
                     epoxyController.setDataForView(queueRecycler, it.second)
                 }
     }
 
-    private fun List<MediaQueue.QueueItem>.toViewModels() = map {
+    private fun MediaQueue.Model.toViewModels() = queue.map {
         QueueItemViewModel_()
-                .id(it.file.path)
+                .id(it.file.path, it.timeAddedToQueue)
                 .queueItem(it)
+                .showSelected(it == currentItem)
                 .title(FileUtils.getFileDisplayTitle(FileUtils.getFileSortKey(it.file)))
                 .listener(listener)
     }
