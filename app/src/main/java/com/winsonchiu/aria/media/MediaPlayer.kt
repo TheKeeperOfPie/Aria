@@ -8,10 +8,10 @@ import android.os.SystemClock
 import android.support.v4.media.session.PlaybackStateCompat
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
-import com.winsonchiu.aria.application.AriaApplication
-import com.winsonchiu.aria.dagger.ApplicationComponent
+import com.winsonchiu.aria.framework.application.AriaApplication
+import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.media.util.LoggingMediaSessionCallback
-import com.winsonchiu.aria.util.arch.LoggingLifecycleObserver
+import com.winsonchiu.aria.framework.util.arch.LoggingLifecycleObserver
 import javax.inject.Inject
 
 class MediaPlayer(service: MediaService) : LoggingLifecycleObserver, LoggingMediaSessionCallback() {

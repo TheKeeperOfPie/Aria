@@ -6,10 +6,10 @@ import android.view.View
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.folders.folder.FolderFragment
 import com.winsonchiu.aria.folders.folder.FolderToFolderTransition
-import com.winsonchiu.aria.fragment.build
-import com.winsonchiu.aria.fragment.subclass.BaseFragment
+import com.winsonchiu.aria.framework.fragment.build
+import com.winsonchiu.aria.framework.fragment.subclass.BaseFragment
+import com.winsonchiu.aria.framework.util.hasFragment
 import com.winsonchiu.aria.home.HomeFragmentDaggerComponent
-import com.winsonchiu.aria.util.hasFragment
 
 class FolderRootFragment : BaseFragment<HomeFragmentDaggerComponent, FolderRootFragmentDaggerComponent>() {
 

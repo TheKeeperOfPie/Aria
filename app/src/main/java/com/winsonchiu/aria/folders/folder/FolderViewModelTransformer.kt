@@ -7,6 +7,7 @@ import com.winsonchiu.aria.R
 import com.winsonchiu.aria.folders.util.FileDisplayAndSortMetadata
 import com.winsonchiu.aria.folders.util.FileSorter
 import com.winsonchiu.aria.folders.util.FileSorter.sortFileItemViewModels
+import com.winsonchiu.aria.folders.util.FileUtils
 import com.winsonchiu.aria.music.MetadataExtractor
 import com.winsonchiu.aria.music.artistDisplayValue
 import java.io.File
@@ -73,7 +74,6 @@ object FolderViewModelTransformer {
                     FileItemViewModel_()
                             .id(file.name)
                             .fileMetadata(fileMetadata)
-                            .image(image)
                             .listener(listener)
                             .title(displayTitle)
                             .description(
@@ -95,54 +95,12 @@ object FolderViewModelTransformer {
     }
 
     private fun getFileDisplayAndSortMetadata(it: FolderController.FileMetadata): FileDisplayAndSortMetadata {
-        val fileSortKey = getFileSortKey(it.file)
-        val fileDisplayTitle = getFileDisplayTitle(fileSortKey?.substringBeforeLast("."))
+        val fileSortKey = FileUtils.getFileSortKey(it.file)
+        val fileDisplayTitle = FileUtils.getFileDisplayTitle(fileSortKey?.substringBeforeLast("."))
         return FileDisplayAndSortMetadata(it, fileDisplayTitle, fileSortKey)
     }
 
     private fun getFolderTitle(folder: File) = folder.invariantSeparatorsPath
-
-    private fun getFileSortKey(file: File): String? {
-        val tags = mutableListOf<Char>()
-        val remaining = mutableListOf<Char>()
-        var insideBracket = false
-        var finished = false
-        file.name.forEach {
-            if (finished) {
-                remaining += it
-            } else {
-                when (it) {
-                    '[' -> insideBracket = true
-                    ']' -> insideBracket = false
-                }
-
-                when {
-                    it == '[' || it == ']' || insideBracket -> tags += it
-                    else -> {
-                        remaining += it
-                        if (!it.isWhitespace() && !it.isDigit() && it != '-') {
-                            finished = true
-                        }
-                    }
-                }
-            }
-        }
-
-        return String(remaining.toCharArray()).trim()
-    }
-
-    private fun getFileDisplayTitle(fileSortKey: String?): String? {
-        fileSortKey ?: return null
-        val startIndex = fileSortKey.indexOfFirst {
-            when (it) {
-                '-', '.' -> return@indexOfFirst false
-            }
-
-            !it.isDigit() && !it.isWhitespace()
-        }
-
-        return fileSortKey.drop(startIndex)
-    }
 
     private fun getFileDescription(
             context: Context,

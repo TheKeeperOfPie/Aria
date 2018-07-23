@@ -8,8 +8,8 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import com.jakewharton.rxrelay2.BehaviorRelay
-import com.winsonchiu.aria.dagger.ActivityScreenScope
-import com.winsonchiu.aria.dagger.activity.ActivityLifecycleBoundComponent
+import com.winsonchiu.aria.framework.dagger.ActivityScreenScope
+import com.winsonchiu.aria.framework.dagger.activity.ActivityLifecycleBoundComponent
 import com.winsonchiu.aria.media.util.NullableMediaBrowserSubscriptionCallback
 import java.util.Optional
 import javax.inject.Inject

@@ -8,8 +8,8 @@ import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import com.winsonchiu.aria.application.AriaApplication
-import com.winsonchiu.aria.dagger.ApplicationComponent
+import com.winsonchiu.aria.framework.application.AriaApplication
+import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.media.util.toMediaMetadata
 import javax.inject.Inject
 

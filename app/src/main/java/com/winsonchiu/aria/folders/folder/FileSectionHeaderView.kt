@@ -7,7 +7,7 @@ import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.util.initialize
+import com.winsonchiu.aria.framework.util.initialize
 import kotlinx.android.synthetic.main.file_section_header_view.view.fileSectionHeaderText
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)

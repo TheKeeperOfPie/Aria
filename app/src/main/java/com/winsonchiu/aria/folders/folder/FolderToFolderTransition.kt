@@ -1,10 +1,10 @@
 package com.winsonchiu.aria.folders.folder
 
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.util.animation.transition.DoNothingAsOverlay
-import com.winsonchiu.aria.util.animation.transition.GhostViewOverlay
-import com.winsonchiu.aria.util.animation.transition.SlideAndFade
-import com.winsonchiu.aria.util.animation.transition.TransitionSetSupport
+import com.winsonchiu.aria.framework.util.animation.transition.DoNothingAsOverlay
+import com.winsonchiu.aria.framework.util.animation.transition.GhostViewOverlay
+import com.winsonchiu.aria.framework.util.animation.transition.SlideAndFade
+import com.winsonchiu.aria.framework.util.animation.transition.TransitionSetSupport
 
 object FolderToFolderTransition {
 

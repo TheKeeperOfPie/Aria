@@ -1,9 +1,9 @@
 package com.winsonchiu.aria.folders.root
 
-import com.winsonchiu.aria.dagger.RootFragmentScreenScope
-import com.winsonchiu.aria.dagger.fragment.FragmentDefaultBoundModule
-import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.folders.folder.FolderFragmentDaggerComponent
+import com.winsonchiu.aria.framework.dagger.RootFragmentScreenScope
+import com.winsonchiu.aria.framework.dagger.fragment.FragmentDefaultBoundModule
+import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.music.artwork.ArtworkCache
 import dagger.Module
 import dagger.Provides

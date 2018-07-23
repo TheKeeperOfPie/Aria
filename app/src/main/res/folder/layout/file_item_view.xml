@@ -9,7 +9,7 @@
     tools:parentTag="android.support.constraint.ConstraintLayout"
     >
 
-    <com.winsonchiu.aria.view.MaskedImageView
+    <com.winsonchiu.aria.framework.view.MaskedImageView
         android:id="@+id/fileImage"
         android:layout_width="70dp"
         android:layout_height="70dp"

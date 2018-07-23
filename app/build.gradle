@@ -43,7 +43,8 @@ android {
                     "/src/main/res/all",
                     "/src/main/res/folder",
                     "/src/main/res/home",
-                    "/src/main/res/media"
+                    "/src/main/res/media",
+                    "/src/main/res/queue"
             ]
         }
     }
@@ -65,7 +66,7 @@ kapt {
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
+    implementation "com.android.support.constraint:constraint-layout:2.0.0-alpha1"
     def supportLibraryVersion = "27.1.1"
 
     //noinspection GradleCompatible

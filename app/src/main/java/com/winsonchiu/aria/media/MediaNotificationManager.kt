@@ -19,7 +19,7 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
 import com.winsonchiu.aria.BuildConfig
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.activity.MainActivity
+import com.winsonchiu.aria.main.MainActivity
 import com.winsonchiu.aria.media.util.toMediaMetadata
 
 class MediaNotificationManager(
@@ -113,7 +113,7 @@ class MediaNotificationManager(
         return buildNotification(
                 mediaDescription.title,
                 mediaDescription.subtitle,
-                queueItem.image,
+                queueItem.image?.bitmap,
                 isPlaying,
                 sessionToken
         )

@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.media
 
 import com.jakewharton.rxrelay2.BehaviorRelay
-import com.winsonchiu.aria.dagger.ApplicationScope
+import com.winsonchiu.aria.framework.dagger.ApplicationScope
 import com.winsonchiu.aria.folders.folder.FolderController
 import javax.inject.Inject
 

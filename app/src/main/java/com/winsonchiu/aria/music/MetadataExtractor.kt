@@ -2,8 +2,8 @@ package com.winsonchiu.aria.music
 
 import android.media.MediaMetadataRetriever
 import android.support.annotation.WorkerThread
-import com.winsonchiu.aria.dagger.ApplicationScope
-import com.winsonchiu.aria.util.Failsafe
+import com.winsonchiu.aria.framework.dagger.ApplicationScope
+import com.winsonchiu.aria.framework.util.Failsafe
 import java.io.File
 import javax.inject.Inject
 

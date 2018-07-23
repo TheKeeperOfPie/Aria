@@ -1,8 +1,8 @@
 package com.winsonchiu.aria.home
 
-import com.winsonchiu.aria.dagger.HomeFragmentScreenScope
-import com.winsonchiu.aria.dagger.fragment.FragmentDefaultBoundModule
-import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
+import com.winsonchiu.aria.framework.dagger.HomeFragmentScreenScope
+import com.winsonchiu.aria.framework.dagger.fragment.FragmentDefaultBoundModule
+import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.folders.root.FolderRootFragmentDaggerComponent
 import dagger.Module
 import dagger.Provides

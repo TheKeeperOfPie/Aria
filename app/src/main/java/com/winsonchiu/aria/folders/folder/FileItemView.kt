@@ -11,9 +11,9 @@ import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.music.artwork.ArtworkCache
-import com.winsonchiu.aria.util.DrawableUtils
-import com.winsonchiu.aria.util.initialize
-import com.winsonchiu.aria.util.textOrGone
+import com.winsonchiu.aria.framework.util.DrawableUtils
+import com.winsonchiu.aria.framework.util.initialize
+import com.winsonchiu.aria.framework.util.textOrGone
 import kotlinx.android.synthetic.main.file_item_view.view.fileDescriptionText
 import kotlinx.android.synthetic.main.file_item_view.view.fileImage
 import kotlinx.android.synthetic.main.file_item_view.view.fileNameText
@@ -26,9 +26,6 @@ class FileItemView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     lateinit var fileMetadata: FolderController.FileMetadata
-        @ModelProp set
-
-    var image: ArtworkCache.Metadata? = null
         @ModelProp set
 
     var title: String? = null
@@ -61,7 +58,7 @@ class FileItemView @JvmOverloads constructor(
 
         fileDescriptionText.textOrGone(description)
 
-        val image = image
+        val image = fileMetadata.image
 
         fileImage.setImageBitmap(image?.bitmap)
         fileImage.foreground = when {

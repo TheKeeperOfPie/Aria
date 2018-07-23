@@ -14,11 +14,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme"
-        android:name=".application.AriaApplication"
+        android:name="com.winsonchiu.aria.framework.application.AriaApplication"
         tools:ignore="GoogleAppIndexingWarning"
         >
 
-        <activity android:name=".activity.MainActivity">
+        <activity android:name="com.winsonchiu.aria.main.MainActivity">
 
             <intent-filter>
 

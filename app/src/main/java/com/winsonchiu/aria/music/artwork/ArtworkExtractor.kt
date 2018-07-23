@@ -11,11 +11,11 @@ import android.net.Uri
 import android.provider.MediaStore
 import android.support.annotation.WorkerThread
 import com.squareup.picasso.Picasso
-import com.winsonchiu.aria.dagger.HomeFragmentScreenScope
+import com.winsonchiu.aria.framework.dagger.HomeFragmentScreenScope
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileFilters.COVER_IMAGE_REGEX
-import com.winsonchiu.aria.util.Failsafe
-import com.winsonchiu.aria.util.dpToPx
+import com.winsonchiu.aria.framework.util.Failsafe
+import com.winsonchiu.aria.framework.util.dpToPx
 import java.io.File
 import java.util.Arrays
 import javax.inject.Inject

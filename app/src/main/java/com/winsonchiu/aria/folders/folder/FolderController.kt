@@ -4,9 +4,9 @@ import android.annotation.SuppressLint
 import android.os.Environment
 import android.support.v4.app.Fragment
 import com.jakewharton.rxrelay2.BehaviorRelay
-import com.winsonchiu.aria.async.RequestState
-import com.winsonchiu.aria.dagger.FragmentScreenScope
-import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
+import com.winsonchiu.aria.framework.async.RequestState
+import com.winsonchiu.aria.framework.dagger.FragmentScreenScope
+import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileSorter
 import com.winsonchiu.aria.folders.util.withFolders
@@ -108,7 +108,7 @@ class FolderController @Inject constructor(
     fun playFolder(selected: FileMetadata) {
         val metadataList = folderContents.value.files
         metadataList.map {
-            MediaQueue.QueueItem(it.file, it.image?.bitmap, it.metadata)
+            MediaQueue.QueueItem(it.file, it.image, it.metadata)
         }
                 .also { mediaQueue.set(it, metadataList.indexOf(selected)) }
     }

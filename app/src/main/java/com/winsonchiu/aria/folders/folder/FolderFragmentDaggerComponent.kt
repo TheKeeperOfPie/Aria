@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.folders.folder
 
-import com.winsonchiu.aria.dagger.FragmentScreenScope
-import com.winsonchiu.aria.dagger.fragment.FragmentLifecycleBoundComponent
+import com.winsonchiu.aria.framework.dagger.FragmentScreenScope
+import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
 import dagger.Binds
 import dagger.Module
 import dagger.Subcomponent
