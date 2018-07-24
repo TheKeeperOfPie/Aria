@@ -1,5 +1,10 @@
 package com.winsonchiu.aria.folders.util
 
+import android.content.Context
+import com.winsonchiu.aria.R
+import com.winsonchiu.aria.folders.folder.FolderController
+import com.winsonchiu.aria.music.MetadataExtractor
+import com.winsonchiu.aria.music.artistDisplayValue
 import java.io.File
 
 object FileUtils {
@@ -45,4 +50,43 @@ object FileUtils {
 
         return fileSortKey.drop(startIndex.coerceAtLeast(0))
     }
+
+    fun getFileDescription(
+            context: Context,
+            metadata: MetadataExtractor.Metadata?,
+            showArtist: Boolean,
+            showAlbum: Boolean
+    ): String? {
+        metadata ?: return null
+
+        val resources = context.resources
+        val artist = metadata.artistDisplayValue()
+        val album = metadata.album
+
+        fun String?.isShowable() = !isNullOrBlank()
+                && !equals("unknown", ignoreCase = true)
+                && !equals("null", ignoreCase = true)
+
+        val artistShowable = artist.isShowable() && showArtist
+        val albumShowable = album.isShowable() && showAlbum
+
+        return when {
+            artistShowable && albumShowable -> resources.getString(
+                    R.string.fileDescriptionFormatArtistAndAlbum,
+                    artist,
+                    album
+            )
+            artistShowable -> resources.getString(R.string.fileDescriptionFormatArtist, artist)
+            albumShowable -> resources.getString(R.string.fileDescriptionFormatAlbum, album)
+            else -> null
+        }
+    }
+
+    fun getFileDisplayAndSortMetadata(it: FolderController.FileMetadata): FileDisplayAndSortMetadata {
+        val fileSortKey = FileUtils.getFileSortKey(it.file)
+        val fileDisplayTitle = FileUtils.getFileDisplayTitle(fileSortKey?.substringBeforeLast("."))
+        return FileDisplayAndSortMetadata(it, fileDisplayTitle, fileSortKey)
+    }
+
+    fun getFolderTitle(folder: File) = folder.invariantSeparatorsPath
 }

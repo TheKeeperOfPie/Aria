@@ -37,6 +37,11 @@ class MediaQueue @Inject constructor() {
         setItemAndEmit(currentItem)
     }
 
+    fun playNext(item: QueueItem) {
+        this.queue.add(Math.floorMod(currentIndex + 1, queue.size + 1), item)
+        setItemAndEmit(currentItem)
+    }
+
     private fun setItemAndEmit(item: QueueItem?) {
         if (item != null) {
             val index = queue.indexOf(item)

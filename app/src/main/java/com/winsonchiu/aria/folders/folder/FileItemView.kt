@@ -55,7 +55,7 @@ class FileItemView @JvmOverloads constructor(
     fun onChanged() {
         fileNameText.text = title
 
-        fileDescriptionText.textOrGone(description)
+        fileDescriptionText.textOrGone = description
 
         val image = fileMetadata.image
 

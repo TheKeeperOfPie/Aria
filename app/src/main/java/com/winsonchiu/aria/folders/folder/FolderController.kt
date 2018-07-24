@@ -111,6 +111,16 @@ class FolderController @Inject constructor(
                 .also { mediaQueue.add(it, MediaQueue.QueueItem(selected.file, selected.image, selected.metadata)) }
     }
 
+    fun playNext(file: File) {
+        val metadata = folderContents.value.files.first { it.file == file }
+        mediaQueue.playNext(MediaQueue.QueueItem(metadata.file, metadata.image, metadata.metadata))
+    }
+
+    fun addToQueue(file: File) {
+        val metadata = folderContents.value.files.first { it.file == file }
+        mediaQueue.add(MediaQueue.QueueItem(metadata.file, metadata.image, metadata.metadata))
+    }
+
     data class Model(
             val folder: File,
             val files: List<FileMetadata>

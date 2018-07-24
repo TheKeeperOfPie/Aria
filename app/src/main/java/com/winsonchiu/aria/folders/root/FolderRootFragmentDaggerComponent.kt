@@ -27,10 +27,6 @@ interface FolderRootFragmentDaggerComponent {
 class FolderRootFragmentModule {
 
     @Provides
-    @RootFragmentScreenScope
-    fun provideArtworkCache() = ArtworkCache()
-
-    @Provides
     @IntoSet
     @RootFragmentScreenScope
     fun provideDefaultBoundComponent(): FragmentLifecycleBoundComponent = FragmentDefaultBoundModule.DefaultBoundComponent

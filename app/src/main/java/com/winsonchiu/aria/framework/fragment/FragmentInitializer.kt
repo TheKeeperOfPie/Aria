@@ -1,12 +1,9 @@
 package com.winsonchiu.aria.framework.fragment
 
 import android.os.Bundle
-import android.os.IBinder
 import android.os.Parcelable
-import android.os.PersistableBundle
 import android.support.v4.app.Fragment
-import android.util.Size
-import android.util.SizeF
+import com.winsonchiu.aria.framework.util.putArgument
 
 @Suppress("UNCHECKED_CAST")
 inline fun <FragmentType : Fragment, T : FragmentInitializer<FragmentType>> T.build(block: T.() -> Unit): FragmentType {
@@ -43,26 +40,7 @@ abstract class FragmentInitializer<out FragmentType : Fragment>(private val frag
 
     private fun Bundle?.putExtras() = this?.apply {
         for ((key, value) in argumentsMap) {
-            when (value) {
-                null -> Unit
-                is IBinder -> putBinder(key, value)
-                is Boolean -> putBoolean(key, value)
-                is Bundle -> putBundle(key, value)
-                is Byte -> putByte(key, value)
-                is Char -> putChar(key, value)
-                is CharSequence -> putCharSequence(key, value)
-                is Double -> putDouble(key, value)
-                is Float -> putFloat(key, value)
-                is Int -> putInt(key, value)
-                is Long -> putLong(key, value)
-                is Parcelable -> putParcelable(key, value)
-                is Short -> putShort(key, value)
-                is Size -> putSize(key, value)
-                is SizeF -> putSizeF(key, value)
-                is String -> putString(key, value)
-                is PersistableBundle -> putAll(value)
-                else -> throw IllegalStateException("Invalid bundle value")
-            }
+            putArgument(key, value)
         }
     }
 }

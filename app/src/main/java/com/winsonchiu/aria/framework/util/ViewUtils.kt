@@ -21,43 +21,62 @@ fun <T : ViewGroup> T.initialize(@LayoutRes layoutRes: Int) {
     ButterKnife.bind(this)
 }
 
-fun <T> TypedEpoxyController<T>.setDataForView(recyclerView: EpoxyRecyclerView, data: T) {
+fun <T> TypedEpoxyController<T>.setDataForView(
+        recyclerView: EpoxyRecyclerView,
+        data: T
+) {
     setData(data)
     if (recyclerView.adapter != adapter) {
         recyclerView.setController(this)
     }
 }
 
-fun SimpleEpoxyController.setDataForView(recyclerView: EpoxyRecyclerView, data: List<EpoxyModel<*>>) {
+fun SimpleEpoxyController.setDataForView(
+        recyclerView: EpoxyRecyclerView,
+        data: List<EpoxyModel<*>>
+) {
     setModels(data)
     if (recyclerView.adapter != adapter) {
         recyclerView.setController(this)
     }
 }
 
-fun <T> TypedEpoxyController<T>.setDataForView(recyclerView: RecyclerView, data: T) {
+fun <T> TypedEpoxyController<T>.setDataForView(
+        recyclerView: RecyclerView,
+        data: T
+) {
     setData(data)
     if (recyclerView.adapter != adapter) {
         recyclerView.adapter = adapter
     }
 }
 
-fun TextView.textOrGone(text: CharSequence?) {
-    this.text = text
-    visibility = if (text.isNullOrBlank()) {
-        View.GONE
-    } else {
-        View.VISIBLE
+var TextView.textOrGone: CharSequence?
+    get() = text
+    set(value) {
+        this.text = value
+        visibility = if (text.isNullOrBlank()) {
+            View.GONE
+        } else {
+            View.VISIBLE
+        }
     }
-}
 
 fun Int.dpToPx(view: View) = dpToPx(view.context)
 fun Int.dpToPx(context: Context) = dpToPx(context.resources.displayMetrics)
-fun Int.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this.toFloat(), displayMetrics).roundToInt()
+fun Int.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        this.toFloat(),
+        displayMetrics
+).roundToInt()
 
 fun Float.dpToPx(view: View) = dpToPx(view.context)
 fun Float.dpToPx(context: Context) = dpToPx(context.resources.displayMetrics)
-fun Float.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, this, displayMetrics)
+fun Float.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_DIP,
+        this,
+        displayMetrics
+)
 
 
 fun ViewGroup.findChild(block: (child: View) -> Boolean): View? {

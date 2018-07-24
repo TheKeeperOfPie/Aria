@@ -1,9 +1,11 @@
 package com.winsonchiu.aria.music
 
 import android.media.MediaMetadataRetriever
+import android.os.Parcelable
 import android.support.annotation.WorkerThread
 import com.winsonchiu.aria.framework.dagger.ApplicationScope
 import com.winsonchiu.aria.framework.util.Failsafe
+import kotlinx.android.parcel.Parcelize
 import java.io.File
 import javax.inject.Inject
 
@@ -61,6 +63,7 @@ class MetadataExtractor @Inject constructor() {
         }
     }
 
+    @Parcelize
     data class Metadata(
             val cdTrackNumber: String? = null,
             val album: String? = null,
@@ -88,7 +91,7 @@ class MetadataExtractor @Inject constructor() {
             val location: String? = null,
             val videoRotation: String? = null,
             val captureFrameRate: String? = null
-    )
+    ) : Parcelable
 }
 
 fun MetadataExtractor.Metadata?.artistDisplayValue(): String? {

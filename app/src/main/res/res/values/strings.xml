@@ -3,4 +3,8 @@
     <string name="page_title_folders">Folders</string>
 
     <string name="item_added">%1$s added</string>
+
+    <string name="add_to_queue">Add to queue</string>
+    <string name="play_next">Play next</string>
+
 </resources>
