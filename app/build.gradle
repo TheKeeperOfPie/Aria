@@ -42,7 +42,9 @@ android {
             res.srcDirs = [
                     "/src/main/res/folder",
                     "/src/main/res/home",
+                    "/src/main/res/items",
                     "/src/main/res/media",
+                    "/src/main/res/nowplaying",
                     "/src/main/res/queue",
                     "/src/main/res/res",
             ]

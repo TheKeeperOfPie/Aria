@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<MotionScene
+    xmlns:motion="http://schemas.android.com/apk/res-auto">
+
+    <Transition
+        motion:constraintSetEnd="@layout/now_playing_view_constraint_collapsed"
+        motion:constraintSetStart="@layout/now_playing_view_constraint_expanded"
+        motion:duration="1000"
+        />
+
+</MotionScene>

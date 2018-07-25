@@ -8,11 +8,25 @@
     tools:context=".main.MainActivity"
     >
 
-    <FrameLayout
-        android:id="@+id/main_activity_fragment_container"
+    <com.winsonchiu.aria.main.MainLayout
+        android:id="@+id/layoutMain"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        />
+        android:layout_height="wrap_content"
+        >
+
+        <FrameLayout
+            android:id="@+id/main_activity_fragment_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+        <com.winsonchiu.aria.nowplaying.NowPlayingView
+            android:id="@+id/viewNowPlaying"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </com.winsonchiu.aria.main.MainLayout>
 
     <FrameLayout
         android:layout_width="match_parent"

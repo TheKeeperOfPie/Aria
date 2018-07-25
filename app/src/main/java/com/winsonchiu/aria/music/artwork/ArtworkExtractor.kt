@@ -17,7 +17,7 @@ import com.winsonchiu.aria.framework.dagger.ActivityScreenScope
 import com.winsonchiu.aria.framework.util.Failsafe
 import com.winsonchiu.aria.framework.util.dpToPx
 import java.io.File
-import java.util.*
+import java.util.Arrays
 import javax.inject.Inject
 
 @ActivityScreenScope
@@ -148,6 +148,7 @@ class ArtworkExtractor @Inject constructor(
                 }
     }
 
+    // TODO: Remove Bitmap fetching in favor of Uris
     private fun scaleIfNecessary(bitmap: Bitmap): Bitmap {
         return if (bitmap.width != targetSize || bitmap.height != targetSize) {
             ThumbnailUtils.extractThumbnail(bitmap, targetSize, targetSize, ThumbnailUtils.OPTIONS_RECYCLE_INPUT)
