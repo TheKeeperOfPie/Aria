@@ -1,6 +1,7 @@
 package com.winsonchiu.aria.framework.dagger.activity
 
 import com.winsonchiu.aria.framework.dagger.ActivityScreenScope
+import com.winsonchiu.aria.framework.dagger.ViewInjector
 import com.winsonchiu.aria.framework.menu.itemsheet.view.ItemsMenuFileHeaderView
 import com.winsonchiu.aria.home.HomeFragmentDaggerComponent
 import com.winsonchiu.aria.main.MainActivity
@@ -18,7 +19,7 @@ import dagger.multibindings.IntoSet
             ActivityModule::class
         ]
 )
-interface ActivityComponent {
+interface ActivityComponent : ViewInjector {
 
     fun homeFragmentComponent(): HomeFragmentDaggerComponent
 

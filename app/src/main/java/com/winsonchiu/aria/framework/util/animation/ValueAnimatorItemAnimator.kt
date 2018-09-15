@@ -3,10 +3,10 @@ package com.winsonchiu.aria.framework.util.animation
 import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ValueAnimator
-import android.support.annotation.Size
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.Size
 import androidx.core.animation.doOnCancel
 import androidx.core.animation.doOnEnd
+import androidx.recyclerview.widget.RecyclerView
 
 abstract class ValueAnimatorItemAnimator<ItemInfo : RecyclerView.ItemAnimator.ItemHolderInfo> :
     CustomInfoItemAnimator<ItemInfo>() {

@@ -9,7 +9,7 @@ import android.media.MediaMetadataRetriever
 import android.media.ThumbnailUtils
 import android.net.Uri
 import android.provider.MediaStore
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileFilters.COVER_IMAGE_REGEX

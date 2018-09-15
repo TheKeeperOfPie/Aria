@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="android.support.constraint.ConstraintLayout"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
     >
 
     <ImageView
@@ -18,7 +18,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/ic_album_24dp"
+        android:contentDescription="TODO" app:srcCompat="@drawable/ic_album_24dp"
         />
 
     <TextView

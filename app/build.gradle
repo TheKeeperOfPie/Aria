@@ -1,19 +1,20 @@
+//noinspection GradleCompatible
 apply plugin: "com.android.application"
 apply plugin: "kotlin-android"
 apply plugin: "kotlin-android-extensions"
 apply plugin: "kotlin-kapt"
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         applicationId "com.winsonchiu.aria"
-        minSdkVersion 27
-        targetSdkVersion 27
+        minSdkVersion 28
+        targetSdkVersion 28
         multiDexEnabled true
         versionCode 1
         versionName "0.1"
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -50,7 +51,6 @@ android {
             ]
         }
     }
-    buildToolsVersion '28.0.0 rc1'
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -73,76 +73,78 @@ dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation "com.android.support.constraint:constraint-layout:2.0.0-alpha1"
-    def supportLibraryVersion = "27.1.1"
+    implementation "androidx.constraintlayout:constraintlayout:2.0.0-alpha2"
+    implementation "androidx.constraintlayout:constraintlayout-solver:2.0.0-alpha2"
 
-    //noinspection GradleCompatible
-    implementation "com.android.support:appcompat-v7:$supportLibraryVersion"
-    implementation "com.android.support:animated-vector-drawable:$supportLibraryVersion"
-    implementation "com.android.support:customtabs:$supportLibraryVersion"
-    implementation "com.android.support:design:$supportLibraryVersion"
-    implementation "com.android.support:palette-v7:$supportLibraryVersion"
-    implementation "com.android.support:recyclerview-v7:$supportLibraryVersion"
-    implementation "com.android.support:support-annotations:$supportLibraryVersion"
-    implementation "com.android.support:support-vector-drawable:$supportLibraryVersion"
+    implementation "androidx.appcompat:appcompat:1.0.0-rc02"
+    implementation "androidx.coordinatorlayout:coordinatorlayout:1.0.0-rc02"
+    implementation "androidx.drawerlayout:drawerlayout:1.0.0-rc02"
+    implementation "androidx.vectordrawable:vectordrawable-animated:1.0.0-rc02"
+    implementation "androidx.browser:browser:1.0.0-rc02"
+    implementation "androidx.fragment:fragment-ktx:1.0.0-rc02"
+    implementation "androidx.palette:palette-ktx:1.0.0-rc02"
+    implementation "androidx.recyclerview:recyclerview-selection:1.0.0-rc02"
+    implementation "androidx.annotation:annotation:1.0.0-rc02"
+    implementation "androidx.annotation:annotation:1.0.0-rc02"
+    implementation "androidx.media:media:1.0.0-rc02"
+    implementation "androidx.media2:media2:1.0.0-alpha02"
+    implementation "com.google.android.material:material:1.0.0-rc02"
 
-    implementation 'androidx.core:core-ktx:0.3'
+    implementation 'androidx.core:core-ktx:1.0.0-rc02'
 
-    def lifecycleVersion = "1.1.1"
-    implementation "android.arch.lifecycle:common-java8:$lifecycleVersion"
-    implementation "android.arch.lifecycle:extensions:$lifecycleVersion"
-    testImplementation "android.arch.core:core-testing:$lifecycleVersion"
+    implementation "androidx.lifecycle:lifecycle-common-java8:2.0.0-rc01"
+    implementation "androidx.lifecycle:lifecycle-extensions:2.0.0-rc01"
+    implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:2.0.0-rc01"
+    implementation "androidx.lifecycle:lifecycle-reactivestreams-ktx:2.0.0-rc01"
 
-    def roomVersion = "1.1.0-beta2"
-    kapt "android.arch.persistence.room:compiler:$roomVersion"
-    implementation "android.arch.persistence.room:runtime:$roomVersion"
-    implementation "android.arch.persistence.room:rxjava2:$roomVersion"
-    testImplementation "android.arch.persistence.room:testing:$roomVersion"
-    implementation 'android.arch.paging:runtime:1.0.0-beta1'
-    implementation 'android.arch.paging:rxjava2:1.0.0-alpha1'
+    implementation "androidx.paging:paging-runtime:2.0.0-rc01"
+    implementation "androidx.paging:paging-rxjava2:2.0.0-rc01"
 
-    def daggerVersion = "2.15"
+    def daggerVersion = "2.16"
     implementation "com.google.dagger:dagger-android-support:$daggerVersion"
     implementation "com.google.dagger:dagger-android:$daggerVersion"
     implementation "com.google.dagger:dagger:$daggerVersion"
+    implementation "com.squareup:javapoet:1.11.1"
 
     kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
     kapt "com.google.dagger:dagger-compiler:$daggerVersion"
 
-    implementation 'com.squareup.okhttp3:okhttp:3.10.0'
-    implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'com.jakewharton.picasso:picasso2-okhttp3-downloader:1.1.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.4.0'
+    implementation "com.squareup.okhttp3:okhttp:3.11.0"
+    implementation "com.squareup.picasso:picasso:2.71828"
+    implementation "com.squareup.retrofit2:retrofit:2.4.0"
 
-    debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.5.4'
-    releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.5.4'
+    def leakCanaryVersion = "1.6.1"
+    debugImplementation "com.squareup.leakcanary:leakcanary-android:$leakCanaryVersion"
+    releaseImplementation "com.squareup.leakcanary:leakcanary-android-no-op:$leakCanaryVersion"
 
-    implementation 'io.reactivex.rxjava2:rxjava:2.1.12'
+    implementation 'io.reactivex.rxjava2:rxjava:2.2.2'
     implementation 'io.reactivex.rxjava2:rxandroid:2.0.2'
     implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
     implementation "com.github.akarnokd:rxjava2-extensions:0.18.9"
 
-    def epoxyVersion = "2.11.0"
+    def epoxyVersion = "3.0.0-rc1"
     kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
     implementation "com.airbnb.android:epoxy:$epoxyVersion"
 
-    def butterKnifeVersion = "8.8.1"
+    def butterKnifeVersion = "9.0.0-SNAPSHOT"
     implementation "com.jakewharton:butterknife:$butterKnifeVersion"
     kapt "com.jakewharton:butterknife-compiler:$butterKnifeVersion"
 
-    def autoDisposeVersion = "0.7.0"
-    implementation "com.uber.autodispose:autodispose-android-archcomponents-kotlin:$autoDisposeVersion"
-    implementation "com.uber.autodispose:autodispose-android-archcomponents-test-kotlin:$autoDisposeVersion"
+    def autoDisposeVersion = "1.0.0-RC2"
+    implementation "com.uber.autodispose:autodispose-android-archcomponents-ktx:$autoDisposeVersion"
+    implementation "com.uber.autodispose:autodispose-android-archcomponents-test-ktx:$autoDisposeVersion"
     implementation "com.uber.autodispose:autodispose-android-archcomponents-test:$autoDisposeVersion"
     implementation "com.uber.autodispose:autodispose-android-archcomponents:$autoDisposeVersion"
-    implementation "com.uber.autodispose:autodispose-android-kotlin:$autoDisposeVersion"
+    implementation "com.uber.autodispose:autodispose-android-ktx:$autoDisposeVersion"
     implementation "com.uber.autodispose:autodispose-android:$autoDisposeVersion"
-    implementation "com.uber.autodispose:autodispose-kotlin:$autoDisposeVersion"
+    implementation "com.uber.autodispose:autodispose-ktx:$autoDisposeVersion"
     implementation "com.uber.autodispose:autodispose:$autoDisposeVersion"
+
+    implementation 'com.sothree.slidinguppanel:library:3.4.0'
 }
 
 dependencies {
     testImplementation "junit:junit:4.12"
-    androidTestImplementation "com.android.support.test:runner:1.0.1"
-    androidTestImplementation "com.android.support.test.espresso:espresso-core:3.0.1"
+    androidTestImplementation "androidx.test:runner:1.1.0-alpha4"
+    androidTestImplementation "androidx.test.espresso:espresso-core:3.1.0-alpha4"
 }

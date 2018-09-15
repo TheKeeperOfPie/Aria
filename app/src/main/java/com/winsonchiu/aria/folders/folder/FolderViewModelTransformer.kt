@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.folders.folder
 
 import android.content.Context
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import com.airbnb.epoxy.EpoxyModel
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.folders.util.FileSorter

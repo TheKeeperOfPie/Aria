@@ -1,19 +1,23 @@
 package com.winsonchiu.aria.framework.util
 
 import android.content.Context
-import android.support.annotation.LayoutRes
-import android.support.v7.widget.RecyclerView
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.LayoutRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
+import androidx.recyclerview.widget.RecyclerView
 import butterknife.ButterKnife
 import com.airbnb.epoxy.EpoxyModel
 import com.airbnb.epoxy.EpoxyRecyclerView
 import com.airbnb.epoxy.SimpleEpoxyController
 import com.airbnb.epoxy.TypedEpoxyController
+import com.winsonchiu.aria.BuildConfig
+import java.lang.reflect.Field
+import java.lang.reflect.Method
 import kotlin.math.roundToInt
 
 fun <T : ViewGroup> T.initialize(@LayoutRes layoutRes: Int) {
@@ -91,4 +95,55 @@ fun ViewGroup.findChild(block: (child: View) -> Boolean): View? {
     }
 
     return null
+}
+
+private var constraintLayoutUpdateHierarchyMethod: Method? = null
+
+fun ConstraintLayout.forceUpdateHierarchy() {
+    try {
+        if (constraintLayoutUpdateHierarchyMethod == null) {
+            constraintLayoutUpdateHierarchyMethod = ConstraintLayout::class.java.getDeclaredMethod("setChildrenConstraints")
+            constraintLayoutUpdateHierarchyMethod?.isAccessible = true
+        }
+
+        constraintLayoutUpdateHierarchyMethod?.invoke(this)
+    } catch (ignored: Exception) {
+        if (BuildConfig.DEBUG) {
+            throw ignored
+        }
+    }
+}
+
+private var constraintLayoutHorizontalDimensionFixedField: Field? = null
+
+fun ConstraintLayout.LayoutParams.horizontalDimensionFixed(fixed: Boolean) {
+    try {
+        if (constraintLayoutHorizontalDimensionFixedField == null) {
+            constraintLayoutHorizontalDimensionFixedField = ConstraintLayout.LayoutParams::class.java.getDeclaredField("horizontalDimensionFixed")
+            constraintLayoutHorizontalDimensionFixedField?.isAccessible = true
+        }
+
+        constraintLayoutHorizontalDimensionFixedField?.set(this, fixed)
+    } catch (ignored: Exception) {
+        if (BuildConfig.DEBUG) {
+            throw ignored
+        }
+    }
+}
+
+fun ConstraintLayout.LayoutParams.getHorizontalDimensionFixed(): Boolean {
+    try {
+        if (constraintLayoutHorizontalDimensionFixedField == null) {
+            constraintLayoutHorizontalDimensionFixedField = ConstraintLayout.LayoutParams::class.java.getDeclaredField("horizontalDimensionFixed")
+            constraintLayoutHorizontalDimensionFixedField?.isAccessible = true
+        }
+
+        return constraintLayoutHorizontalDimensionFixedField?.get(this) as Boolean
+    } catch (ignored: Exception) {
+        if (BuildConfig.DEBUG) {
+            throw ignored
+        }
+    }
+
+    return true
 }

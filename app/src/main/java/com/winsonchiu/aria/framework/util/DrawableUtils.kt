@@ -3,7 +3,7 @@ package com.winsonchiu.aria.framework.util
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.drawable.Drawable
-import android.support.v7.content.res.AppCompatResources
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.use
 import com.winsonchiu.aria.R
 

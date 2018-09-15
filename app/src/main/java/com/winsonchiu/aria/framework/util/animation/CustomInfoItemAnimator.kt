@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.framework.util.animation
 
-import android.support.v7.widget.DefaultItemAnimator
-import android.support.v7.widget.RecyclerView
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.RecyclerView
 
 abstract class CustomInfoItemAnimator<ItemInfo : RecyclerView.ItemAnimator.ItemHolderInfo> : DefaultItemAnimator() {
 

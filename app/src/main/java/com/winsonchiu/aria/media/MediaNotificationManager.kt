@@ -8,15 +8,14 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
-import android.support.v4.app.NotificationCompat
-import android.support.v4.app.NotificationManagerCompat
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
-import android.support.v4.media.app.NotificationCompat.MediaStyle
-import android.support.v4.media.session.MediaButtonReceiver
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.Log
+import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
+import androidx.media.session.MediaButtonReceiver
 import com.winsonchiu.aria.BuildConfig
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.main.MainActivity
@@ -131,7 +130,7 @@ class MediaNotificationManager(
 
         return NotificationCompat.Builder(service, CHANNEL_ID)
                 .setStyle(
-                        MediaStyle()
+                        androidx.media.app.NotificationCompat.MediaStyle()
                                 .setMediaSession(sessionToken)
                                 .setShowActionsInCompactView(0, 1, 2)
                 )

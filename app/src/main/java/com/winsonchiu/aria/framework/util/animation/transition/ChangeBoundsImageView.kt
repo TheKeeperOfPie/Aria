@@ -3,11 +3,10 @@ package com.winsonchiu.aria.framework.util.animation.transition
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.graphics.Rect
-import android.support.annotation.CallSuper
-import android.support.transition.ChangeBounds
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import androidx.annotation.CallSuper
 import com.winsonchiu.aria.BuildConfig
 import com.winsonchiu.aria.framework.util.animation.AnimationUtils
 

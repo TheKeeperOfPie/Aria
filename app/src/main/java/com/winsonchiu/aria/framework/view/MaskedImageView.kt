@@ -3,8 +3,8 @@ package com.winsonchiu.aria.framework.view
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Path
-import android.support.v7.widget.AppCompatImageView
 import android.util.AttributeSet
+import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.content.res.use
 import androidx.core.graphics.withSave
 import com.winsonchiu.aria.R

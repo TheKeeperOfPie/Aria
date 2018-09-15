@@ -1,8 +1,8 @@
 package com.winsonchiu.aria.framework.activity
 
 import android.os.Bundle
-import android.support.annotation.CallSuper
-import android.support.v7.app.AppCompatActivity
+import androidx.annotation.CallSuper
+import androidx.appcompat.app.AppCompatActivity
 import com.winsonchiu.aria.framework.application.AriaApplication
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.framework.dagger.activity.ActivityComponent

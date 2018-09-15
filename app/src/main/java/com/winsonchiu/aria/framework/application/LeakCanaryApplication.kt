@@ -3,7 +3,7 @@ package com.winsonchiu.aria.framework.application
 import android.annotation.SuppressLint
 import android.app.Application
 import android.os.StrictMode
-import android.support.annotation.CallSuper
+import androidx.annotation.CallSuper
 import com.squareup.leakcanary.LeakCanary
 import com.winsonchiu.aria.BuildConfig
 import com.winsonchiu.aria.main.MainActivity

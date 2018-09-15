@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.framework.fragment
 
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.winsonchiu.aria.framework.util.putArgument
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty

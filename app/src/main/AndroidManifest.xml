@@ -29,7 +29,7 @@
 
         </activity>
 
-        <service android:name=".media.MediaService">
+        <service android:name=".media.MediaService" android:permission="">
             <intent-filter>
                 <action android:name="android.media.browse.MediaBrowserService" />
             </intent-filter>
@@ -43,7 +43,7 @@
              Additionally, this is used to resume the service from an inactive state upon
              receiving a media button event (such as "play").
         -->
-        <receiver android:name="android.support.v4.media.session.MediaButtonReceiver">
+        <receiver android:name="androidx.media.session.MediaButtonReceiver">
             <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON"/>
             </intent-filter>

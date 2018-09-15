@@ -1,8 +1,8 @@
 package com.winsonchiu.aria.media.util
 
 import android.os.Bundle
-import android.support.annotation.CallSuper
 import android.support.v4.media.MediaBrowserCompat
+import androidx.annotation.CallSuper
 
 abstract class NullableMediaBrowserSubscriptionCallback : MediaBrowserCompat.SubscriptionCallback() {
 

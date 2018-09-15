@@ -3,8 +3,6 @@ package com.winsonchiu.aria.framework.util.animation.transition
 import android.animation.Animator
 import android.animation.ValueAnimator
 import android.graphics.Color
-import android.support.transition.Fade
-import android.support.transition.Slide
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup

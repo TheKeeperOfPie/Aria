@@ -26,9 +26,9 @@ open class TransitionSetFramework(
 open class TransitionSetSupport(
         private val defaultStartDelay: Long = -1,
         private val defaultDuration: Long = 350
-) : android.support.transition.TransitionSet() {
+) : androidx.transition.TransitionSet() {
 
-    internal fun android.support.transition.Transition.addToSet(startDelay: Long = defaultStartDelay, duration: Long = defaultDuration) {
+    internal fun androidx.transition.Transition.addToSet(startDelay: Long = defaultStartDelay, duration: Long = defaultDuration) {
         this.setStartDelay(startDelay.multiplyByDebugModifier())
                 .setDuration(duration.multiplyByDebugModifier())
                 .let(::addTransition)

@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.framework.dagger.activity
 
-import android.support.annotation.CallSuper
-import android.support.annotation.MainThread
+import androidx.annotation.CallSuper
+import androidx.annotation.MainThread
 import com.jakewharton.rxrelay2.PublishRelay
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.FlowableSubscribeProxy
@@ -9,6 +9,7 @@ import com.uber.autodispose.ObservableSubscribeProxy
 import com.uber.autodispose.ScopeProvider
 import com.uber.autodispose.SingleSubscribeProxy
 import com.winsonchiu.aria.framework.util.arch.LoggingLifecycleObserver
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -29,7 +30,7 @@ abstract class ActivityLifecycleBoundComponent : LoggingLifecycleObserver, Scope
         onFinalDestroyRelay.accept(Unit)
     }
 
-    override fun requestScope() = onFinalDestroyRelay.firstElement()
+    override fun requestScope() = Completable.fromMaybe(onFinalDestroyRelay.firstElement())
 
     fun <T> Single<T>.bindToLifecycle(): SingleSubscribeProxy<T> {
         return `as`(AutoDispose.autoDisposable(this@ActivityLifecycleBoundComponent))

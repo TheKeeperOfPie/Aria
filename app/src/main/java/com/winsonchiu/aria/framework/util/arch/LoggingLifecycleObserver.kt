@@ -1,9 +1,9 @@
 package com.winsonchiu.aria.framework.util.arch
 
-import android.arch.lifecycle.DefaultLifecycleObserver
-import android.arch.lifecycle.LifecycleOwner
-import android.support.annotation.CallSuper
 import android.util.Log
+import androidx.annotation.CallSuper
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 
 interface LoggingLifecycleObserver : DefaultLifecycleObserver {
 

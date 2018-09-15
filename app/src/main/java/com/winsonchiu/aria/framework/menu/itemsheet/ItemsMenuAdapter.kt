@@ -1,8 +1,8 @@
 package com.winsonchiu.aria.framework.menu.itemsheet
 
-import android.support.v7.widget.RecyclerView
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.RecyclerView
 import kotlin.reflect.full.primaryConstructor
 
 class ItemsMenuAdapter<DataType : ItemsMenuItem>(

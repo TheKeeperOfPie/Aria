@@ -1,8 +1,8 @@
 package com.winsonchiu.aria.folders.folder
 
 import android.content.Context
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView

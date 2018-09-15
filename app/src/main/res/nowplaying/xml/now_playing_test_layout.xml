@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/textSongDescription"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginStart="16dp"
+    android:layout_marginEnd="16dp"
+    android:lines="1"
+    android:maxLines="1"
+    android:singleLine="true"
+    android:textAlignment="textStart"
+    android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+    android:textSize="12sp"
+    app:layout_constrainedWidth="true"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintHorizontal_bias="0"
+    app:layout_constraintStart_toEndOf="@id/imageArtwork"
+    app:layout_constraintTop_toBottomOf="@id/textSongTitle"
+    tools:text="Fate - Unlimited Blade Works - Brave Shine | Aimer"
+    />

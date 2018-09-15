@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.framework.fragment.subclass
 
 import android.content.Context
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.winsonchiu.aria.framework.activity.DaggerComponentActivity
 import com.winsonchiu.aria.framework.fragment.FragmentLoader
 import com.winsonchiu.aria.framework.fragment.FragmentLoaderCallback

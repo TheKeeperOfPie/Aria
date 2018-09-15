@@ -1,9 +1,9 @@
 package com.winsonchiu.aria.queue
 
 import android.os.Bundle
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.helper.ItemTouchHelper
 import android.view.View
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.SimpleEpoxyController
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.folders.util.FileUtils
@@ -29,11 +29,11 @@ class QueueFragment : BaseFragment<ActivityComponent, QueueFragmentDaggerCompone
 
     private val itemTouchHelper: ItemTouchHelper = ItemTouchHelper(object : ItemTouchHelper.Callback() {
 
-        override fun getMovementFlags(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder?): Int {
+        override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
             return makeMovementFlags(ItemTouchHelper.UP or ItemTouchHelper.DOWN, ItemTouchHelper.START)
         }
 
-        override fun onMove(recyclerView: RecyclerView?, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
+        override fun onMove(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder, target: RecyclerView.ViewHolder): Boolean {
             val queueItem = (viewHolder.itemView as QueueItemView).queueItem
             val positionOne = currentQueue.queue.indexOf(queueItem)
             val positionTwo = currentQueue.queue.indexOf((target.itemView as QueueItemView).queueItem)
@@ -49,7 +49,7 @@ class QueueFragment : BaseFragment<ActivityComponent, QueueFragmentDaggerCompone
             return true
         }
 
-        override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder?): Float {
+        override fun getSwipeThreshold(viewHolder: RecyclerView.ViewHolder): Float {
             return 0.3f
         }
 

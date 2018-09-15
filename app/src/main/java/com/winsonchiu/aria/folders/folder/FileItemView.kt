@@ -2,8 +2,8 @@ package com.winsonchiu.aria.folders.folder
 
 import android.content.Context
 import android.graphics.drawable.Drawable
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
+import androidx.constraintlayout.widget.ConstraintLayout
 import butterknife.BindDrawable
 import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp

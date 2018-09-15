@@ -1,11 +1,11 @@
 package com.winsonchiu.aria.media
 
-import android.arch.lifecycle.LifecycleOwner
-import android.arch.lifecycle.ServiceLifecycleDispatcher
 import android.content.Intent
 import android.os.IBinder
-import android.support.annotation.CallSuper
-import android.support.v4.media.MediaBrowserServiceCompat
+import androidx.annotation.CallSuper
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ServiceLifecycleDispatcher
+import androidx.media.MediaBrowserServiceCompat
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.ObservableSubscribeProxy
 import com.uber.autodispose.SingleSubscribeProxy

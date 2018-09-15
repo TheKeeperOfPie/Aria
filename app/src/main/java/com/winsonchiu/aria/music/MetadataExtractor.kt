@@ -2,7 +2,7 @@ package com.winsonchiu.aria.music
 
 import android.media.MediaMetadataRetriever
 import android.os.Parcelable
-import android.support.annotation.WorkerThread
+import androidx.annotation.WorkerThread
 import com.winsonchiu.aria.framework.dagger.ApplicationScope
 import com.winsonchiu.aria.framework.util.Failsafe
 import kotlinx.android.parcel.Parcelize
@@ -29,7 +29,7 @@ class MetadataExtractor @Inject constructor() {
         }
 
         return Failsafe.withDefault(EMPTY) {
-            mediaMetadataRetriever.get().run {
+            mediaMetadataRetriever.get()!!.run {
                 setDataSource(file.absolutePath)
                 Metadata(
                         extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER),

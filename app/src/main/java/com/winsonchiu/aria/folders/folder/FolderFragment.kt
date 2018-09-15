@@ -1,10 +1,10 @@
 package com.winsonchiu.aria.folders.folder
 
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.widget.LinearLayoutManager
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.airbnb.epoxy.SimpleEpoxyController
+import com.google.android.material.snackbar.Snackbar
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.folders.root.FolderRootFragmentDaggerComponent
 import com.winsonchiu.aria.framework.async.RequestState

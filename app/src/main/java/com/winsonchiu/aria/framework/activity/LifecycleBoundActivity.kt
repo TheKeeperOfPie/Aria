@@ -1,9 +1,9 @@
 package com.winsonchiu.aria.framework.activity
 
-import android.arch.lifecycle.ViewModel
-import android.arch.lifecycle.ViewModelProvider
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.ViewModelProviders
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.ObservableSubscribeProxy
 import com.uber.autodispose.SingleSubscribeProxy

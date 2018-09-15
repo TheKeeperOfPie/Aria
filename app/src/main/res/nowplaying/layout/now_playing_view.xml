@@ -6,8 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:constraintSet="@layout/now_playing_view_constraint_expanded"
-    tools:parentTag="android.support.constraint.motion.MotionLayout"
     tools:layoutDescription="@xml/now_playing_view_scene"
+    tools:parentTag="androidx.constraintlayout.motion.widget.MotionLayout"
     >
 
     <ImageView
@@ -16,7 +16,7 @@
         android:layout_height="0dp"
         android:contentDescription="@string/now_playing_content_description_track_artwork"
         android:scaleType="centerCrop"
-        android:background="#D1020A"
+        tools:background="#D1020A"
         />
 
     <View
@@ -31,28 +31,74 @@
         android:layout_height="wrap_content"
         />
 
-    <android.support.constraint.Barrier
+    <androidx.constraintlayout.widget.Barrier
         android:id="@+id/barrierImage"
         android:layout_width="0dp"
         android:layout_height="0dp"
         />
 
-    <TextView
+    <com.winsonchiu.aria.framework.view.TextViewWrapper
         android:id="@+id/textSongTitle"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:textAppearance="@style/TextAppearance.AppCompat.Title"
-        android:text="Brave Shine"
-        />
+        android:background="@android:color/holo_red_light"
+        >
 
-    <TextView
+        <com.winsonchiu.aria.framework.view.ReflowTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="56dp"
+            android:gravity="start"
+            android:lines="1"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textSize="14sp"
+            tools:text="Brave Shine"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            tools:text="Brave Shine"
+            />
+
+    </com.winsonchiu.aria.framework.view.TextViewWrapper>
+
+    <com.winsonchiu.aria.framework.view.TextViewWrapper
         android:id="@+id/textSongDescription"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
-        android:text="Fate - Unlimited Blade Works - Brave Shine | Aimer"
-        />
+        android:background="@android:color/holo_red_light"
+        >
+
+        <com.winsonchiu.aria.framework.view.ReflowTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginStart="56dp"
+            android:gravity="start"
+            android:lines="1"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            android:textSize="12sp"
+            tools:text="Fate - Unlimited Blade Works - Brave Shine | Aimer - FateUBW"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
+            tools:text="Fate - Unlimited Blade Works - Brave Shine | Aimer - FateUBW"
+            />
+
+    </com.winsonchiu.aria.framework.view.TextViewWrapper>
 
     <ImageView
         android:id="@+id/imageSkipPrevious"

@@ -2,9 +2,9 @@ package com.winsonchiu.aria.framework.util.animation.transition
 
 import android.animation.Animator
 import android.graphics.Rect
-import android.support.annotation.CallSuper
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import com.winsonchiu.aria.BuildConfig
 import com.winsonchiu.aria.framework.util.animation.transition.BoundsRestrictor.RestrictMode.END
 import com.winsonchiu.aria.framework.util.animation.transition.BoundsRestrictor.RestrictMode.NONE

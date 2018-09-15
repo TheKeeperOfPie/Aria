@@ -2,12 +2,12 @@ package com.winsonchiu.aria.framework.menu.itemsheet.view
 
 import android.content.Context
 import android.os.Parcelable
-import android.support.annotation.DrawableRes
-import android.support.constraint.ConstraintLayout
 import android.util.AttributeSet
+import androidx.annotation.DrawableRes
+import androidx.constraintlayout.widget.ConstraintLayout
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.uber.autodispose.android.ViewScopeProvider
-import com.uber.autodispose.kotlin.autoDisposable
+import com.uber.autodispose.autoDisposable
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.folders.util.FileUtils
 import com.winsonchiu.aria.framework.activity.DaggerComponentActivity

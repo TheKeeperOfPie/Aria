@@ -4,15 +4,16 @@ import android.os.Bundle
 import android.os.IBinder
 import android.os.Parcelable
 import android.os.PersistableBundle
-import android.support.annotation.IdRes
-import android.support.v4.app.FragmentManager
 import android.util.Size
 import android.util.SizeF
+import androidx.annotation.IdRes
+import androidx.fragment.app.FragmentManager
 
 fun FragmentManager.hasFragment(@IdRes containerId: Int): Boolean {
     return findFragmentById(containerId) != null
 }
 
+@Suppress("UNCHECKED_CAST")
 fun Bundle.putArgument(key: String, value: Any?) {
     when (value) {
         null -> Unit

@@ -1,21 +1,21 @@
 package com.winsonchiu.aria.framework.util.animation.transition
 
 import android.animation.Animator
-import android.support.annotation.CallSuper
 import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.CallSuper
 import java.util.concurrent.atomic.AtomicReference
 
 typealias TransitionValuesFramework = android.transition.TransitionValues
-typealias TransitionValuesSupport = android.support.transition.TransitionValues
+typealias TransitionValuesSupport = androidx.transition.TransitionValues
 
 typealias TransitionListenerFramework = android.transition.Transition.TransitionListener
-typealias TransitionListenerSupport = android.support.transition.Transition.TransitionListener
+typealias TransitionListenerSupport = androidx.transition.Transition.TransitionListener
 
 /**
  * This is a generalized wrapper of [android.transition.Transition] and
- * [android.support.transition.Transition].
+ * [androidx.transition.Transition].
  *
  * It is designed to be one-way, meaning you set both enter and return or exit and reenter, with
  * reversed values. It will not automatically reverse an animation given opposite start and end
@@ -124,7 +124,7 @@ abstract class GeneralizedTransition(
 
     open fun forFramework(): android.transition.Transition = TransitionFramework(this)
 
-    open fun forSupport(): android.support.transition.Transition = TransitionSupport(this)
+    open fun forSupport(): androidx.transition.Transition = TransitionSupport(this)
 }
 
 /**
@@ -164,11 +164,11 @@ private class TransitionFramework(
 }
 
 /**
- * [GeneralizedTransition] wrapper which delegates to [android.support.transition.Transition]
+ * [GeneralizedTransition] wrapper which delegates to [androidx.transition.Transition]
  */
 private class TransitionSupport(
         private val generalizedTransition: GeneralizedTransition
-) : android.support.transition.Transition() {
+) : androidx.transition.Transition() {
     override fun captureStartValues(transitionValues: TransitionValuesSupport) {
         generalizedTransition.captureStart(transitionValues.view, transitionValues.values)
     }
@@ -201,7 +201,7 @@ private class TransitionSupport(
 
 /**
  * Generalized extension of [android.transition.Transition.TransitionListener]
- * and [android.support.transition.Transition.TransitionListener]
+ * and [androidx.transition.Transition.TransitionListener]
  */
 abstract class GeneralizedTransitionListener(
         private val innerListener: GeneralizedTransitionListener? = null
@@ -246,29 +246,29 @@ abstract class GeneralizedTransitionListener(
         }
     }
 
-    fun forSupport(): android.support.transition.Transition.TransitionListener {
-        return object : android.support.transition.Transition.TransitionListener {
-            override fun onTransitionEnd(transition: android.support.transition.Transition) {
+    fun forSupport(): androidx.transition.Transition.TransitionListener {
+        return object : androidx.transition.Transition.TransitionListener {
+            override fun onTransitionEnd(transition: androidx.transition.Transition) {
                 this@GeneralizedTransitionListener.onTransitionEnd()
                 innerListener?.onTransitionEnd()
             }
 
-            override fun onTransitionResume(transition: android.support.transition.Transition) {
+            override fun onTransitionResume(transition: androidx.transition.Transition) {
                 this@GeneralizedTransitionListener.onTransitionResume()
                 innerListener?.onTransitionResume()
             }
 
-            override fun onTransitionPause(transition: android.support.transition.Transition) {
+            override fun onTransitionPause(transition: androidx.transition.Transition) {
                 this@GeneralizedTransitionListener.onTransitionPause()
                 innerListener?.onTransitionPause()
             }
 
-            override fun onTransitionCancel(transition: android.support.transition.Transition) {
+            override fun onTransitionCancel(transition: androidx.transition.Transition) {
                 this@GeneralizedTransitionListener.onTransitionCancel()
                 innerListener?.onTransitionCancel()
             }
 
-            override fun onTransitionStart(transition: android.support.transition.Transition) {
+            override fun onTransitionStart(transition: androidx.transition.Transition) {
                 this@GeneralizedTransitionListener.onTransitionStart()
                 innerListener?.onTransitionStart()
             }

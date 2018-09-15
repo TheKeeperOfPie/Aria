@@ -3,7 +3,6 @@ package com.winsonchiu.aria.framework.util.animation.transition
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.graphics.Matrix
-import android.support.transition.ChangeTransform
 import android.transition.Visibility
 import android.util.Log
 import android.view.View
@@ -96,7 +95,7 @@ abstract class GhostViewOverlay(
         }
     }
 
-    override fun forSupport(): android.support.transition.Transition {
+    override fun forSupport(): androidx.transition.Transition {
         return when (overlayMode) {
             FRAMEWORK_VISIBILITY -> VisibilitySupport(this)
             else -> super.forSupport()
@@ -134,7 +133,7 @@ abstract class GhostViewOverlay(
 
     private class VisibilitySupport(
             private val generalizedTransition: GeneralizedTransition
-    ) : android.support.transition.Visibility() {
+    ) : androidx.transition.Visibility() {
 
         override fun captureStartValues(transitionValues: TransitionValuesSupport) {
             super.captureStartValues(transitionValues)

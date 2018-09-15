@@ -1,11 +1,247 @@
 <?xml version="1.0" encoding="utf-8"?>
 <MotionScene
-    xmlns:motion="http://schemas.android.com/apk/res-auto">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:motion="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="DuplicateIds"
+    >
 
     <Transition
         motion:constraintSetEnd="@layout/now_playing_view_constraint_collapsed"
         motion:constraintSetStart="@layout/now_playing_view_constraint_expanded"
-        motion:duration="1000"
         />
+
+    <ConstraintSet android:id="@+id/expanded">
+
+        <Constraint
+            android:id="@+id/imageArtwork"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            />
+
+        <Constraint
+            android:id="@+id/viewSquareBoundary"
+            android:layout_width="0dp"
+            android:layout_height="400dp"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            />
+
+        <Constraint
+            android:id="@+id/viewSquareBoundaryBottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            motion:layout_constraintTop_toBottomOf="@id/viewSquareBoundary"
+            />
+
+        <Constraint
+            android:id="@+id/barrierImage"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:barrierDirection="top"
+            motion:constraint_referenced_ids="textSongTitle, viewSquareBoundaryBottom"
+            />
+
+        <Constraint
+            android:id="@+id/textSongTitle"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="12dp"
+            motion:layout_constrainedHeight="false"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/imageArtwork"
+            motion:layout_constraintBottom_toTopOf="@id/textSongDescription"
+            motion:layout_constraintVertical_chainStyle="packed"
+            >
+
+            <CustomAttribute
+                motion:attributeName="progress"
+                motion:customFloatValue="1"
+                />
+
+        </Constraint>
+
+        <Constraint
+            android:id="@+id/textSongDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="24dp"
+            motion:layout_constrainedHeight="false"
+            motion:layout_constraintBottom_toTopOf="@+id/imageSkipPrevious"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/textSongTitle"
+            motion:layout_goneMarginTop="20dp"
+            >
+
+            <CustomAttribute
+                motion:attributeName="progress"
+                motion:customFloatValue="1"
+                />
+
+        </Constraint>
+
+        <Constraint
+            android:id="@+id/imageSkipPrevious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="24dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toStartOf="@+id/imagePlay"
+            motion:layout_constraintHorizontal_chainStyle="packed"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/textSongDescription"
+            />
+
+        <Constraint
+            android:id="@+id/imagePlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            motion:layout_constraintBottom_toBottomOf="@id/imageSkipPrevious"
+            motion:layout_constraintEnd_toStartOf="@+id/imageSkipNext"
+            motion:layout_constraintStart_toEndOf="@id/imageSkipPrevious"
+            />
+
+        <Constraint
+            android:id="@+id/imageSkipNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="16dp"
+            motion:layout_constraintBottom_toBottomOf="@id/imageSkipPrevious"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toEndOf="@id/imagePlay"
+            />
+
+    </ConstraintSet>
+
+    <ConstraintSet android:id="@+id/collapsed">
+
+        <Constraint
+            android:id="@+id/imageArtwork"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            />
+
+        <Constraint
+            android:id="@+id/viewSquareBoundary"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintDimensionRatio="1:1"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            />
+
+        <Constraint
+            android:id="@+id/viewSquareBoundaryBottom"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            motion:layout_constraintTop_toBottomOf="@id/viewSquareBoundary"
+            />
+
+        <Constraint
+            android:id="@+id/barrierImage"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:barrierDirection="top"
+            motion:constraint_referenced_ids="textSongTitle, viewSquareBoundaryBottom"
+            />
+
+        <Constraint
+            android:id="@+id/textSongTitle"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginEnd="16dp"
+            motion:layout_constrainedHeight="false"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
+            >
+
+            <CustomAttribute
+                motion:attributeName="progress"
+                motion:customFloatValue="0"
+                />
+
+        </Constraint>
+
+        <Constraint
+            android:id="@+id/textSongDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            motion:layout_constrainedHeight="false"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintHorizontal_bias="0"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toBottomOf="@id/textSongTitle"
+            >
+
+            <CustomAttribute
+                motion:attributeName="progress"
+                motion:customFloatValue="0"
+                />
+
+        </Constraint>
+
+        <Constraint
+            android:id="@+id/imageSkipPrevious"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="24dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
+            motion:layout_constraintEnd_toStartOf="@+id/imagePlay"
+            motion:layout_constraintHorizontal_chainStyle="packed"
+            motion:layout_constraintStart_toStartOf="parent"
+            />
+
+        <Constraint
+            android:id="@+id/imagePlay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="12dp"
+            motion:layout_constraintBottom_toBottomOf="@id/imageSkipPrevious"
+            motion:layout_constraintEnd_toStartOf="@+id/imageSkipNext"
+            motion:layout_constraintStart_toEndOf="@id/imageSkipPrevious"
+            />
+
+        <Constraint
+            android:id="@+id/imageSkipNext"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="16dp"
+            motion:layout_constraintBottom_toBottomOf="@id/imageSkipPrevious"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toEndOf="@id/imagePlay"
+            />
+
+    </ConstraintSet>
 
 </MotionScene>

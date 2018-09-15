@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    tools:parentTag="android.support.constraint.ConstraintLayout"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
     >
 
     <ImageView
@@ -13,7 +13,7 @@
         android:layout_width="24dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:minHeight="56dp"
+        android:contentDescription="TODO" android:minHeight="56dp"
         android:paddingTop="10dp"
         android:paddingBottom="10dp"
         android:scaleType="centerInside"

@@ -1,6 +1,6 @@
 package com.winsonchiu.aria.framework.util.animation
 
-import android.support.annotation.FloatRange
+import androidx.annotation.FloatRange
 
 object AnimationUtils {
 

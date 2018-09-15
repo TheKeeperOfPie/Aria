@@ -1,6 +1,6 @@
 package com.winsonchiu.aria.framework.util.arch
 
-import android.arch.lifecycle.MutableLiveData
+import androidx.lifecycle.MutableLiveData
 
 open class DefaultLiveData<ValueType>() : MutableLiveData<ValueType>() {
 

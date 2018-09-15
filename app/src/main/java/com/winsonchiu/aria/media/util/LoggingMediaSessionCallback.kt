@@ -4,11 +4,11 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.os.ResultReceiver
-import android.support.annotation.CallSuper
 import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.RatingCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.util.Log
+import androidx.annotation.CallSuper
 
 abstract class LoggingMediaSessionCallback : MediaSessionCompat.Callback() {
 

@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.main
 
-import android.arch.lifecycle.ViewModel
-import android.support.v7.app.AppCompatActivity
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModel
 import com.winsonchiu.aria.framework.activity.DaggerComponentActivity
 import com.winsonchiu.aria.framework.dagger.activity.ActivityComponent
 import com.winsonchiu.aria.framework.dagger.activity.ActivityLifecycleBoundComponent

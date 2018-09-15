@@ -1,12 +1,12 @@
 package com.winsonchiu.aria.framework.util.animation.transition
 
 import android.graphics.Rect
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentTransaction
 import android.transition.Transition
 import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentTransaction
 import com.winsonchiu.aria.BuildConfig
 import java.lang.reflect.Method
 
@@ -77,12 +77,12 @@ class WindowTransitionHolder(
 }
 
 class FragmentTransitionHolder<in PreviousFragment : Fragment, in NewFragment : Fragment>(
-        private val previousExitTransition: android.support.transition.Transition? = null,
-        private val previousReenterTransition: android.support.transition.Transition? = null,
-        private val newSharedElementEnterTransition: android.support.transition.Transition? = null,
-        private val newSharedElementReturnTransition: android.support.transition.Transition? = null,
-        private val newEnterTransition: android.support.transition.Transition? = null,
-        private val newReturnTransition: android.support.transition.Transition? = null
+        private val previousExitTransition: androidx.transition.Transition? = null,
+        private val previousReenterTransition: androidx.transition.Transition? = null,
+        private val newSharedElementEnterTransition: androidx.transition.Transition? = null,
+        private val newSharedElementReturnTransition: androidx.transition.Transition? = null,
+        private val newEnterTransition: androidx.transition.Transition? = null,
+        private val newReturnTransition: androidx.transition.Transition? = null
 ) {
 
     fun applyTo(previousFragment: PreviousFragment, newFragment: NewFragment) {

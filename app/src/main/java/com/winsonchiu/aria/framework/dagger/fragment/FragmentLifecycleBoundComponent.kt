@@ -1,10 +1,10 @@
 package com.winsonchiu.aria.framework.dagger.fragment
 
-import android.arch.lifecycle.LifecycleOwner
 import android.os.Bundle
-import android.support.annotation.CallSuper
-import android.support.v4.app.Fragment
-import android.support.v4.app.FragmentManager
+import androidx.annotation.CallSuper
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.lifecycle.LifecycleOwner
 import com.jakewharton.rxrelay2.PublishRelay
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.FlowableSubscribeProxy
@@ -13,6 +13,7 @@ import com.uber.autodispose.ScopeProvider
 import com.uber.autodispose.SingleSubscribeProxy
 import com.winsonchiu.aria.framework.fragment.FragmentInitializer
 import com.winsonchiu.aria.framework.util.arch.LoggingLifecycleObserver
+import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -54,7 +55,7 @@ abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, Fragm
         onFinalDestroyRelay.accept(Unit)
     }
 
-    override fun requestScope() = onFinalDestroyRelay.firstElement()
+    override fun requestScope() = Completable.fromMaybe(onFinalDestroyRelay.firstElement())
 
     override fun onBackStackChanged() {
         // TODO: See if ViewModel.onCleared is a better solution

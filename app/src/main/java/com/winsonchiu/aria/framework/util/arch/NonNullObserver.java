@@ -1,8 +1,8 @@
 package com.winsonchiu.aria.framework.util.arch;
 
-import android.arch.lifecycle.Observer;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.lifecycle.Observer;
 
 /**
  * This class needs to be in Java so that Kotlin supports NonNullObserver { } construction

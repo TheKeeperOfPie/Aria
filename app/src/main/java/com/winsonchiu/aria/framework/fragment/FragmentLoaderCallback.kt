@@ -2,8 +2,8 @@ package com.winsonchiu.aria.framework.fragment
 
 import android.content.Context
 import android.os.Bundle
-import android.support.v4.app.LoaderManager
-import android.support.v4.content.Loader
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.Loader
 
 class FragmentLoaderCallback<Component>(private val context: Context) : LoaderManager.LoaderCallbacks<Component> {
 

@@ -2,7 +2,7 @@ package com.winsonchiu.aria.folders.folder
 
 import android.annotation.SuppressLint
 import android.os.Environment
-import android.support.v4.app.Fragment
+import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileSorter

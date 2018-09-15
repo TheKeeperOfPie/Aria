@@ -1,11 +1,11 @@
 package com.winsonchiu.aria.framework.menu.itemsheet
 
 import android.os.Bundle
-import android.support.design.widget.BottomSheetDialogFragment
-import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.framework.fragment.FragmentArgument
 import kotlinx.android.synthetic.main.items_menu_fragment.*
