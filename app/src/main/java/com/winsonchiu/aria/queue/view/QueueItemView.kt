@@ -10,10 +10,13 @@ import butterknife.OnClick
 import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
+import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.framework.util.DrawableUtils
+import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.initialize
 import com.winsonchiu.aria.media.MediaQueue
+import com.winsonchiu.aria.music.artwork.ArtworkTransformation
 import kotlinx.android.synthetic.main.queue_item_view.view.*
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
@@ -27,7 +30,7 @@ class QueueItemView @JvmOverloads constructor(
     lateinit var queueItem: MediaQueue.QueueItem
 
     @set:ModelProp
-    var title: String? = null
+    var title: CharSequence? = null
 
     @set:ModelProp
     var showSelected: Boolean = false
@@ -41,6 +44,8 @@ class QueueItemView @JvmOverloads constructor(
             it.data
         }
     }
+
+    private val artworkTransformation = ArtworkTransformation(56.dpToPx(context))
 
     init {
         initialize(R.layout.queue_item_view)
@@ -58,7 +63,11 @@ class QueueItemView @JvmOverloads constructor(
 
     @AfterPropsSet
     fun onChanged() {
-        fileImage.setImageBitmap(queueItem.image?.bitmap)
+        Picasso.get()
+                .load(queueItem.image)
+                .transform(artworkTransformation)
+                .into(fileImage)
+
         fileNameText.text = title
 
         foreground = if (showSelected) {

@@ -209,23 +209,24 @@ class SwitchDrawable(
     var topLeft: PointF? = null
         set(topLeft) {
             field = topLeft
+            Log.d("SwitchDrawable", "topLeft called with $topLeft")
             updateBounds()
         }
     var width: Int = 0
         set(width) {
             field = width
+            Log.d("SwitchDrawable", "topLeft called with $width")
             updateBounds()
         }
     var height: Int = 0
         set(height) {
             field = height
+            Log.d("SwitchDrawable", "topLeft called with $height")
             updateBounds()
         }
 
     override fun draw(canvas: Canvas) {
         canvas.drawBitmap(currentBitmap!!, currentBitmapSrcBounds, bounds, paint)
-
-        Log.d("SwitchDrawable", "draw called with $currentBitmapSrcBounds")
 
         if (textPaint != null) {
             textPaint.color = ColorUtils.setAlphaComponent(textColorStart!!, (progress * 255).toInt())
@@ -450,6 +451,8 @@ class ReflowAnimator constructor(
      */
     fun createAnimator(): ValueAnimator {
         reset()
+
+        Log.d("TextViewWrapper", "createAnimator called with")
 
         // capture bitmaps of the text
         startText = createBitmap(sourceView)

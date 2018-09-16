@@ -1,8 +1,10 @@
 package com.winsonchiu.aria.folders.folder
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.SimpleEpoxyController
 import com.google.android.material.snackbar.Snackbar
 import com.winsonchiu.aria.R
@@ -64,8 +66,8 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                             .commit()
                 }
             } else {
-                mediaQueue.add(MediaQueue.QueueItem(fileMetadata.file, fileMetadata.image, fileMetadata.metadata))
                 view?.run {
+                    mediaQueue.add(MediaQueue.QueueItem(context, fileMetadata))
                     Snackbar.make(this, getString(R.string.item_added, fileMetadata.file.name), Snackbar.LENGTH_SHORT)
                             .show()
                 }
@@ -82,7 +84,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
 
             ItemsMenuDialogFragment.newInstance(
                     listOf(
-                            FolderItemOption.Header(fileMetadata),
+                            FolderItemOption.Header(context!!, fileMetadata),
                             FolderItemOption.PlayNext(file),
                             FolderItemOption.AddToQueue(file)
                     )
@@ -102,7 +104,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
         folderSwipeRefresh.setDistanceToTriggerSync(150.dpToPx(view))
 
         folderRecyclerView.itemAnimator = FolderItemAnimator()
-        folderRecyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        folderRecyclerView.layoutManager = LinearLayoutManager(context, RecyclerView.VERTICAL, false)
         folderRecyclerView.setHasFixedSize(true)
 
         postponeEnterTransition(150)
@@ -146,10 +148,14 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
         data class Header(
                 override val data: ItemsMenuFileHeaderView.Model.Data
         ) : FolderItemOption(), ItemsMenuFileHeaderView.Model {
-            constructor(fileMetadata: FolderController.FileMetadata) : this(
+            constructor(
+                    context: Context,
+                    fileMetadata: FolderController.FileMetadata
+            ) : this(
                     ItemsMenuFileHeaderView.Model.Data(
-                            fileMetadata.file,
-                            fileMetadata.metadata
+                            fileMetadata.title,
+                            fileMetadata.description(context),
+                            fileMetadata.image
                     )
             )
         }

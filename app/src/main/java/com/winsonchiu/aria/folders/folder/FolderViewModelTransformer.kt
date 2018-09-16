@@ -1,6 +1,8 @@
 package com.winsonchiu.aria.folders.folder
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import androidx.annotation.WorkerThread
 import com.airbnb.epoxy.EpoxyModel
 import com.winsonchiu.aria.R
@@ -70,7 +72,8 @@ object FolderViewModelTransformer {
                 .let { sortFileItemViewModels(it, FileSorter.Method.BY_NAME, false) }
                 .map {
                     val (fileMetadata, displayTitle, sortKey) = it
-                    val (file, image, metadata) = fileMetadata
+                    val (file, metadata) = fileMetadata
+
                     FileItemViewModel_()
                             .id(file.name)
                             .fileMetadata(fileMetadata)

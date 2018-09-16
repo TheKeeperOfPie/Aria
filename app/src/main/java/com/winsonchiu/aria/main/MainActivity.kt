@@ -57,6 +57,7 @@ class MainActivity : LifecycleBoundActivity() {
                         BottomSheetBehavior.STATE_EXPANDED -> viewNowPlaying.progress = 0f
                         BottomSheetBehavior.STATE_DRAGGING,
                         BottomSheetBehavior.STATE_HIDDEN,
+                        BottomSheetBehavior.STATE_HALF_EXPANDED,
                         BottomSheetBehavior.STATE_SETTLING -> {}
                     }
                 }
@@ -79,7 +80,7 @@ class MainActivity : LifecycleBoundActivity() {
 
         mediaQueue.queueUpdates
                 .mapNonNull { it.currentItem }
-                .map { NowPlayingView.Model(it.file, it.metadata) }
+                .map { NowPlayingView.Model(it.metadata.title, it.metadata.description, it.image) }
                 .bindToLifecycle()
                 .subscribe {
                     viewNowPlaying.bindData(it)

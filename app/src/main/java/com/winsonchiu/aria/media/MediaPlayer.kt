@@ -15,7 +15,9 @@ import com.winsonchiu.aria.media.util.LoggingMediaSessionCallback
 import io.reactivex.Maybe
 import javax.inject.Inject
 
-class MediaPlayer(service: MediaService) : LoggingLifecycleObserver, LoggingMediaSessionCallback() {
+class MediaPlayer(
+        private val service: MediaService
+) : LoggingLifecycleObserver, LoggingMediaSessionCallback() {
 
     @Inject
     lateinit var mediaQueue: MediaQueue
@@ -69,7 +71,7 @@ class MediaPlayer(service: MediaService) : LoggingLifecycleObserver, LoggingMedi
         }
 
         player.reset()
-        player.setDataSource(queueItem.file.absolutePath)
+        player.setDataSource(service, queueItem.content)
         player.setAudioAttributes(
                 AudioAttributes.Builder()
                         .setContentType(CONTENT_TYPE_MUSIC)

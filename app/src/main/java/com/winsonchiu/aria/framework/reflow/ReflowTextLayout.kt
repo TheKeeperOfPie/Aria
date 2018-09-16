@@ -2,15 +2,19 @@ package com.winsonchiu.aria.framework.reflow
 
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.annotation.TargetApi
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
+import android.util.TypedValue
 import android.view.View
 import android.view.ViewTreeObserver
 import android.widget.FrameLayout
 import android.widget.TextView
+import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isInvisible
-import androidx.transition.TransitionValues
-import com.winsonchiu.aria.framework.view.ReflowText
+import androidx.core.widget.TextViewCompat
+import com.winsonchiu.aria.framework.view.ReflowAnimator
 import com.winsonchiu.aria.framework.view.ReflowTextView
 
 class ReflowTextLayout @JvmOverloads constructor(
@@ -20,14 +24,14 @@ class ReflowTextLayout @JvmOverloads constructor(
 ) : FrameLayout(context, attrs, defStyleAttr) {
 
     lateinit var textStart: ReflowTextView
-    lateinit var textEnd: TextView
+    lateinit var textEnd: ReflowTextView
 
     override fun onFinishInflate() {
         super.onFinishInflate()
 
         textStart = getChildAt(0) as ReflowTextView
-        textEnd = getChildAt(1) as TextView
-        textEnd.isInvisible = !isInEditMode
+        textEnd = getChildAt(1) as ReflowTextView
+        textStart.isInvisible = !isInEditMode
     }
 
     var text: CharSequence?
@@ -50,6 +54,19 @@ class ReflowTextLayout @JvmOverloads constructor(
 
     private var animator: ValueAnimator? = null
 
+    @SuppressLint("RestrictedApi")
+    @TargetApi(Build.VERSION_CODES.O)
+    fun AppCompatTextView.forceAutoSizeCalculation() {
+        if (TextViewCompat.getAutoSizeTextType(this) != TextView.AUTO_SIZE_TEXT_TYPE_UNIFORM) {
+            return
+        }
+
+        val autoSizeMinTextSize = TextViewCompat.getAutoSizeMinTextSize(this)
+        val autoSizeMaxTextSize = TextViewCompat.getAutoSizeMaxTextSize(this)
+        val autoSizeStepGranularity = TextViewCompat.getAutoSizeStepGranularity(this).coerceAtLeast(1)
+        setAutoSizeTextTypeUniformWithConfiguration(autoSizeMinTextSize, autoSizeMaxTextSize, autoSizeStepGranularity, TypedValue.COMPLEX_UNIT_PX)
+    }
+
     private val titlePreDrawListener = object : ViewTreeObserver.OnPreDrawListener {
         @SuppressLint("RestrictedApi")
         override fun onPreDraw(): Boolean {
@@ -67,16 +84,22 @@ class ReflowTextLayout @JvmOverloads constructor(
                         && startHeightNonZero
                         && endWidthNonZero
                         && endHeightNonZero) {
-                    val reflowText = ReflowText()
-                    val startValues = TransitionValues().apply {
-                        view = textStart
-                    }
-                    val endValues = TransitionValues().apply {
-                        view = textStart
-                    }
-                    reflowText.captureValues(startValues)
-                    reflowText.captureValues(endValues)
-                    animator = reflowText.createAnimator(this@ReflowTextLayout, startValues, endValues)!!
+//                    val reflowText = ReflowText()
+//                    val startValues = TransitionValues().apply {
+//                        view = textStart
+//                    }
+//                    val endValues = TransitionValues().apply {
+//                        view = textEnd
+//                    }
+//                    reflowText.captureValues(startValues)
+//                    reflowText.captureValues(endValues)
+//                    animator = reflowText.createAnimator(this@ReflowTextLayout, startValues, endValues)!!
+
+                    textStart.forceAutoSizeCalculation()
+                    textEnd.forceAutoSizeCalculation()
+
+                    val reflowAnimator = ReflowAnimator(textEnd, textStart)
+                    animator = reflowAnimator.createAnimator()
 
                     updateProgress()
                     textStart.viewTreeObserver.removeOnPreDrawListener(this)

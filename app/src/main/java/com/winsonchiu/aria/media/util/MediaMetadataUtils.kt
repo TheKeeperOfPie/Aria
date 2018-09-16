@@ -5,7 +5,7 @@ import com.winsonchiu.aria.folders.folder.FolderController
 import com.winsonchiu.aria.media.MediaQueue
 import com.winsonchiu.aria.music.artistDisplayValue
 
-fun FolderController.FileMetadata.toMediaMetadata(): MediaMetadataCompat = MediaMetadataCompat.Builder()
+fun FolderController.FileMetadata.toMediaMetadata() = MediaMetadataCompat.Builder()
         .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, file.absolutePath)
         .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, metadata?.album)
         .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, metadata.artistDisplayValue())
@@ -17,13 +17,24 @@ fun FolderController.FileMetadata.toMediaMetadata(): MediaMetadataCompat = Media
         .build()
 
 // TODO: Album art
-fun MediaQueue.QueueItem.toMediaMetadata(): MediaMetadataCompat = MediaMetadataCompat.Builder()
-        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, file.absolutePath)
-        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, metadata?.album)
-        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, metadata.artistDisplayValue())
-        .putString(MediaMetadataCompat.METADATA_KEY_GENRE, metadata?.genre)
-        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, metadata?.title ?: file.nameWithoutExtension)
+fun MediaQueue.QueueItem.toMediaMetadata() = MediaMetadataCompat.Builder()
+        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, content.toString())
+        .putText(MediaMetadataCompat.METADATA_KEY_ALBUM, metadata.album)
+        .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, metadata.artist)
+        .putText(MediaMetadataCompat.METADATA_KEY_GENRE, metadata.genre)
+        .putText(MediaMetadataCompat.METADATA_KEY_TITLE, metadata.title)
 //        .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, image)
         .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, null)
-        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, metadata?.duration ?: -1L)
+        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, metadata.duration)
         .build()
+
+//fun MediaQueue.QueueItem.toMediaMetadata() = MediaMetadataCompat.Builder()
+//        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, file.absolutePath)
+//        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, metadata?.album)
+//        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, metadata.artistDisplayValue())
+//        .putString(MediaMetadataCompat.METADATA_KEY_GENRE, metadata?.genre)
+//        .putString(MediaMetadataCompat.METADATA_KEY_TITLE, metadata?.title ?: file.nameWithoutExtension)
+////        .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, image)
+//        .putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, null)
+//        .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, metadata?.duration ?: -1L)
+//        .build()

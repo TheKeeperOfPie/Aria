@@ -1,31 +1,31 @@
 package com.winsonchiu.aria.folders.folder
 
 import android.annotation.SuppressLint
+import android.app.Application
+import android.content.Context
 import android.os.Environment
 import androidx.fragment.app.Fragment
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.winsonchiu.aria.folders.util.FileFilters
 import com.winsonchiu.aria.folders.util.FileSorter
+import com.winsonchiu.aria.folders.util.FileUtils
 import com.winsonchiu.aria.folders.util.withFolders
 import com.winsonchiu.aria.framework.async.RequestState
 import com.winsonchiu.aria.framework.dagger.FragmentScreenScope
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
 import com.winsonchiu.aria.media.MediaQueue
 import com.winsonchiu.aria.music.MetadataExtractor
-import com.winsonchiu.aria.music.artwork.ArtworkCache
-import com.winsonchiu.aria.music.artwork.ArtworkExtractor
+import com.winsonchiu.aria.music.artwork.ArtworkRequestHandler
 import io.reactivex.Single
-import io.reactivex.functions.BiFunction
-import io.reactivex.schedulers.Schedulers
+import io.reactivex.rxkotlin.Observables
 import java.io.File
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
 @FragmentScreenScope
 class FolderController @Inject constructor(
+        private val application: Application,
         private val metadataExtractor: MetadataExtractor,
-        private val artworkExtractor: ArtworkExtractor,
-        private val artworkCache: ArtworkCache,
         private val mediaQueue: MediaQueue
 ) : FragmentLifecycleBoundComponent() {
 
@@ -44,35 +44,14 @@ class FolderController @Inject constructor(
         }
     }.cache()
 
-    private val files = folderFile.map {
-        (it.listFiles(FileFilters.AUDIO.withFolders()) ?: emptyArray())
-                .toList()
-                .let { FileSorter.sort(it, FileSorter.Method.BY_NAME) }
-                .map {
-                    FileMetadata(
-                            it,
-                            null,
-                            metadataExtractor.extract(it)
-                    )
-                }
-    }.cache()
-
-    private val filesWithArtwork = files.map {
-        it.map { it.copy(image = artworkExtractor.getArtworkForFile(it.file, artworkCache)) }
-    }
-
-    private val filesWithArtworkAndDepthSearch = filesWithArtwork.map {
-        it.map {
-            it.copy(
-                    image = artworkExtractor.getArtworkWithFileDepthSearch(
-                            it.file,
-                            artworkCache
-                    )
-            )
-        }
-    }
+    private val refreshRelay = BehaviorRelay.createDefault(System.currentTimeMillis())
 
     init {
+        subscribe()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun subscribe() {
         stateChange.debounce(500, TimeUnit.MILLISECONDS)
                 .subscribe(state)
     }
@@ -80,45 +59,42 @@ class FolderController @Inject constructor(
     @SuppressLint("CheckResult")
     override fun onFirstInitialize(fragment: Fragment) {
         super.onFirstInitialize(fragment)
-        files.mergeWith(filesWithArtwork)
-                .mergeWith(filesWithArtworkAndDepthSearch)
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe { stateChange.accept(RequestState.LOADING) }
-                .doFinally { stateChange.accept(RequestState.DONE) }
-                .withLatestFrom(folderFile.toFlowable(), BiFunction<List<FileMetadata>, File, Model> { it, folderFile ->
-                    Model(folderFile, it)
-                })
+
+        Observables.combineLatest(refreshRelay, folderFile.toObservable())
+                .switchMapSingle { (_, folder) ->
+                    Single.fromCallable {
+                        val files = (folder.listFiles(FileFilters.AUDIO.withFolders()) ?: emptyArray())
+                                .toList()
+                                .let { FileSorter.sort(it, FileSorter.Method.BY_NAME) }
+                                .map { FileMetadata(it, metadataExtractor.extract(it)) }
+
+                        Model(folder, files)
+                    }
+                            .doOnSubscribe { stateChange.accept(RequestState.LOADING) }
+                            .doFinally { stateChange.accept(RequestState.DONE) }
+                }
                 .bindToLifecycle()
                 .subscribe(folderContents)
     }
 
-    @SuppressLint("CheckResult")
     fun refresh() {
-        filesWithArtwork.mergeWith(filesWithArtworkAndDepthSearch)
-                .subscribeOn(Schedulers.io())
-                .doOnSubscribe { stateChange.accept(RequestState.LOADING) }
-                .doFinally { stateChange.accept(RequestState.DONE) }
-                .withLatestFrom(folderFile.toFlowable(), BiFunction<List<FileMetadata>, File, Model> { it, folderFile ->
-                    Model(folderFile, it)
-                })
-                .bindToLifecycle()
-                .subscribe(folderContents)
+        refreshRelay.accept(System.currentTimeMillis())
     }
 
     fun addFolderToQueue(selected: FileMetadata) {
         folderContents.value.files
-                .map { MediaQueue.QueueItem(it.file, it.image, it.metadata) }
-                .also { mediaQueue.add(it, MediaQueue.QueueItem(selected.file, selected.image, selected.metadata)) }
+                .map { MediaQueue.QueueItem(application, it) }
+                .also { mediaQueue.add(it, MediaQueue.QueueItem(application, selected)) }
     }
 
     fun playNext(file: File) {
         val metadata = folderContents.value.files.first { it.file == file }
-        mediaQueue.playNext(MediaQueue.QueueItem(metadata.file, metadata.image, metadata.metadata))
+        mediaQueue.playNext(MediaQueue.QueueItem(application, metadata))
     }
 
     fun addToQueue(file: File) {
         val metadata = folderContents.value.files.first { it.file == file }
-        mediaQueue.add(MediaQueue.QueueItem(metadata.file, metadata.image, metadata.metadata))
+        mediaQueue.add(MediaQueue.QueueItem(application, metadata))
     }
 
     data class Model(
@@ -128,7 +104,30 @@ class FolderController @Inject constructor(
 
     data class FileMetadata(
             val file: File,
-            val image: ArtworkCache.Metadata?,
             val metadata: MetadataExtractor.Metadata?
-    )
+    ) {
+
+        val image by lazy {
+            ArtworkRequestHandler.musicFileUri(file)
+        }
+
+        val title by lazy {
+            FileUtils.getFileDisplayTitle(
+                    FileUtils.getFileSortKey(file)?.substringBeforeLast(
+                            "."
+                    )
+            )
+        }
+
+        private var description: CharSequence? = null
+
+        fun description(context: Context): CharSequence? {
+            if (description == null) {
+                description = FileUtils.getFileDescription(context, metadata, true, true)
+            }
+
+            return description
+
+        }
+    }
 }

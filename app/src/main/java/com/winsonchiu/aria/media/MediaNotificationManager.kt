@@ -12,7 +12,6 @@ import android.support.v4.media.MediaDescriptionCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
-import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
 import androidx.media.session.MediaButtonReceiver
@@ -88,7 +87,6 @@ class MediaNotificationManager(
             isPlaying: Boolean,
             sessionToken: MediaSessionCompat.Token?
     ) {
-        Log.d(TAG, "updateNotification called with", Exception())
         notificationManager.notify(NOTIFICATION_ID, buildNotification(queueItem, isPlaying, sessionToken))
     }
 
@@ -113,7 +111,7 @@ class MediaNotificationManager(
         return buildNotification(
                 mediaDescription.title,
                 mediaDescription.subtitle,
-                queueItem.image?.bitmap,
+                null,//queueItem.image, TODO: Notification image
                 isPlaying,
                 sessionToken
         )

@@ -46,5 +46,5 @@ abstract class LeakCanaryApplication : Application() {
         incrementExpectedActivityCount.invoke(null, MainActivity::class.java)
     }
 
-    protected fun onCreateApp() {}
+    protected open fun onCreateApp() {}
 }

@@ -18,6 +18,7 @@ import android.text.Layout
 import android.text.StaticLayout
 import android.text.TextPaint
 import android.text.TextUtils
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.LinearInterpolator
@@ -59,10 +60,10 @@ class ReflowText {
             startValues: TransitionValues,
             endValues: TransitionValues
     ): ValueAnimator {
-        val view = startValues!!.view as ReflowTextView
+        val view = startValues.view as ReflowTextView
         val transition = AnimatorSet()
-        val startData = startValues!!.values.get(PROPNAME_DATA) as ReflowData
-        val endData = endValues!!.values.get(PROPNAME_DATA) as ReflowData
+        val startData = startValues.values.get(PROPNAME_DATA) as ReflowData
+        val endData = endValues.values.get(PROPNAME_DATA) as ReflowData
         mDuration = calculateDuration(startData.bounds, endData.bounds)
 
         // create layouts & capture a bitmaps of the text in both states
@@ -97,7 +98,7 @@ class ReflowText {
         // temporarily turn off clipping so we can draw outside of our bounds don't draw
 //        view.setWillNotDraw(true)
         view.disableDrawForReflow = true
-        (view.getParent() as ViewGroup).clipChildren = false
+        (view.parent as ViewGroup).clipChildren = false
 
         // calculate the runs of text to move together
         val runs = getRuns(
@@ -105,12 +106,14 @@ class ReflowText {
                 endData, endLayout, endLayoutMaxLines
         )
 
+        Log.d("ReflowText", "runs = $runs")
+
         // create animators for moving, scaling and fading each run of text
 //        transition.playTogether(
 //                createRunAnimators(view, startData, endData, startText, endText, runs)
 //        )
 
-        val animators = createRunAnimators(view as ReflowTextView, startData, endData, startText, endText, runs)
+        val animators = createRunAnimators(view, startData, endData, startText, endText, runs)
 
 //        if (!freezeFrame) {
 //            transition.addListener(object : AnimatorListenerAdapter() {
@@ -125,7 +128,7 @@ class ReflowText {
 //            })
 //        }
         return ValueAnimator.ofFloat(0f, 1f).apply {
-            addUpdateListener {  set ->
+            addUpdateListener { set ->
                 animators.forEach {
                     it.setCurrentFraction(set.animatedFraction)
                 }
@@ -321,6 +324,8 @@ class ReflowText {
         while (upward && i < runs.size || !upward && i >= 0) {
             val run = runs[i]
 
+            Log.d("ReflowText", "ready run $run")
+
             // skip text runs which aren't visible in either state
 //            if (!run.startVisible && !run.endVisible) {
 //                i += if (upward) 1 else -1
@@ -377,9 +382,13 @@ class ReflowText {
             val progress = PropertyValuesHolder.ofFloat(
                     SwitchDrawable.PROGRESS, 0f, 1f
             )
-            val runAnim = ObjectAnimator.ofPropertyValuesHolder(
+
+            val runAnim = if (i == 0) ObjectAnimator.ofPropertyValuesHolder(
                     drawable, topLeft, width, height, progress
-            )
+            ) else
+                ObjectAnimator.ofPropertyValuesHolder(
+                        drawable, getPathValuesHolder(run, dy, dx, true), width, height, progress
+                )
 
             val rightward = run.start.centerX() + dx < run.end.centerX()
             if (run.startVisible && run.endVisible
@@ -397,7 +406,7 @@ class ReflowText {
             runAnim.duration = animDuration
             animators.add(runAnim)
 
-            if (run.startVisible != run.endVisible) {
+            if (i != 0 || run.startVisible != run.endVisible) {
                 // if run is appearing/disappearing then fade it in/out
                 val fade = ObjectAnimator.ofInt<SwitchDrawable>(
                         drawable,
@@ -430,48 +439,70 @@ class ReflowText {
         return animators
     }
 
+
+    private fun getPathValuesHolder(
+            run: ReflowText.Run,
+            dy: Int,
+            dx: Int,
+            skipX: Boolean
+    ): PropertyValuesHolder {
+        val propertyValuesHolder: PropertyValuesHolder
+        val pathMotion = object : PathMotion() {
+            override fun getPath(
+                    startX: Float,
+                    startY: Float,
+                    endX: Float,
+                    endY: Float
+            ): Path {
+                val path = Path()
+                path.moveTo(startX, startY)
+                path.lineTo(endX, endY)
+                return path
+            }
+        }
+        propertyValuesHolder = PropertyValuesHolder.ofObject<PointF>(
+                SwitchDrawable.TOP_LEFT, null,
+                pathMotion.getPath(
+                        run.start.left.toFloat(),
+                        run.start.top.toFloat(),
+                        if (skipX) run.start.left.toFloat() else (run.end.left - dx).toFloat(),
+                        (run.end.top - dy).toFloat()
+                )
+        )
+
+        return propertyValuesHolder
+    }
+
     private fun createLayout(
             data: ReflowData,
             context: Context,
             enforceMaxLines: Boolean
     ): Layout {
         val paint = TextPaint(Paint.ANTI_ALIAS_FLAG)
-        paint.setTextSize(data.textSize)
-        paint.setColor(data.textColor)
-        paint.setLetterSpacing(data.letterSpacing)
+        paint.textSize = data.textSize
+        paint.color = data.textColor
+        paint.letterSpacing = data.letterSpacing
         if (data.fontResId != 0) {
             try {
                 val font = ResourcesCompat.getFont(context, data.fontResId)
                 if (font != null) {
-                    paint.setTypeface(font)
+                    paint.typeface = font
                 }
             } catch (nfe: Resources.NotFoundException) {
             }
 
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            val builder = StaticLayout.Builder.obtain(
-                    data.text, 0, data.text.length, paint, data.textWidth
-            )
-                    .setLineSpacing(data.lineSpacingAdd, data.lineSpacingMult)
-                    .setBreakStrategy(data.breakStrategy)
-            if (enforceMaxLines && data.maxLines != -1) {
-                builder.setMaxLines(data.maxLines)
-                builder.setEllipsize(TextUtils.TruncateAt.END)
-            }
-            return builder.build()
-        } else {
-            return StaticLayout(
-                    data.text,
-                    paint,
-                    data.textWidth,
-                    Layout.Alignment.ALIGN_NORMAL,
-                    data.lineSpacingMult,
-                    data.lineSpacingAdd,
-                    true
-            )
+        val builder = StaticLayout.Builder.obtain(
+                data.text, 0, data.text.length, paint, data.textWidth
+        )
+                .setLineSpacing(data.lineSpacingAdd, data.lineSpacingMult)
+                .setBreakStrategy(data.breakStrategy)
+        if (enforceMaxLines && data.maxLines != -1) {
+            builder.setMaxLines(data.maxLines)
+            builder.setEllipsize(TextUtils.TruncateAt.END)
         }
+        return builder.build()
     }
 
 //    private fun createBitmap(@NonNull data: ReflowData, @NonNull layout: Layout): Bitmap {
@@ -535,7 +566,7 @@ class ReflowText {
             val view = reflowable.view
             val loc = IntArray(2)
             view.getLocationInWindow(loc)
-            bounds = Rect(loc[0], loc[1], loc[0] + view.getWidth(), loc[1] + view.getHeight())
+            bounds = Rect(loc[0], loc[1], loc[0] + view.width, loc[1] + view.height)
             textPosition = reflowable.textPosition
             textHeight = reflowable.textHeight
             lineSpacingAdd = reflowable.lineSpacingAdd
@@ -550,7 +581,7 @@ class ReflowText {
     /**
      * Models the location of a run of text in both start and end states.
      */
-    private class Run internal constructor(
+    private data class Run internal constructor(
             internal val start: Rect,
             internal val startVisible: Boolean,
             internal val end: Rect,
@@ -753,48 +784,48 @@ class ReflowText {
             get() = textView
 
         override val text: String
-            get() = textView.getText().toString()
+            get() = textView.text.toString()
 
         override val textPosition: Point
-            get() = Point(textView.getCompoundPaddingLeft(), textView.getCompoundPaddingTop())
+            get() = Point(textView.compoundPaddingLeft, textView.compoundPaddingTop)
 
         override val textWidth: Int
-            get() = (textView.getWidth()
-                    - textView.getCompoundPaddingLeft() - textView.getCompoundPaddingRight())
+            get() = (textView.width
+                    - textView.compoundPaddingLeft - textView.compoundPaddingRight)
 
         override val textHeight: Int
-            get() = if (textView.getMaxLines() !== -1) {
-                (textView.getMaxLines() * textView.getLineHeight()) + 1
+            get() = if (textView.maxLines !== -1) {
+                (textView.maxLines * textView.lineHeight) + 1
             } else {
-                (textView.getHeight() - textView.getCompoundPaddingTop()
-                        - textView.getCompoundPaddingBottom())
+                (textView.height - textView.compoundPaddingTop
+                        - textView.compoundPaddingBottom)
             }
 
         override val lineSpacingAdd: Float
-            get() = textView.getLineSpacingExtra()
+            get() = textView.lineSpacingExtra
 
         override val lineSpacingMult: Float
-            get() = textView.getLineSpacingMultiplier()
+            get() = textView.lineSpacingMultiplier
 
         override val breakStrategy: Int
             get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                textView.getBreakStrategy()
+                textView.breakStrategy
             } else -1
 
         override val letterSpacing: Float
-            get() = textView.getLetterSpacing()
+            get() = textView.letterSpacing
 
         override val fontResId: Int
             get() = -1//textView.getFontResId()
 
         override val textSize: Float
-            get() = textView.getTextSize()
+            get() = textView.textSize
 
         override val textColor: Int
-            get() = textView.getCurrentTextColor()
+            get() = textView.currentTextColor
 
         override val maxLines: Int
-            get() = textView.getMaxLines()
+            get() = textView.maxLines
     }
 
     companion object {

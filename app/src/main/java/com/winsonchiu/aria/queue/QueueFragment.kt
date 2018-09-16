@@ -120,10 +120,10 @@ class QueueFragment : BaseFragment<ActivityComponent, QueueFragmentDaggerCompone
 
     private fun MediaQueue.Model.toViewModels() = queue.map {
         QueueItemViewModel_()
-                .id(it.file.path, it.timeAddedToQueue)
+                .id(it.content.toString(), it.timeAddedToQueue)
                 .queueItem(it)
                 .showSelected(it == currentItem)
-                .title(FileUtils.getFileDisplayTitle(FileUtils.getFileSortKey(it.file)))
+                .title(it.metadata.title)
                 .listener(listener)
     }
 }

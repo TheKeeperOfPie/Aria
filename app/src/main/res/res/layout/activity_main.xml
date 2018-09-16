@@ -45,4 +45,19 @@
 
     </FrameLayout>
 
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        >
+
+        <fragment
+            android:id="@+id/testFragment"
+            class="com.winsonchiu.aria.framework.reflow.TestFragment"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            />
+
+    </FrameLayout>
+
 </androidx.drawerlayout.widget.DrawerLayout>

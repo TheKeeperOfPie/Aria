@@ -5,7 +5,7 @@ import com.winsonchiu.aria.framework.dagger.ActivityScreenScope
 import javax.inject.Inject
 
 @ActivityScreenScope
-class ArtworkCache(
+class ArtworkCache private constructor(
         private val cache: MutableMap<String?, Metadata?>
 ) : MutableMap<String?, ArtworkCache.Metadata?> by cache {
 
@@ -13,10 +13,10 @@ class ArtworkCache(
     constructor() : this(mutableMapOf())
 
     companion object {
-        val EMPTY = Metadata(null)
+        private val EMPTY = Metadata(null)
     }
 
-    data class Metadata(
+    private data class Metadata(
             val bitmap: Bitmap?
     )
 }

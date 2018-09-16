@@ -23,11 +23,15 @@ object FileSorter {
         first.name.fromFirstLetterOrDigit().compareTo(second.name.fromFirstLetterOrDigit(), ignoreCase = true)
     }
 
-    private val fileDisplayAndSortMetadataSorter = Comparator.nullsLast<String>({ first, second ->
+    private val fileDisplayAndSortMetadataSorter = Comparator.nullsLast<String> { first, second ->
         first.fromFirstLetterOrDigit().compareTo(second.fromFirstLetterOrDigit(), ignoreCase = true)
-    }).let { Comparator.comparing<FileDisplayAndSortMetadata, String?>(Function { it.sortKey }, it) }
+    }.let { Comparator.comparing<FileDisplayAndSortMetadata, String?>(Function { it.sortKey }, it) }
 
-    fun sort(files: List<File>, method: Method, reverse: Boolean = false): List<File> {
+    fun sort(
+            files: List<File>,
+            method: Method,
+            reverse: Boolean = false
+    ): List<File> {
         return if (reverse) {
             when (method) {
                 BY_NAME -> files.sortedWith(caseInsensitiveSorter.reversed())
@@ -41,7 +45,11 @@ object FileSorter {
         }
     }
 
-    fun sortFileItemViewModels(files: List<FileDisplayAndSortMetadata>, method: Method, reverse: Boolean = false): List<FileDisplayAndSortMetadata> {
+    fun sortFileItemViewModels(
+            files: List<FileDisplayAndSortMetadata>,
+            method: Method,
+            reverse: Boolean = false
+    ): List<FileDisplayAndSortMetadata> {
         return if (reverse) {
             when (method) {
                 BY_NAME -> files.sortedWith(fileDisplayAndSortMetadataSorter.reversed())

@@ -1,11 +1,12 @@
 package com.winsonchiu.aria.media
 
+import android.content.Context
+import android.net.Uri
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
+import com.winsonchiu.aria.folders.folder.FolderController
+import com.winsonchiu.aria.folders.util.FileUtils
 import com.winsonchiu.aria.framework.dagger.ApplicationScope
-import com.winsonchiu.aria.music.MetadataExtractor
-import com.winsonchiu.aria.music.artwork.ArtworkCache
-import java.io.File
 import javax.inject.Inject
 
 @ApplicationScope
@@ -21,18 +22,27 @@ class MediaQueue @Inject constructor() {
 
     private var currentIndex = 0
 
-    fun set(queue: List<QueueItem>, initialItem: QueueItem? = null) {
+    fun set(
+            queue: List<QueueItem>,
+            initialItem: QueueItem? = null
+    ) {
         this.queue.clear()
         this.queue.addAll(queue)
         setItemAndEmit(initialItem)
     }
 
-    fun add(items: List<QueueItem>, currentItem: QueueItem? = null) {
+    fun add(
+            items: List<QueueItem>,
+            currentItem: QueueItem? = null
+    ) {
         this.queue.addAll(items)
         setItemAndEmit(currentItem)
     }
 
-    fun add(item: QueueItem, currentItem: QueueItem? = null) {
+    fun add(
+            item: QueueItem,
+            currentItem: QueueItem? = null
+    ) {
         this.queue.add(item)
         setItemAndEmit(currentItem)
     }
@@ -81,11 +91,36 @@ class MediaQueue @Inject constructor() {
     }
 
     data class QueueItem(
-            val file: File,
-            val image: ArtworkCache.Metadata?,
-            val metadata: MetadataExtractor.Metadata?,
+            val content: Uri,
+            val image: Uri?,
+            val metadata: Metadata,
             val timeAddedToQueue: Long = System.currentTimeMillis()
-    )
+    ) {
+        constructor(
+                context: Context,
+                fileMetadata: FolderController.FileMetadata
+        ) : this(
+                content = Uri.fromFile(fileMetadata.file),
+                image = fileMetadata.image,
+                metadata = Metadata(
+                        title = fileMetadata.title,
+                        description = fileMetadata.description(context),
+                        album = fileMetadata.metadata?.album,
+                        artist = fileMetadata.metadata?.artist,
+                        genre = fileMetadata.metadata?.genre,
+                        duration = fileMetadata.metadata?.duration ?: -1L
+                )
+        )
+
+        class Metadata(
+                val title: CharSequence?,
+                val description: CharSequence?,
+                val album: CharSequence?,
+                val artist: CharSequence?,
+                val genre: CharSequence?,
+                val duration: Long
+        )
+    }
 
     data class Model(
             val queue: List<QueueItem> = emptyList(),
