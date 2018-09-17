@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
-import android.util.Log
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Request
 import com.squareup.picasso.RequestHandler
@@ -78,8 +77,6 @@ class ArtworkRequestHandler @Inject constructor(
     private fun getMusicFile(uri: Uri): Bitmap? {
         val filePath = URLDecoder.decode(uri.path, "UTF-8")
         val imageUri = artworkExtractor.getArtwork(File(uri.path))
-
-        Log.d("ArtworkRequestHandler", "load music file for $filePath, $imageUri")
 
         return when (imageUri?.authority) {
             EMBEDDED_FILE_AUTHORITY -> getEmbedded(imageUri)

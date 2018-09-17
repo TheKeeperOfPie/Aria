@@ -9,6 +9,10 @@ class ArtworkTransformation(
         @Px val targetSize: Int = 0
 ) : Transformation {
 
+    companion object {
+        private val RATIO_RANGE = 1.5..2.5
+    }
+
     override fun key() = "${ArtworkTransformation::class.java.canonicalName}:$targetSize"
 
     private fun shouldResize(
@@ -45,30 +49,34 @@ class ArtworkTransformation(
         val heightRatio = if (targetHeight != 0) targetHeight / inHeight.toFloat() else targetWidth / inWidth.toFloat()
         val scaleX: Float
         val scaleY: Float
-        if (widthRatio > heightRatio) {
-            val newSize = Math.ceil((inHeight * (heightRatio / widthRatio)).toDouble()).toInt()
-            drawY = (inHeight - newSize) / 2
-            drawHeight = newSize
-            scaleX = widthRatio
-            scaleY = targetHeight / drawHeight.toFloat()
-        } else if (widthRatio < heightRatio) {
-            val newSize = Math.ceil((inWidth * (widthRatio / heightRatio)).toDouble()).toInt()
-
-            val ratio = inWidth.toFloat() / inHeight
-
-            if (ratio in 1.85..2.15) {
-                drawX = inWidth - newSize
-            } else {
-                drawX = (inWidth - newSize) / 2
+        when {
+            widthRatio > heightRatio -> {
+                val newSize = Math.ceil((inHeight * (heightRatio / widthRatio)).toDouble()).toInt()
+                drawY = (inHeight - newSize) / 2
+                drawHeight = newSize
+                scaleX = widthRatio
+                scaleY = targetHeight / drawHeight.toFloat()
             }
-            drawWidth = newSize
-            scaleX = targetWidth / drawWidth.toFloat()
-            scaleY = heightRatio
-        } else {
-            drawX = 0
-            drawWidth = inWidth
-            scaleY = heightRatio
-            scaleX = scaleY
+            widthRatio < heightRatio -> {
+                val newSize = Math.ceil((inWidth * (widthRatio / heightRatio)).toDouble()).toInt()
+
+                val ratio = inWidth.toFloat() / inHeight
+
+                drawX = if (ratio in RATIO_RANGE) {
+                    inWidth - newSize
+                } else {
+                    (inWidth - newSize) / 2
+                }
+                drawWidth = newSize
+                scaleX = targetWidth / drawWidth.toFloat()
+                scaleY = heightRatio
+            }
+            else -> {
+                drawX = 0
+                drawWidth = inWidth
+                scaleY = heightRatio
+                scaleX = scaleY
+            }
         }
         if (shouldResize( inWidth, inHeight, targetWidth, targetHeight)) {
             matrix.preScale(scaleX, scaleY)

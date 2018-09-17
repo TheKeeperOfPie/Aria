@@ -9,7 +9,7 @@
     tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
     >
 
-    <com.winsonchiu.aria.framework.view.MaskedImageView
+    <com.winsonchiu.aria.folders.folder.view.FileImageView
         android:id="@+id/fileImage"
         android:layout_width="70dp"
         android:layout_height="70dp"
@@ -21,7 +21,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:radius="12dp"
         />
 
     <TextView

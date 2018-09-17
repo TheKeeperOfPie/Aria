@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.SimpleEpoxyController
 import com.google.android.material.snackbar.Snackbar
 import com.winsonchiu.aria.R
+import com.winsonchiu.aria.folders.folder.view.FileItemView
 import com.winsonchiu.aria.folders.root.FolderRootFragmentDaggerComponent
 import com.winsonchiu.aria.framework.async.RequestState
 import com.winsonchiu.aria.framework.fragment.FragmentInitializer

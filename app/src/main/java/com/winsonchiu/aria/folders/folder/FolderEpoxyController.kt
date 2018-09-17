@@ -2,6 +2,8 @@ package com.winsonchiu.aria.folders.folder
 
 import com.airbnb.epoxy.EpoxyModel
 import com.airbnb.epoxy.TypedEpoxyController
+import com.winsonchiu.aria.folders.folder.view.FileItemView
+import com.winsonchiu.aria.folders.folder.view.FileItemViewModel_
 
 class FolderEpoxyController(
         private val listener: FileItemView.Listener

@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.folders.folder
+package com.winsonchiu.aria.folders.folder.view
 
 import android.content.Context
 import android.util.AttributeSet

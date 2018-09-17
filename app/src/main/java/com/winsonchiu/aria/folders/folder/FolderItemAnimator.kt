@@ -2,6 +2,8 @@ package com.winsonchiu.aria.folders.folder
 
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.EpoxyViewHolder
+import com.winsonchiu.aria.folders.folder.view.FileItemView
+import com.winsonchiu.aria.folders.folder.view.FileItemViewModel_
 import com.winsonchiu.aria.framework.util.animation.ValueAnimatorItemAnimator
 import kotlinx.android.synthetic.main.file_item_view.view.*
 

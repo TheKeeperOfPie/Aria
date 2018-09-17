@@ -67,6 +67,13 @@ class ArtworkExtractor @Inject constructor(
                 ?: searchFolderForCover(file)
                 ?: searchFolderForCover(file.parentFile)
                 ?: searchFolderForCover(file.parentFile?.parentFile)
+                ?: file.parentFile?.let {
+                    ArtworkFileTreeWalk(it)
+                            .maxDepth(2)
+                            .filter { it.isDirectory }
+                            .mapNotNull { searchFolderForCover(it) }
+                            .firstOrNull()
+                }
 
         if (uri == null) {
             knownNoneCache += key
@@ -76,6 +83,7 @@ class ArtworkExtractor @Inject constructor(
 
         return uri
     }
+
 
     private fun getArtworkForDirectory(file: File): Uri? {
         val files = file.listFiles(FileFilters.AUDIO)

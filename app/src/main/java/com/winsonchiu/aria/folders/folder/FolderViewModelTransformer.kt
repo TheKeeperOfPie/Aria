@@ -1,15 +1,15 @@
 package com.winsonchiu.aria.folders.folder
 
 import android.content.Context
-import android.net.Uri
-import android.util.Log
 import androidx.annotation.WorkerThread
 import com.airbnb.epoxy.EpoxyModel
 import com.winsonchiu.aria.R
+import com.winsonchiu.aria.folders.folder.view.FileItemView
+import com.winsonchiu.aria.folders.folder.view.FileItemViewModel_
+import com.winsonchiu.aria.folders.folder.view.FileSectionHeaderViewModel_
 import com.winsonchiu.aria.folders.util.FileSorter
 import com.winsonchiu.aria.folders.util.FileSorter.sortFileItemViewModels
 import com.winsonchiu.aria.folders.util.FileUtils
-import com.winsonchiu.aria.folders.util.FileUtils.getFileDisplayAndSortMetadata
 import com.winsonchiu.aria.folders.util.FileUtils.getFolderTitle
 import com.winsonchiu.aria.music.artistDisplayValue
 import java.io.File
