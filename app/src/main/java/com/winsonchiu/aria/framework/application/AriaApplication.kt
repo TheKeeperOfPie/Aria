@@ -1,12 +1,14 @@
 package com.winsonchiu.aria.framework.application
 
 import android.os.Looper
+import android.os.StrictMode
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.framework.dagger.ApplicationModule
 import com.winsonchiu.aria.framework.dagger.DaggerApplicationComponent
+import com.winsonchiu.aria.main.MainActivity
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
 
@@ -39,8 +41,18 @@ class AriaApplication : LeakCanaryApplication() {
         )
     }
 
+    override fun enableStrictMode() {
+        super.enableStrictMode()
+
+        // To fix a quirk with rotating multiple times quickly, increment the expected Activity count
+        val incrementExpectedActivityCount = StrictMode::class.java.getMethod("incrementExpectedActivityCount", Class::class.java)
+        incrementExpectedActivityCount.invoke(null, MainActivity::class.java)
+        incrementExpectedActivityCount.invoke(null, MainActivity::class.java)
+        incrementExpectedActivityCount.invoke(null, MainActivity::class.java)
+    }
+
     @Suppress("HasPlatformType")
-    override fun getSystemService(name: String?) = when (name) {
+    override fun getSystemService(name: String) = when (name) {
         APPLICATION_COMPONENT -> applicationComponent
         else -> super.getSystemService(name)
     }

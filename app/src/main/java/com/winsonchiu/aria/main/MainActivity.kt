@@ -5,13 +5,13 @@ import android.view.View
 import androidx.core.view.GravityCompat
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.framework.activity.LifecycleBoundActivity
 import com.winsonchiu.aria.framework.dagger.activity.ActivityComponent
+import com.winsonchiu.aria.framework.dagger.activity.LifecycleBoundActivity
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.hasFragment
 import com.winsonchiu.aria.framework.util.mapNonNull
 import com.winsonchiu.aria.home.HomeFragment
-import com.winsonchiu.aria.media.MediaQueue
+import com.winsonchiu.aria.queue.MediaQueue
 import com.winsonchiu.aria.nowplaying.NowPlayingView
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject

@@ -1,0 +1,14 @@
+apply plugin: 'java-library'
+apply plugin: 'kotlin'
+
+def lintVersion = "26.3.0-alpha10" // Android Gradle Plugin version + 23.0.0
+
+dependencies {
+    compileOnly "com.android.tools.lint:lint-api:$lintVersion"
+    compileOnly "com.android.tools.lint:lint-checks:$lintVersion"
+
+    testCompile "junit:junit:4.12"
+    testCompile "com.android.tools.lint:lint:$lintVersion"
+    testCompile "com.android.tools.lint:lint-tests:$lintVersion"
+    testCompile "com.android.tools:testutils:$lintVersion"
+}

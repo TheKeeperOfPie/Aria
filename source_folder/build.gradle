@@ -1,0 +1,72 @@
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+    }
+    dependencies {
+        classpath "com.jakewharton:butterknife-gradle-plugin:9.0.0-SNAPSHOT"
+    }
+}
+
+apply plugin: "com.android.library"
+apply plugin: "kotlin-android"
+apply plugin: "kotlin-android-extensions"
+apply plugin: "kotlin-kapt"
+apply plugin: "com.jakewharton.butterknife"
+
+android {
+    compileSdkVersion 28
+
+    defaultConfig {
+        minSdkVersion 28
+        targetSdkVersion 28
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+
+    dexOptions {
+        preDexLibraries true
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+kapt {
+    useBuildCache = true
+}
+
+androidExtensions {
+    experimental = true
+}
+
+dependencies {
+    api project(":queue")
+    api project(":item_sheet")
+
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+
+    def daggerVersion = "2.16"
+    kapt "com.google.dagger:dagger-android-processor:$daggerVersion"
+    kapt "com.google.dagger:dagger-compiler:$daggerVersion"
+
+    def epoxyVersion = "3.0.0-rc1"
+    kapt "com.airbnb.android:epoxy-processor:$epoxyVersion"
+}

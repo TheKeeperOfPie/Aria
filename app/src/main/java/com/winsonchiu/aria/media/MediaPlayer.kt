@@ -12,6 +12,7 @@ import com.winsonchiu.aria.framework.application.AriaApplication
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.framework.util.arch.LoggingLifecycleObserver
 import com.winsonchiu.aria.media.util.LoggingMediaSessionCallback
+import com.winsonchiu.aria.queue.MediaQueue
 import io.reactivex.Maybe
 import javax.inject.Inject
 

@@ -19,6 +19,7 @@ import com.winsonchiu.aria.BuildConfig
 import com.winsonchiu.aria.R
 import com.winsonchiu.aria.main.MainActivity
 import com.winsonchiu.aria.media.util.toMediaMetadata
+import com.winsonchiu.aria.queue.MediaQueue
 
 class MediaNotificationManager(
         private val service: Service

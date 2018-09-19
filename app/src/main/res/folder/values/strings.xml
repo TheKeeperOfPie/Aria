@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-
-    <string name="fileDescriptionFormatArtistAndAlbum">%1$s - %2$s</string>
-    <string name="fileDescriptionFormatArtist">%1$s</string>
-    <string name="fileDescriptionFormatAlbum">%1$s</string>
-
-</resources>

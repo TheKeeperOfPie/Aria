@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.folders.root.FolderRootFragment
+import com.winsonchiu.aria.source.folder.root.FolderRootFragment
 
 class HomePagerAdapter(
         private val context: Context,

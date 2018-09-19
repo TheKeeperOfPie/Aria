@@ -11,6 +11,7 @@ import androidx.media.MediaBrowserServiceCompat
 import com.winsonchiu.aria.framework.application.AriaApplication
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.media.util.toMediaMetadata
+import com.winsonchiu.aria.queue.MediaQueue
 import javax.inject.Inject
 
 class MediaService : LifecycleMediaBrowserService() {

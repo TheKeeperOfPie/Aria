@@ -1,0 +1,9 @@
+<resources>
+
+    <string name="app_name">Aria Source Folder</string>
+
+    <string name="fileDescriptionFormatArtistAndAlbum">%1$s - %2$s</string>
+    <string name="fileDescriptionFormatArtist">%1$s</string>
+    <string name="fileDescriptionFormatAlbum">%1$s</string>
+
+</resources>

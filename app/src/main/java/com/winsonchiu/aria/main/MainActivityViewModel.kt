@@ -2,9 +2,10 @@ package com.winsonchiu.aria.main
 
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModel
-import com.winsonchiu.aria.framework.activity.DaggerComponentActivity
 import com.winsonchiu.aria.framework.dagger.activity.ActivityComponent
 import com.winsonchiu.aria.framework.dagger.activity.ActivityLifecycleBoundComponent
+import com.winsonchiu.aria.framework.dagger.activity.DaggerComponentActivity
+import com.winsonchiu.aria.framework.dagger.activity.DaggerConstants
 import javax.inject.Inject
 
 class MainActivityViewModel(activity: AppCompatActivity) : ViewModel() {
@@ -13,7 +14,7 @@ class MainActivityViewModel(activity: AppCompatActivity) : ViewModel() {
     lateinit var lifecycleBoundComponents: Set<@JvmSuppressWildcards ActivityLifecycleBoundComponent>
 
     init {
-        (activity.getSystemService(DaggerComponentActivity.ACTIVITY_COMPONENT) as ActivityComponent).inject(this)
+        (activity.getSystemService(DaggerConstants.ACTIVITY_COMPONENT) as ActivityComponent).inject(this)
         lifecycleBoundComponents.forEach { it.onFirstInitialize() }
     }
 

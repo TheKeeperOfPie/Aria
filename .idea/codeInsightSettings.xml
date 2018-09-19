@@ -2,10 +2,10 @@
 <project version="4">
   <component name="JavaProjectCodeInsightSettings">
     <excluded-names>
+      <name>*.R.id*</name>
       <name>android.app.Frag*</name>
       <name>android.arch*</name>
       <name>android.support.*</name>
-      <name>com.*.R.id</name>
     </excluded-names>
   </component>
 </project>

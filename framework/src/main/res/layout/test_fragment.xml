@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >a
+
+    <com.winsonchiu.aria.framework.reflow.ReflowTextLayout
+        android:id="@+id/textSongTitle"
+        android:layout_width="0dp"
+        android:layout_height="250dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="12dp"
+        android:background="@android:color/holo_red_light"
+        android:gravity="bottom"
+        app:layout_constrainedHeight="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        >
+
+        <com.winsonchiu.aria.framework.view.ReflowTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="start"
+            android:lines="1"
+            android:maxLines="1"
+            android:singleLine="true"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            android:textSize="14sp"
+            tools:text="Brave Shine"
+            />
+
+        <com.winsonchiu.aria.framework.view.ReflowTextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_gravity="center|bottom"
+            android:gravity="center|bottom"
+            android:textAppearance="@style/TextAppearance.AppCompat.Title"
+            tools:text="Brave Shine"
+            />
+
+    </com.winsonchiu.aria.framework.reflow.ReflowTextLayout>
+
+
+    <SeekBar
+        android:id="@+id/seekBar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="48dp"
+        android:layout_marginTop="48dp"
+        android:layout_marginEnd="48dp"
+        android:layout_marginBottom="48dp"
+        android:max="1000"
+        android:min="0"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/textSongTitle"
+        />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

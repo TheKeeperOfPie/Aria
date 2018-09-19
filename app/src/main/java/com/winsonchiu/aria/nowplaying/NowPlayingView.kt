@@ -8,8 +8,8 @@ import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.core.view.doOnNextLayout
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.R
+import com.winsonchiu.aria.artwork.ArtworkTransformation
 import com.winsonchiu.aria.framework.util.initialize
-import com.winsonchiu.aria.music.artwork.ArtworkTransformation
 import kotlinx.android.synthetic.main.now_playing_view_constraint_expanded_as_merge.view.*
 
 class NowPlayingView @JvmOverloads constructor(

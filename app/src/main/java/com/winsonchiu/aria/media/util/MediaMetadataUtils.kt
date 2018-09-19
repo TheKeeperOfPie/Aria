@@ -1,9 +1,9 @@
 package com.winsonchiu.aria.media.util
 
 import android.support.v4.media.MediaMetadataCompat
-import com.winsonchiu.aria.folders.folder.FolderController
-import com.winsonchiu.aria.media.MediaQueue
-import com.winsonchiu.aria.music.artistDisplayValue
+import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.source.folder.inner.FolderController
+import com.winsonchiu.aria.source.folder.util.artistDisplayValue
 
 fun FolderController.FileMetadata.toMediaMetadata() = MediaMetadataCompat.Builder()
         .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, file.absolutePath)
