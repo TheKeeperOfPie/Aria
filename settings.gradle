@@ -1,4 +1,0 @@
-include ':app', ':artwork', ':source_folder', ':item_sheet',
-        ':lint',
-        ':queue',
-        ':framework'
