@@ -1,4 +1,6 @@
 import com.android.build.gradle.ProguardFiles
+import com.winsonchiu.aria.Dependencies
+import com.winsonchiu.aria.Modules
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
@@ -50,8 +52,6 @@ kapt {
     useBuildCache = true
 }
 
-dependencies {
-    api(project(":framework"))
-
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+Dependencies(this) {
+    api(Modules.framework)
 }

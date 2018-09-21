@@ -58,7 +58,7 @@ class AriaApplication : LeakCanaryApplication() {
     }
 
     @Suppress("HasPlatformType")
-    override fun getSystemServiceName(serviceClass: Class<*>?) = when (serviceClass) {
+    override fun getSystemServiceName(serviceClass: Class<*>) = when (serviceClass) {
         ApplicationComponent::class.java -> APPLICATION_COMPONENT
         else -> super.getSystemServiceName(serviceClass)
     }

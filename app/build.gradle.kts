@@ -4,6 +4,8 @@ import org.jetbrains.kotlin.config.KotlinCompilerVersion
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.internal.AndroidExtensionsExtension
 import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+import com.winsonchiu.aria.Dependencies
+import com.winsonchiu.aria.Modules
 
 plugins {
     id("com.android.application")
@@ -79,16 +81,15 @@ androidExtensions {
 }
 
 dependencies {
-    implementation(project(":queue"))
-    implementation(project(":sourceFolder"))
+    api(project(":queue"))
+}
 
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+Dependencies(this) {
+    implementation(Modules.queue)
+    implementation(Modules.sourceFolder)
 
-    implementation("androidx.media:media:1.0.0-rc02")
-    implementation("androidx.media2:media2:1.0.0-alpha02")
+    implementation(Dependencies.AndroidX.media)
+    implementation(Dependencies.AndroidX.media2)
 
-    implementation("androidx.paging:paging-runtime:2.0.0-rc01")
-    implementation("androidx.paging:paging-rxjava2:2.0.0-rc01")
-
-    kaptDagger()
+    implementation(Dependencies.Google.dagger)
 }

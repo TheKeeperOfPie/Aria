@@ -28,7 +28,7 @@ abstract class DaggerComponentActivity : AppCompatActivity() {
 
     @CallSuper
     @Suppress("HasPlatformType")
-    override fun getSystemService(name: String?) = when (name) {
+    override fun getSystemService(name: String) = when (name) {
         DaggerConstants.ACTIVITY_COMPONENT -> activityComponent
         else -> super.getSystemService(name)
     }

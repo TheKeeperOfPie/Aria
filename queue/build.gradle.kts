@@ -1,3 +1,5 @@
+import com.winsonchiu.aria.Dependencies
+import com.winsonchiu.aria.Modules
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.internal.AndroidExtensionsExtension
 
@@ -68,14 +70,10 @@ androidExtensions {
     })
 }
 
-dependencies {
-    api(project(":artwork"))
-    api(project(":framework"))
+Dependencies(this) {
+    api(Modules.artwork)
+    api(Modules.framework)
 
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
-    kaptDagger()
-
-    val epoxyVersion = "3.0.0-rc1"
-    kapt("com.airbnb.android:epoxy-processor:$epoxyVersion")
+    api(Dependencies.Google.dagger)
+    api(Dependencies.Airbnb.epoxy)
 }
