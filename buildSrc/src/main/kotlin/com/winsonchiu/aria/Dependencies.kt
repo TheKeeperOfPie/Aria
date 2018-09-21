@@ -8,8 +8,7 @@ import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.project
 
-// TODO: Make private
-object Versions {
+private object Versions {
 
     val kotlin = "1.3-M2"
 
@@ -259,14 +258,14 @@ object Modules {
 
 sealed class Dependency {
 
-    abstract operator fun invoke(
+    abstract internal operator fun invoke(
             dependencyHandler: DependencyHandler,
             configuration: String
     )
 
     class Single private constructor(private val value: String) : Dependency() {
 
-        companion object {
+        internal companion object {
             fun constructDoNotCall(value: String) = Single(value)
         }
 
@@ -280,7 +279,7 @@ sealed class Dependency {
 
     class Kapt private constructor(private val value: String) : Dependency() {
 
-        companion object {
+        internal companion object {
             fun constructDoNotCall(value: String) = Kapt(value)
         }
 
@@ -304,14 +303,10 @@ sealed class Dependency {
 
 data class Module(val value: String) {
 
-    operator fun invoke(
+    internal operator fun invoke(
             dependencyHandler: DependencyHandler,
             configuration: String
     ) = dependencyHandler.add(configuration, dependencyHandler.project(":$value"))
-}
-
-fun DependencyHandlerScope.projectArtwork() {
-
 }
 
 class WrapperDependencyHandler(dependencyHandler: DependencyHandler) : DependencyHandler by dependencyHandler {

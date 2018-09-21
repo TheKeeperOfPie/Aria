@@ -1,5 +1,4 @@
 buildscript {
-    extensions.add("kotlinVersion", "1.3-M2")
     repositories {
         google()
         jcenter()
@@ -8,7 +7,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.3.0-alpha11")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${extensions["kotlinVersion"]}")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3-M2")
     }
 }
 

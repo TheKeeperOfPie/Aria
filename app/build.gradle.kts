@@ -40,6 +40,7 @@ android {
             isShrinkResources = true
             isCrunchPngs = true
 
+            signingConfig  = signingConfigs.getByName("debug")
             proguardFiles(getDefaultProguardFile("proguard-android.txt", project), "proguard-rules.pro")
         }
     }
