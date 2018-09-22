@@ -1,3 +1,6 @@
+import org.gradle.internal.impldep.aQute.bnd.osgi.Constants.options
+import org.gradle.kotlin.dsl.support.kotlinEap
+
 buildscript {
     repositories {
         google()
@@ -7,7 +10,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.3.0-alpha11")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3-M2")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.0-rc-57")
     }
 }
 

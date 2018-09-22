@@ -14,7 +14,7 @@ abstract class ViewScopingFragment<in ParentComponent, ChildComponent> :
     LifecycleBoundFragment<ParentComponent, ChildComponent>() {
 
     @get:LayoutRes
-    abstract val layoutId: Int
+    protected abstract val layoutId: Int
 
     private lateinit var unbinder: Unbinder
 

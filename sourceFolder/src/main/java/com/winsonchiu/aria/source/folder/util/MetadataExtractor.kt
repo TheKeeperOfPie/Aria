@@ -16,7 +16,7 @@ class MetadataExtractor @Inject constructor() {
         val EMPTY = Metadata()
     }
 
-    private val mediaMetadataRetriever = object : ThreadLocal<MediaMetadataRetriever>() {
+    private val mediaMetadataRetriever: ThreadLocal<MediaMetadataRetriever> = object : ThreadLocal<MediaMetadataRetriever>() {
         override fun initialValue(): MediaMetadataRetriever {
             return MediaMetadataRetriever()
         }

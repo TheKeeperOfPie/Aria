@@ -7,11 +7,27 @@ import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 import com.winsonchiu.aria.Dependencies
 import com.winsonchiu.aria.Modules
 
+buildscript {
+    repositories {
+        mavenCentral()
+        google()
+        maven("https://oss.sonatype.org/content/repositories/snapshots/")
+    }
+
+    dependencies {
+        classpath("com.jakewharton:butterknife-gradle-plugin:9.0.0-SNAPSHOT")
+    }
+}
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     id("kotlin-android-extensions")
     id("kotlin-kapt")
+}
+
+apply {
+    plugin("com.jakewharton.butterknife")
 }
 
 android {
@@ -79,10 +95,6 @@ androidExtensions {
     configure(delegateClosureOf<AndroidExtensionsExtension> {
         isExperimental = true
     })
-}
-
-dependencies {
-    api(project(":queue"))
 }
 
 Dependencies(this) {

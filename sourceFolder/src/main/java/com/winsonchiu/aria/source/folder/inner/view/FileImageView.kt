@@ -5,17 +5,16 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Path
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.withSave
-import butterknife.BindDrawable
 import butterknife.ButterKnife
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.artwork.ArtworkTransformation
 import com.winsonchiu.aria.framework.util.dpToPx
-import com.winsonchiu.aria.source.folder.R2
+import com.winsonchiu.aria.source.folder.R
 import com.winsonchiu.aria.source.folder.inner.FolderController
 
 class FileImageView @JvmOverloads constructor(
@@ -39,8 +38,9 @@ class FileImageView @JvmOverloads constructor(
 
     private var data: FolderController.FileMetadata? = null
 
-    @BindDrawable(R2.drawable.folder_file_image_music)
-    lateinit var overlayImageMusic: Drawable
+    val overlayImageMusic by lazy {
+        AppCompatResources.getDrawable(context, R.drawable.folder_file_image_music)
+    }
 
     private val artworkTransformation = ArtworkTransformation(70.dpToPx(context))
 

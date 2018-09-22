@@ -5,12 +5,13 @@ import com.winsonchiu.aria.Dependency.Multiple
 import com.winsonchiu.aria.Dependency.Single
 import org.gradle.api.Project
 import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.kotlin.dsl.DependencyHandlerScope
 import org.gradle.kotlin.dsl.project
 
-private object Versions {
+private val useButterKnifeReflect = true
 
-    val kotlin = "1.3-M2"
+object Versions {
+
+    val kotlin = "1.3.0-rc-57"
 
     object Airbnb {
         val epoxy = "3.0.0-rc1"
@@ -18,34 +19,34 @@ private object Versions {
 
     object AndroidX {
 
-        val media = "1.0.0-rc02"
-        val media2 = "1.0.0-alpha02"
+        val media = "1.0.0"
+        val media2 = "1.0.0-alpha03"
 
-        val core = "1.0.0-rc02"
+        val core = "1.0.0"
 
-        val appcompat = "1.0.0-rc02"
-        val coordinatorLayout = "1.0.0-rc02"
-        val drawerLayout = "1.0.0-rc02"
-        val fragment = "1.0.0-rc02"
-        val vectorDrawable = "1.0.0-rc02"
-        val browser = "1.0.0-rc02"
-        val palette = "1.0.0-rc02"
-        val recyclerViewSelection = "1.0.0-rc02"
-        val recyclerView = "1.0.0-rc02"
-        val annotation = "1.0.0-rc02"
+        val appcompat = "1.0.0"
+        val coordinatorLayout = "1.0.0"
+        val drawerLayout = "1.0.0"
+        val fragment = "1.0.0"
+        val vectorDrawable = "1.0.0"
+        val browser = "1.0.0"
+        val palette = "1.0.0"
+        val recyclerViewSelection = "1.0.0"
+        val recyclerView = "1.0.0"
+        val annotation = "1.0.0"
         val constraintLayout = "2.0.0-alpha2"
 
         object Lifecycle {
-            val common = "2.0.0-rc01"
-            val extensions = "2.0.0-rc01"
-            val viewModel = "2.0.0-rc01"
-            val reactiveStreams = "2.0.0-rc01"
+            val common = "2.0.0"
+            val extensions = "2.0.0"
+            val viewModel = "2.0.0"
+            val reactiveStreams = "2.0.0"
         }
     }
 
     object Google {
         val dagger = "2.16"
-        val material = "1.0.0-rc02"
+        val material = "1.0.0"
     }
 
     object JakeWharton {
@@ -176,12 +177,17 @@ object Dependencies {
 
         val rxRelay = "com.jakewharton.rxrelay2:rxrelay"(Versions.JakeWharton.rxRelay)
 
-        val butterKnife = Multiple(
-                ButterKnife.compiler,
-                ButterKnife.runtime
-        )
+        val butterKnife = if (useButterKnifeReflect) {
+            ButterKnife.reflect
+        } else {
+            Multiple(
+                    ButterKnife.compiler,
+                    ButterKnife.runtime
+            )
+        }
 
         object ButterKnife {
+            val reflect = "com.jakewharton:butterknife-reflect"(Versions.JakeWharton.butterKnife)
             val runtime = "com.jakewharton:butterknife"(Versions.JakeWharton.butterKnife)
             val compiler = kapt("com.jakewharton:butterknife-compiler", Versions.JakeWharton.butterKnife)
         }
@@ -256,7 +262,7 @@ object Modules {
     val sourceFolder = Module("sourceFolder")
 }
 
-sealed class Dependency {
+abstract class Dependency {
 
     abstract internal operator fun invoke(
             dependencyHandler: DependencyHandler,
@@ -306,7 +312,7 @@ data class Module(val value: String) {
     internal operator fun invoke(
             dependencyHandler: DependencyHandler,
             configuration: String
-    ) = dependencyHandler.add(configuration, dependencyHandler.project(":$value"))
+    ) = dependencyHandler.add(configuration, dependencyHandler.project("path" to ":$value"))
 }
 
 class WrapperDependencyHandler(dependencyHandler: DependencyHandler) : DependencyHandler by dependencyHandler {

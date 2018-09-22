@@ -78,6 +78,9 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
 //            mediaBrowserConnection.mediaController.transportControls.play()
 
             val file = fileMetadata.file
+            if (file.isDirectory) {
+                return
+            }
 
             ItemsMenuDialogFragment.newInstance(
                     listOf(
@@ -86,7 +89,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                             FolderItemOption.AddToQueue(file)
                     )
             )
-                    .show(childFragmentManager, null)
+                    .show(fragmentManager, R.id.folder_root_fragment_container)
         }
     }
 

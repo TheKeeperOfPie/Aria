@@ -76,4 +76,6 @@ Dependencies(this) {
 
     api(Dependencies.Google.dagger)
     api(Dependencies.Airbnb.epoxy)
+
+    api(Dependencies.JakeWharton.butterKnife)
 }
