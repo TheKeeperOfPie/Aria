@@ -22,7 +22,6 @@
         android:layout_height="wrap_content"
         app:layout_behavior="@string/bottom_sheet_behavior"
         >
-        <!--app:layout_behavior="com.winsonchiu.aria.itemsheet.TestBottomSheetBehavior"-->
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerItems"

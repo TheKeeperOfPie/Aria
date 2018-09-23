@@ -2,12 +2,12 @@ package com.winsonchiu.aria.framework.dagger.activity
 
 import android.os.Bundle
 import androidx.annotation.CallSuper
-import androidx.appcompat.app.AppCompatActivity
+import com.winsonchiu.aria.dialog.DialogActivity
 import com.winsonchiu.aria.framework.application.AriaApplication
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.framework.dagger.activity.DaggerConstants.ACTIVITY_COMPONENT
 
-abstract class DaggerComponentActivity : AppCompatActivity() {
+abstract class DaggerComponentActivity : DialogActivity() {
 
     private val activityComponent by lazy { makeActivityComponent() }
 

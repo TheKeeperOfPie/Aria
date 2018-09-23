@@ -11,6 +11,12 @@ private val useButterKnifeReflect = true
 
 object Versions {
 
+    object Android {
+        val compileSdk = 28
+        val minSdk = 28
+        val targetSdk = 28
+    }
+
     val kotlin = "1.3.0-rc-57"
 
     object Airbnb {
@@ -256,6 +262,7 @@ object Dependencies {
 
 object Modules {
     val artwork = Module("artwork")
+    val dialog = Module("dialog")
     val framework = Module("framework")
     val itemSheet = Module("itemSheet")
     val queue = Module("queue")

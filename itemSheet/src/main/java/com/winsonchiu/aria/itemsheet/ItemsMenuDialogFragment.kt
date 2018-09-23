@@ -2,44 +2,44 @@ package com.winsonchiu.aria.itemsheet
 
 import android.animation.Animator
 import android.animation.ValueAnimator
+import android.content.Intent
 import android.os.Bundle
 import android.view.GestureDetector
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
-import androidx.annotation.IdRes
+import android.view.animation.AccelerateInterpolator
 import androidx.core.animation.doOnStart
 import androidx.core.view.GestureDetectorCompat
 import androidx.core.view.postDelayed
-import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.winsonchiu.aria.dialog.DialogActivityFragment
 import com.winsonchiu.aria.framework.fragment.FragmentArgument
 import kotlinx.android.synthetic.main.items_menu_fragment.*
 
-class ItemsMenuDialogFragment<DataType : ItemsMenuItem> : Fragment() {
-
-    var items by FragmentArgument<ArrayList<DataType>>("items")
+class ItemsMenuDialogFragment<DataType : ItemsMenuItem> : DialogActivityFragment() {
 
     companion object {
-        val BACK_STACK_TAG = "${ItemsMenuDialogFragment::class.java.canonicalName}.TAG"
 
-        private const val MILLISECONDS_PER_INCH = 25f
+        val KEY_RESULT_ITEM = "${ItemsMenuDialogFragment::class.java.canonicalName}.resultItem"
 
         fun <DataType : ItemsMenuItem> newInstance(items: List<DataType>) = ItemsMenuDialogFragment<DataType>().apply {
             this.items = (items as? ArrayList<DataType> ?: ArrayList(items))
         }
     }
 
+    private var items by FragmentArgument<ArrayList<DataType>>("items")
+
     private lateinit var bottomSheetBehavior: BottomSheetBehavior<View>
 
     private lateinit var gestureDetector: GestureDetectorCompat
 
     private val gestureListener = object : GestureDetector.SimpleOnGestureListener() {
-        override fun onSingleTapConfirmed(e: MotionEvent?): Boolean {
+        override fun onSingleTapUp(e: MotionEvent?): Boolean {
             dismiss()
             return true
         }
@@ -64,8 +64,10 @@ class ItemsMenuDialogFragment<DataType : ItemsMenuItem> : Fragment() {
 
             @Suppress("UNCHECKED_CAST")
             override fun onClick(item: DataType) {
-                (parentFragment as Listener<DataType>).onClick(item)
-                dismiss()
+                val data = Intent().apply {
+                    putExtra(KEY_RESULT_ITEM, item)
+                }
+                deliverResultAndDismiss(data)
             }
         })
 
@@ -93,18 +95,6 @@ class ItemsMenuDialogFragment<DataType : ItemsMenuItem> : Fragment() {
         })
     }
 
-    fun show(fragmentManager: FragmentManager?, @IdRes containerId: Int) {
-        fragmentManager
-                ?.beginTransaction()
-                ?.add(containerId, this, null)
-                ?.addToBackStack(BACK_STACK_TAG)
-                ?.commit()
-    }
-
-    private fun dismiss() {
-        fragmentManager?.popBackStack(BACK_STACK_TAG, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-    }
-
     override fun onCreateAnimator(
             transit: Int,
             enter: Boolean,
@@ -127,6 +117,8 @@ class ItemsMenuDialogFragment<DataType : ItemsMenuItem> : Fragment() {
                         addUpdateListener {
                             viewBackground.alpha = it.animatedFraction
                         }
+
+                        interpolator = FastOutSlowInInterpolator()
                     }
         } else {
             val startTop = layoutBottomSheet.top
@@ -139,14 +131,8 @@ class ItemsMenuDialogFragment<DataType : ItemsMenuItem> : Fragment() {
                             viewBackground.alpha = 1f - it.animatedFraction
                         }
 
-                        val speed = MILLISECONDS_PER_INCH / layoutBottomSheet.context.resources.displayMetrics.densityDpi
-                        val distance = endTop - startTop
-//                        duration = (distance * speed).toLong()
+                        interpolator = AccelerateInterpolator()
                     }
         }
-    }
-
-    interface Listener<DataType : ItemsMenuItem> {
-        fun onClick(item: DataType)
     }
 }

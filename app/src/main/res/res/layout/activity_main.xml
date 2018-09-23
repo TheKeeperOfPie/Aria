@@ -1,63 +1,71 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.drawerlayout.widget.DrawerLayout
+<FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/drawerMain"
+    android:id="@+id/main_activity_dialog_fragment_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.MainActivity"
     >
 
-    <androidx.coordinatorlayout.widget.CoordinatorLayout
-        android:id="@+id/layoutMain"
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/drawerMain"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
+        tools:context=".main.MainActivity"
         >
+
+        <androidx.coordinatorlayout.widget.CoordinatorLayout
+            android:id="@+id/layoutMain"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <FrameLayout
+                android:id="@+id/main_activity_fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+            <com.winsonchiu.aria.nowplaying.NowPlayingView
+                android:id="@+id/viewNowPlaying"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:layout_behavior="@string/bottom_sheet_behavior"
+                />
+
+        </androidx.coordinatorlayout.widget.CoordinatorLayout>
 
         <FrameLayout
-            android:id="@+id/main_activity_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            />
+            android:layout_gravity="end"
+            >
 
-        <com.winsonchiu.aria.nowplaying.NowPlayingView
-            android:id="@+id/viewNowPlaying"
+            <fragment
+                android:id="@+id/queueFragment"
+                class="com.winsonchiu.aria.queue.QueueFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
+
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:layout_behavior="@string/bottom_sheet_behavior"
-            />
+            android:layout_gravity="start"
+            >
 
-    </androidx.coordinatorlayout.widget.CoordinatorLayout>
+            <fragment
+                android:id="@+id/testFragment"
+                class="com.winsonchiu.aria.framework.reflow.TestFragment"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                />
 
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="end"
-        >
+        </FrameLayout>
 
-        <fragment
-            android:id="@+id/queueFragment"
-            class="com.winsonchiu.aria.queue.QueueFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
+    </androidx.drawerlayout.widget.DrawerLayout>
 
-    </FrameLayout>
-
-    <FrameLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        >
-
-        <fragment
-            android:id="@+id/testFragment"
-            class="com.winsonchiu.aria.framework.reflow.TestFragment"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            />
-
-    </FrameLayout>
-
-</androidx.drawerlayout.widget.DrawerLayout>
+</FrameLayout>

@@ -11,12 +11,14 @@ import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.hasFragment
 import com.winsonchiu.aria.framework.util.mapNonNull
 import com.winsonchiu.aria.home.HomeFragment
-import com.winsonchiu.aria.queue.MediaQueue
 import com.winsonchiu.aria.nowplaying.NowPlayingView
+import com.winsonchiu.aria.queue.MediaQueue
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
 class MainActivity : LifecycleBoundActivity() {
+
+    override val dialogFragmentContainerId = R.id.main_activity_dialog_fragment_container
 
     @Inject
     lateinit var mediaQueue: MediaQueue
@@ -67,11 +69,11 @@ class MainActivity : LifecycleBoundActivity() {
 
     override fun injectSelf(activityComponent: ActivityComponent) = activityComponent.inject(this)
 
-    override fun onBackPressed() {
+    override fun handleBackPressed() {
         if (drawerMain.isDrawerOpen(GravityCompat.END)) {
             drawerMain.closeDrawer(GravityCompat.END)
         } else {
-            super.onBackPressed()
+            super.handleBackPressed()
         }
     }
 

@@ -1,6 +1,7 @@
 package com.winsonchiu.aria.source.folder.inner
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,7 +28,12 @@ import kotlinx.android.synthetic.main.folder_fragment.*
 import java.io.File
 import javax.inject.Inject
 
-class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFragmentDaggerComponent>(), ItemsMenuDialogFragment.Listener<FolderFragment.FolderItemOption> {
+class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFragmentDaggerComponent>()  {
+
+    companion object {
+
+        val ITEM_OPTION_REQUEST_CODE = 12452
+    }
 
     override fun makeComponent(parentComponent: FolderRootFragmentDaggerComponent): FolderFragmentDaggerComponent {
         return parentComponent.folderFragmentComponent()
@@ -89,7 +95,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                             FolderItemOption.AddToQueue(file)
                     )
             )
-                    .show(fragmentManager, R.id.folder_root_fragment_container)
+                    .show(this@FolderFragment, ITEM_OPTION_REQUEST_CODE)
         }
     }
 
@@ -134,12 +140,24 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                 }
     }
 
-    override fun onClick(item: FolderItemOption) {
-        when (item) {
-            is FolderFragment.FolderItemOption.Header -> Unit
-            is FolderFragment.FolderItemOption.PlayNext -> folderController.playNext(item.file)
-            is FolderFragment.FolderItemOption.AddToQueue -> folderController.addToQueue(item.file)
-        }.run { }
+    override fun onActivityResult(
+            requestCode: Int,
+            resultCode: Int,
+            data: Intent?
+    ) {
+        if (requestCode == ITEM_OPTION_REQUEST_CODE) {
+            data?.setExtrasClassLoader(FolderFragment::class.java.classLoader)
+            val item = data?.getParcelableExtra<FolderItemOption>(ItemsMenuDialogFragment.KEY_RESULT_ITEM)
+
+            when (item) {
+                is FolderFragment.FolderItemOption.Header -> Unit
+                is FolderFragment.FolderItemOption.PlayNext -> folderController.playNext(item.file)
+                is FolderFragment.FolderItemOption.AddToQueue -> folderController.addToQueue(item.file)
+                null -> {}
+            }.run { }
+        }
+
+        super.onActivityResult(requestCode, resultCode, data)
     }
 
     sealed class FolderItemOption : ItemsMenuItem {

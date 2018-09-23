@@ -1,4 +1,5 @@
 plugins {
+    `groovy`
     `kotlin-dsl`
     `java-gradle-plugin`
 }
@@ -9,13 +10,23 @@ kotlinDslPluginOptions {
 
 gradlePlugin {
     plugins {
-        register("aria-android") {
-            id = "aria-android"
-            implementationClass = "AriaAndroidPlugin"
+        register("submodule") {
+            id = "submodule"
+            implementationClass = "com.winsonchiu.aria.SubModulePlugin"
         }
     }
 }
 
 repositories {
+    google()
     jcenter()
+    maven("https://dl.bintray.com/kotlin/kotlin-eap")
+    maven("https://dl.bintray.com/kotlin/kotlin-dev")
+}
+
+dependencies {
+    implementation(gradleApi())
+    implementation(localGroovy())
+
+    implementation("com.android.tools.build:gradle:3.3.0-alpha11")
 }
