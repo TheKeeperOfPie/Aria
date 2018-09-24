@@ -44,7 +44,7 @@
 
             <fragment
                 android:id="@+id/queueFragment"
-                class="com.winsonchiu.aria.queue.QueueFragment"
+                class="com.winsonchiu.aria.queue.ui.QueueFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />

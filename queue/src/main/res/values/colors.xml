@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <color name="queueItemDefaultBackground">#44FFFFFF</color>
+    <color name="queueEntryDefaultBackground">#44FFFFFF</color>
 
 </resources>

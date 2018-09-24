@@ -20,6 +20,7 @@ import com.winsonchiu.aria.R
 import com.winsonchiu.aria.main.MainActivity
 import com.winsonchiu.aria.media.util.toMediaMetadata
 import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.queue.QueueEntry
 
 class MediaNotificationManager(
         private val service: Service
@@ -84,11 +85,11 @@ class MediaNotificationManager(
     }
 
     fun updateNotification(
-            queueItem: MediaQueue.QueueItem,
+            queueEntry: QueueEntry,
             isPlaying: Boolean,
             sessionToken: MediaSessionCompat.Token?
     ) {
-        notificationManager.notify(NOTIFICATION_ID, buildNotification(queueItem, isPlaying, sessionToken))
+        notificationManager.notify(NOTIFICATION_ID, buildNotification(queueEntry, isPlaying, sessionToken))
     }
 
     fun buildNotification(
@@ -104,15 +105,15 @@ class MediaNotificationManager(
     )
 
     fun buildNotification(
-            queueItem: MediaQueue.QueueItem,
+            queueEntry: QueueEntry,
             isPlaying: Boolean,
             sessionToken: MediaSessionCompat.Token?
     ): Notification {
-        val mediaDescription = queueItem.toMediaMetadata().description
+        val mediaDescription = queueEntry.toMediaMetadata().description
         return buildNotification(
                 mediaDescription.title,
                 mediaDescription.subtitle,
-                null,//queueItem.image, TODO: Notification image
+                null,//queueEntry.image, TODO: Notification image
                 isPlaying,
                 sessionToken
         )

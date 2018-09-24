@@ -21,14 +21,36 @@
         />
 
     <ImageView
+        android:id="@+id/imageUndo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="?selectableItemBackground"
+        android:contentDescription="TODO"
+        android:padding="12dp"
+        android:scaleType="centerInside"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/imagePlay"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/queueRecycler"
+        app:srcCompat="@drawable/ic_undo_24dp"
+        />
+
+    <ImageView
         android:id="@+id/imagePlay"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:contentDescription="TODO" android:padding="12dp"
+        android:layout_marginTop="12dp"
+        android:layout_marginBottom="12dp"
+        android:background="?selectableItemBackground"
+        android:contentDescription="TODO"
+        android:padding="12dp"
         android:scaleType="centerInside"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintStart_toEndOf="@id/imageUndo"
+        app:layout_constraintTop_toBottomOf="@id/queueRecycler"
         app:srcCompat="@drawable/ic_play_arrow_24dp"
         />
 

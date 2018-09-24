@@ -1,7 +1,7 @@
 package com.winsonchiu.aria.media.util
 
 import android.support.v4.media.MediaMetadataCompat
-import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.queue.QueueEntry
 import com.winsonchiu.aria.source.folder.inner.FolderController
 import com.winsonchiu.aria.source.folder.util.artistDisplayValue
 
@@ -17,7 +17,7 @@ fun FolderController.FileMetadata.toMediaMetadata() = MediaMetadataCompat.Builde
         .build()
 
 // TODO: Album art
-fun MediaQueue.QueueItem.toMediaMetadata() = MediaMetadataCompat.Builder()
+fun QueueEntry.toMediaMetadata() = MediaMetadataCompat.Builder()
         .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, content.toString())
         .putText(MediaMetadataCompat.METADATA_KEY_ALBUM, metadata.album)
         .putText(MediaMetadataCompat.METADATA_KEY_ARTIST, metadata.artist)
@@ -28,7 +28,7 @@ fun MediaQueue.QueueItem.toMediaMetadata() = MediaMetadataCompat.Builder()
         .putLong(MediaMetadataCompat.METADATA_KEY_DURATION, metadata.duration)
         .build()
 
-//fun MediaQueue.QueueItem.toMediaMetadata() = MediaMetadataCompat.Builder()
+//fun MediaQueue.QueueEntry.toMediaMetadata() = MediaMetadataCompat.Builder()
 //        .putString(MediaMetadataCompat.METADATA_KEY_MEDIA_ID, file.absolutePath)
 //        .putString(MediaMetadataCompat.METADATA_KEY_ALBUM, metadata?.album)
 //        .putString(MediaMetadataCompat.METADATA_KEY_ARTIST, metadata.artistDisplayValue())

@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.queue
+package com.winsonchiu.aria.queue.ui
 
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentDefaultBoundModule
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent

@@ -13,6 +13,7 @@ import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.framework.util.arch.LoggingLifecycleObserver
 import com.winsonchiu.aria.media.util.LoggingMediaSessionCallback
 import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.queue.QueueEntry
 import io.reactivex.Maybe
 import javax.inject.Inject
 
@@ -29,7 +30,7 @@ class MediaPlayer(
 
     private val playbackStateBuilder = PlaybackStateCompat.Builder()
 
-    private var lastItem: MediaQueue.QueueItem? = null
+    private var lastEntry: QueueEntry? = null
 
     private var seekWhileNotPlaying = 0L
 
@@ -53,7 +54,7 @@ class MediaPlayer(
                 }
 
         mediaQueue.queueUpdates
-                .flatMapMaybe { Maybe.fromCallable { it.currentItem } }
+                .flatMapMaybe { Maybe.fromCallable { it.currentEntry } }
                 .distinctUntilChanged()
                 .`as`(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(service)))
                 .subscribe {
@@ -65,14 +66,14 @@ class MediaPlayer(
         player.setOnCompletionListener { onSkipToNext() }
     }
 
-    private fun play(queueItem: MediaQueue.QueueItem) {
-        if (lastItem == queueItem) {
+    private fun play(queueEntry: QueueEntry) {
+        if (lastEntry == queueEntry) {
             player.start()
             return
         }
 
         player.reset()
-        player.setDataSource(service, queueItem.content)
+        player.setDataSource(service, queueEntry.content)
         player.setAudioAttributes(
                 AudioAttributes.Builder()
                         .setContentType(CONTENT_TYPE_MUSIC)
@@ -82,7 +83,7 @@ class MediaPlayer(
 
         player.prepare()
         player.start()
-        lastItem = queueItem
+        lastEntry = queueEntry
     }
 
     override fun onPlay() {

@@ -81,7 +81,7 @@ class MainActivity : LifecycleBoundActivity() {
         super.onStart()
 
         mediaQueue.queueUpdates
-                .mapNonNull { it.currentItem }
+                .mapNonNull { it.currentEntry }
                 .map { NowPlayingView.Model(it.metadata.title, it.metadata.description, it.image) }
                 .bindToLifecycle()
                 .subscribe {

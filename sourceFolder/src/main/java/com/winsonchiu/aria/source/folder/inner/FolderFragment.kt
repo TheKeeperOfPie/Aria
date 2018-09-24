@@ -19,6 +19,7 @@ import com.winsonchiu.aria.itemsheet.ItemsMenuItem
 import com.winsonchiu.aria.itemsheet.view.ItemsMenuFileHeaderView
 import com.winsonchiu.aria.itemsheet.view.ItemsMenuIconWithTextView
 import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.queue.QueueOp
 import com.winsonchiu.aria.source.folder.R
 import com.winsonchiu.aria.source.folder.inner.view.FileItemView
 import com.winsonchiu.aria.source.folder.root.FolderRootFragmentDaggerComponent
@@ -70,7 +71,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                 }
             } else {
                 view?.run {
-                    mediaQueue.add(fileMetadata.toQueueItem(context))
+                    mediaQueue.push(QueueOp.AddNext(fileMetadata.toQueueEntry(context)))
                     Snackbar.make(this, getString(R.string.item_added, fileMetadata.file.name), Snackbar.LENGTH_SHORT)
                             .show()
                 }
@@ -78,16 +79,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
         }
 
         override fun onLongClick(fileMetadata: FolderController.FileMetadata) {
-//                folderController.addFolderToQueue(fileMetadata)
-//            val item = MediaQueue.QueueItem(fileMetadata.file, fileMetadata.image, fileMetadata.metadata)
-//            mediaQueue.add(item, item)
-//            mediaBrowserConnection.mediaController.transportControls.play()
-
             val file = fileMetadata.file
-            if (file.isDirectory) {
-                return
-            }
-
             ItemsMenuDialogFragment.newInstance(
                     listOf(
                             FolderItemOption.Header(context!!, fileMetadata),

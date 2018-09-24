@@ -15,8 +15,6 @@ abstract class DialogActivity : AppCompatActivity() {
     }
 
     final override fun onBackPressed() {
-        super.onBackPressed()
-
         val fragment = supportFragmentManager.findFragmentById(dialogFragmentContainerId)
         if (fragment is DialogActivityFragment) {
             val backStackTag = fragment.arguments!!.getString(DialogActivityFragment.KEY_BACK_STACK_TAG)

@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.queue
+package com.winsonchiu.aria.queue.ui
 
 import android.os.Bundle
 import android.view.View
@@ -7,8 +7,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.SimpleEpoxyController
 import com.winsonchiu.aria.framework.fragment.subclass.BaseFragment
 import com.winsonchiu.aria.framework.util.setDataForView
-import com.winsonchiu.aria.queue.view.QueueItemView
-import com.winsonchiu.aria.queue.view.QueueItemViewModel_
+import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.queue.QueueEntry
+import com.winsonchiu.aria.queue.QueueOp
+import com.winsonchiu.aria.queue.R
+import com.winsonchiu.aria.queue.ui.view.QueueItemView
+import com.winsonchiu.aria.queue.ui.view.QueueItemViewModel_
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import kotlinx.android.synthetic.main.queue_fragment.*
@@ -37,18 +41,12 @@ class QueueFragment : BaseFragment<QueueFragmentDaggerComponent.ComponentProvide
                 viewHolder: RecyclerView.ViewHolder,
                 target: RecyclerView.ViewHolder
         ): Boolean {
-            val queueItem = (viewHolder.itemView as QueueItemView).queueItem
-            val positionOne = currentQueue.queue.indexOf(queueItem)
-            val positionTwo = currentQueue.queue.indexOf((target.itemView as QueueItemView).queueItem)
+            val positionOne = viewHolder.adapterPosition
+            val positionTwo = target.adapterPosition
 
-            val newList = currentQueue.queue.toMutableList().apply {
-                removeAt(positionOne)
-                add(positionTwo, queueItem)
-            }
-
+            currentQueue = MediaQueue.Model(QueueOp.Move(positionOne, positionTwo).apply(currentQueue.queue, currentQueue.currentIndex))
             epoxyController.setModels(currentQueue.toViewModels())
-            mediaQueue.set(newList)
-
+            mediaQueue.push(QueueOp.Move(positionOne, positionTwo))
             return true
         }
 
@@ -60,21 +58,17 @@ class QueueFragment : BaseFragment<QueueFragmentDaggerComponent.ComponentProvide
                 viewHolder: RecyclerView.ViewHolder,
                 direction: Int
         ) {
-            val position = currentQueue.queue.indexOf((viewHolder.itemView as QueueItemView).queueItem)
-
-            val newList = currentQueue.queue.toMutableList().apply {
-                removeAt(position)
-            }
-
+            val removeIndex = viewHolder.adapterPosition
+            currentQueue = MediaQueue.Model(QueueOp.Remove(removeIndex).apply(currentQueue.queue, currentQueue.currentIndex))
             epoxyController.setModels(currentQueue.toViewModels())
-            mediaQueue.set(newList)
+            mediaQueue.push(QueueOp.Remove(removeIndex))
         }
     })
 
 
     private val listener = object : QueueItemView.Listener {
-        override fun onClick(queueItem: MediaQueue.QueueItem) {
-            mediaQueue.setCurrentItem(queueItem)
+        override fun onClick(queueEntry: QueueEntry) {
+            mediaQueue.setCurrentItem(queueEntry)
         }
 
         override fun onStartDrag(view: QueueItemView) {
@@ -96,6 +90,8 @@ class QueueFragment : BaseFragment<QueueFragmentDaggerComponent.ComponentProvide
         super.onViewCreated(view, savedInstanceState)
 
         itemTouchHelper.attachToRecyclerView(queueRecycler)
+
+        imageUndo.setOnClickListener { mediaQueue.pop() }
 
         imagePlay.setOnClickListener {
             mediaQueue.playPauseActions.accept(Unit)
@@ -130,8 +126,8 @@ class QueueFragment : BaseFragment<QueueFragmentDaggerComponent.ComponentProvide
     private fun MediaQueue.Model.toViewModels() = queue.map {
         QueueItemViewModel_()
                 .id(it.content.toString(), it.timeAddedToQueue)
-                .queueItem(it)
-                .showSelected(it == currentItem)
+                .queueEntry(it)
+                .showSelected(it == currentEntry)
                 .title(it.metadata.title)
                 .listener(listener)
     }

@@ -13,6 +13,8 @@ import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundCompo
 import com.winsonchiu.aria.framework.util.FileFilters
 import com.winsonchiu.aria.framework.util.withFolders
 import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.queue.QueueEntry
+import com.winsonchiu.aria.queue.QueueOp
 import com.winsonchiu.aria.source.folder.util.FileSorter
 import com.winsonchiu.aria.source.folder.util.FileUtils
 import com.winsonchiu.aria.source.folder.util.MetadataExtractor
@@ -81,20 +83,34 @@ class FolderController @Inject constructor(
         refreshRelay.accept(System.currentTimeMillis())
     }
 
-    fun addFolderToQueue(selected: FileMetadata) {
-        folderContents.value.files
-                .map { it.toQueueItem(application) }
-                .also { mediaQueue.add(it, selected.toQueueItem(application)) }
-    }
-
     fun playNext(file: File) {
-        val metadata = folderContents.value.files.first { it.file == file }
-        mediaQueue.playNext(metadata.toQueueItem(application))
+        if (file.isDirectory) {
+            val newEntries = file.walkTopDown()
+                    .filter { FileFilters.AUDIO.accept(it) }
+                    .map { FileMetadata(it, metadataExtractor.extract(it)) }
+                    .map { it.toQueueEntry(application) }
+                    .toList()
+
+            mediaQueue.push(QueueOp.AddNext(newEntries))
+        } else {
+            val metadata = folderContents.value.files.first { it.file == file }
+            mediaQueue.push(QueueOp.AddNext(metadata.toQueueEntry(application)))
+        }
     }
 
     fun addToQueue(file: File) {
-        val metadata = folderContents.value.files.first { it.file == file }
-        mediaQueue.add(metadata.toQueueItem(application))
+        if (file.isDirectory) {
+            val newEntries = file.walkTopDown()
+                    .filter { FileFilters.AUDIO.accept(it) }
+                    .map { FileMetadata(it, metadataExtractor.extract(it)) }
+                    .map { it.toQueueEntry(application) }
+                    .toList()
+
+            mediaQueue.push(QueueOp.AddToEnd(newEntries))
+        } else {
+            val metadata = folderContents.value.files.first { it.file == file }
+            mediaQueue.push(QueueOp.AddToEnd(metadata.toQueueEntry(application)))
+        }
     }
 
     data class Model(
@@ -130,10 +146,10 @@ class FolderController @Inject constructor(
 
         }
 
-        fun toQueueItem(context: Context) = MediaQueue.QueueItem(
+        fun toQueueEntry(context: Context) = QueueEntry(
                 content = Uri.fromFile(file),
                 image = image,
-                metadata = MediaQueue.QueueItem.Metadata(
+                metadata = QueueEntry.Metadata(
                         title = title,
                         description = description(context),
                         album = metadata?.album,

@@ -1,114 +1,93 @@
 package com.winsonchiu.aria.queue
 
-import android.net.Uri
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
+import java.util.LinkedList
 import javax.inject.Inject
 
 @QueueScope
 class MediaQueue @Inject constructor() {
 
-    val queueUpdates = BehaviorRelay.create<Model>()
-
+    // TODO: Move
     val playPauseActions = PublishRelay.create<Unit>()
 
-    private val queue = mutableListOf<QueueItem>()
+    val queueUpdates = BehaviorRelay.createDefault(Model())
 
-    private var currentItem: QueueItem? = null
+    val model
+        get() = queueUpdates.value
 
-    private var currentIndex = 0
+    private var opRecord = OpRecord()
 
-    fun set(
-            queue: List<QueueItem>,
-            initialItem: QueueItem? = null
-    ) {
-        this.queue.clear()
-        this.queue.addAll(queue)
-        setItemAndEmit(initialItem)
+    fun currentItem() = model.currentEntry
+
+    fun next(): QueueEntry? {
+        moveToIndex(model.currentIndex + 1)
+        return model.currentEntry
     }
 
-    fun add(
-            items: List<QueueItem>,
-            currentItem: QueueItem? = null
-    ) {
-        this.queue.addAll(items)
-        setItemAndEmit(currentItem)
-    }
-
-    fun add(
-            item: QueueItem,
-            currentItem: QueueItem? = null
-    ) {
-        this.queue.add(item)
-        setItemAndEmit(currentItem)
-    }
-
-    fun playNext(item: QueueItem) {
-        this.queue.add(Math.floorMod(currentIndex + 1, queue.size + 1), item)
-        setItemAndEmit(currentItem)
-    }
-
-    private fun setItemAndEmit(item: QueueItem?) {
-        if (item != null) {
-            val index = queue.indexOf(item)
-            if (index >= 0) {
-                currentIndex = index
-                currentItem = item
-            }
-        } else if (currentItem == null) {
-            currentItem = queue.getOrNull(currentIndex)
-        }
-
-        queueUpdates.accept(Model(queue.toList(), currentItem, currentIndex))
-    }
-
-    fun currentItem() = currentItem
-
-    fun next(): QueueItem? {
-        moveToIndex(currentIndex + 1)
-        return currentItem
-    }
-
-    fun previous(): QueueItem? {
-        moveToIndex(currentIndex - 1)
-        return currentItem
+    fun previous(): QueueEntry? {
+        moveToIndex(model.currentIndex - 1)
+        return model.currentEntry
     }
 
     private fun moveToIndex(index: Int) {
-        currentIndex = Math.floorMod(index, queue.size)
-        currentItem = queue.getOrNull(currentIndex)
-        queueUpdates.accept(Model(queue.toList(), currentItem, currentIndex))
+        val queue = model.queue
+        val currentIndex = Math.floorMod(index, queue.size)
+        val currentItem = queue.getOrNull(currentIndex)
+        queueUpdates.accept(Model(queue, currentIndex, currentItem))
     }
 
-    fun setCurrentItem(queueItem: QueueItem) {
-        currentIndex = queue.indexOf(queueItem).coerceAtLeast(0)
-        currentItem = queue.getOrNull(currentIndex)
-        queueUpdates.accept(Model(queue.toList(), queueItem, currentIndex))
+    fun setCurrentItem(queueEntry: QueueEntry) {
+        val queue = model.queue
+        val currentIndex = queue.indexOf(queueEntry).coerceAtLeast(0)
+        val currentItem = queue.getOrNull(currentIndex)
+        queueUpdates.accept(Model(queue, currentIndex, currentItem))
     }
 
-    data class QueueItem(
-            val content: Uri,
-            val image: Uri?,
-            val metadata: Metadata,
-            val timeAddedToQueue: Long = System.currentTimeMillis()
-    ) {
+    fun push(op: QueueOp) {
+        opRecord.push(op)
+        queueUpdates.accept(Model(op.apply(model.queue, model.currentIndex)))
+    }
 
-        class Metadata(
-                val title: CharSequence?,
-                val description: CharSequence?,
-                val album: CharSequence?,
-                val artist: CharSequence?,
-                val genre: CharSequence?,
-                val duration: Long
-        )
+    fun pop() {
+        val op = opRecord.pop() ?: return
+        queueUpdates.accept(Model(op.reverse(model.queue, model.currentIndex)))
     }
 
     data class Model(
-            val queue: List<QueueItem> = emptyList(),
-            val currentItem: QueueItem? = null,
-            val currentIndex: Int = 0
+            val queue: List<QueueEntry> = emptyList(),
+            val currentIndex: Int = 0,
+            val currentEntry: QueueEntry? = null
     ) {
 
-        fun copy() = copy(queue = queue.toList(), currentItem = currentItem?.copy(), currentIndex = currentIndex)
+        constructor(output: QueueOp.Output) : this(
+                output.queue,
+                output.currentIndex,
+                output.queue.getOrNull(output.currentIndex)
+        )
+
+        fun copy() = copy(queue = queue.toList(), currentEntry = currentEntry?.copy(), currentIndex = currentIndex)
+    }
+
+    private class OpRecord(
+            private val maxSize: Int = DEFAULT_SIZE
+    ) {
+
+        companion object {
+            private const val DEFAULT_SIZE = 150
+        }
+
+        val record = LinkedList<QueueOp>()
+
+        fun push(op: QueueOp) {
+            record.push(op)
+            if (record.size > maxSize) {
+                record.removeLast()
+            }
+        }
+
+        fun pop(): QueueOp? {
+            return record.pop()
+        }
     }
 }

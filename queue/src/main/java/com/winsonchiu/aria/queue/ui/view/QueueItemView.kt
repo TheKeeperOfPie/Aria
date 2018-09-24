@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.queue.view
+package com.winsonchiu.aria.queue.ui.view
 
 import android.content.Context
 import android.graphics.drawable.ColorDrawable
@@ -15,7 +15,7 @@ import com.winsonchiu.aria.artwork.ArtworkTransformation
 import com.winsonchiu.aria.framework.util.DrawableUtils
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.initialize
-import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.queue.QueueEntry
 import com.winsonchiu.aria.queue.R
 import kotlinx.android.synthetic.main.queue_item_view.view.*
 
@@ -27,7 +27,7 @@ class QueueItemView @JvmOverloads constructor(
 ) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     @set:ModelProp
-    lateinit var queueItem: MediaQueue.QueueItem
+    lateinit var queueEntry: QueueEntry
 
     @set:ModelProp
     var title: CharSequence? = null
@@ -64,7 +64,7 @@ class QueueItemView @JvmOverloads constructor(
     @AfterPropsSet
     fun onChanged() {
         Picasso.get()
-                .load(queueItem.image)
+                .load(queueEntry.image)
                 .transform(artworkTransformation)
                 .into(itemImage)
 
@@ -79,11 +79,11 @@ class QueueItemView @JvmOverloads constructor(
 
     @OnClick()
     fun onClick() {
-        listener?.onClick(queueItem)
+        listener?.onClick(queueEntry)
     }
 
     interface Listener {
-        fun onClick(queueItem: MediaQueue.QueueItem)
+        fun onClick(queueEntry: QueueEntry)
         fun onStartDrag(view: QueueItemView)
     }
 }
