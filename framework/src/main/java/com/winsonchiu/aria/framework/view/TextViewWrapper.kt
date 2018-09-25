@@ -89,7 +89,7 @@ class TextViewWrapper @JvmOverloads constructor(
                         && startHeightNonZero
                         && endWidthNonZero
                         && endHeightNonZero) {
-                    reflowAnimator = ReflowAnimator(textStart, textEnd)
+//                    reflowAnimator = ReflowAnimator(textStart, textEnd)
                     animator = reflowAnimator!!.createAnimator()
 
                     updateProgress()
@@ -114,10 +114,16 @@ class SwitchDrawable(
         private val startBitmapSrcBounds: Rect,
         private val startFontSize: Float,
         private val endBitmap: Bitmap,
-        private val endBitmapSrcBounds: Rect,
+        private var endBitmapSrcBounds: Rect,
         private val endFontSize: Float,
         textPaint: Paint?
 ) : Drawable() {
+
+    init {
+        Log.d("SwitchDrawable", "endBitmapSrcBounds = $endBitmapSrcBounds")
+        Log.d("SwitchDrawable", "endBitmap = $endBitmap")
+//        endBitmapSrcBounds = Rect(0, 0, endBitmap.width, endBitmap.height)
+    }
 
     companion object {
         private const val ELLIPSIS = "…"
@@ -209,19 +215,19 @@ class SwitchDrawable(
     var topLeft: PointF? = null
         set(topLeft) {
             field = topLeft
-            Log.d("SwitchDrawable", "topLeft called with $topLeft")
+//            Log.d("SwitchDrawable", "topLeft called with $topLeft")
             updateBounds()
         }
     var width: Int = 0
         set(width) {
             field = width
-            Log.d("SwitchDrawable", "topLeft called with $width")
+//            Log.d("SwitchDrawable", "topLeft called with $width")
             updateBounds()
         }
     var height: Int = 0
         set(height) {
             field = height
-            Log.d("SwitchDrawable", "topLeft called with $height")
+//            Log.d("SwitchDrawable", "topLeft called with $height")
             updateBounds()
         }
 
@@ -358,6 +364,49 @@ class ReflowTextView @JvmOverloads constructor(
     }
 }
 
+class ReflowDrawView @JvmOverloads constructor(
+        context: Context,
+        attrs: AttributeSet? = null,
+        defStyleAttr: Int = 0
+) : View(context, attrs, defStyleAttr) {
+
+    private val switchCallback = object : Drawable.Callback {
+        override fun unscheduleDrawable(
+                who: Drawable,
+                what: Runnable
+        ) {
+            invalidate()
+        }
+
+        override fun scheduleDrawable(
+                who: Drawable,
+                what: Runnable,
+                `when`: Long
+        ) {
+            invalidate()
+        }
+
+        override fun invalidateDrawable(who: Drawable) {
+            invalidate()
+        }
+    }
+
+    private var switchDrawables = mutableListOf<Drawable>()
+
+    fun addSwitchDrawable(drawable: Drawable) {
+        drawable.callback = switchCallback
+        switchDrawables.add(drawable)
+    }
+
+    fun clearSwitchDrawables() {
+        switchDrawables.clear()
+    }
+
+    override fun dispatchDraw(canvas: Canvas) {
+        switchDrawables.forEach { it.draw(canvas) }
+    }
+}
+
 /**
  * This is copied from https://github.com/shazam/reflow-animator, which is derived from
  * https://github.com/nickbutcher/plaid, and modified specifically for use inside [SlantHeaderView]
@@ -369,8 +418,9 @@ class ReflowTextView @JvmOverloads constructor(
  * Strongly recommended to use a curved `pathMotion` for a more natural transition.
  */
 class ReflowAnimator constructor(
-        private val sourceView: ReflowTextView,
-        private val targetView: TextView
+        private val sourceView: TextView,
+        private val targetView: TextView,
+        private val drawView: ReflowDrawView
 ) {
 
     companion object {
@@ -459,14 +509,13 @@ class ReflowAnimator constructor(
         endText = createBitmap(targetView)
 
         // temporarily turn off clipping so we can draw outside of our bounds don't draw
-        sourceView.disableDrawForReflow = true
         (sourceView.parent as ViewGroup).clipChildren = false
 
         // calculate the runs of text to move together
         val runs = runs
 
         // buildAnimator animators for moving, scaling and fading each run of text
-        val runAnimators = createRunAnimators(sourceView, startText!!, endText!!, runs)
+        val runAnimators = createRunAnimators(sourceView, drawView, startText!!, endText!!, runs)
         runAnimators.forEach { it.duration = DURATION.toLong() }
 
         animator.addUpdateListener {
@@ -483,8 +532,7 @@ class ReflowAnimator constructor(
      * Call when text has changed to reset drawables
      */
     fun reset() {
-        sourceView.disableDrawForReflow = false
-        sourceView.clearSwitchDrawables()
+        drawView.clearSwitchDrawables()
     }
 
     /**
@@ -618,7 +666,8 @@ class ReflowAnimator constructor(
      * Create Animators to transition each run of text from start to end position and size.
      */
     private fun createRunAnimators(
-            view: ReflowTextView,
+            view: TextView,
+            drawView: ReflowDrawView,
             startText: Bitmap,
             endText: Bitmap,
             runs: List<ReflowRun>
@@ -660,7 +709,7 @@ class ReflowAnimator constructor(
                     run.start.right,
                     run.start.bottom
             )
-            view.addSwitchDrawable(drawable)
+            drawView.addSwitchDrawable(drawable)
 
             val topLeft = getPathValuesHolder(run, dy, dx, false)
             val width = PropertyValuesHolder.ofInt(
@@ -673,7 +722,7 @@ class ReflowAnimator constructor(
             val progress = PropertyValuesHolder.ofFloat(
                     SwitchDrawable.PROGRESS, 0f, 1f
             )
-            val runAnim = if (i == 0) ObjectAnimator.ofPropertyValuesHolder(
+            val runAnim = if (i == -1/*0*/) ObjectAnimator.ofPropertyValuesHolder(
                     drawable, topLeft, width, height, progress
             ) else
                 ObjectAnimator.ofPropertyValuesHolder(
@@ -682,7 +731,7 @@ class ReflowAnimator constructor(
 
             animators.add(runAnim)
 
-            if (i != 0 || (run.isStartVisible != run.isEndVisible)) {
+            if (/*i != 0 || */(run.isStartVisible != run.isEndVisible)) {
                 // if run is appearing/disappearing then fade it in/out
                 val fade = ValueAnimator.ofFloat(0f, 1f)
                 val startAlpha = if (run.isStartVisible) 255 else 0

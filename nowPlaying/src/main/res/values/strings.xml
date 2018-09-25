@@ -1,5 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
+
+    <string name="app_name">Aria Now Playing</string>
 
     <string name="now_playing_content_description_track_artwork">Track artwork</string>
     <string name="now_playing_content_description_skip_to_previous">Skip to previous song</string>

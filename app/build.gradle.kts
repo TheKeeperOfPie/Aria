@@ -58,7 +58,6 @@ android {
             res.srcDirs(
                     "/src/main/res/home",
                     "/src/main/res/media",
-                    "/src/main/res/nowplaying",
                     "/src/main/res/res"
             )
         }
@@ -86,6 +85,7 @@ androidExtensions {
 }
 
 Dependencies(this) {
+    implementation(Modules.nowPlaying)
     implementation(Modules.queue)
     implementation(Modules.sourceFolder)
 

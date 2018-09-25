@@ -14,7 +14,6 @@ import android.widget.TextView
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.core.view.isInvisible
 import androidx.core.widget.TextViewCompat
-import com.winsonchiu.aria.framework.view.ReflowAnimator
 import com.winsonchiu.aria.framework.view.ReflowTextView
 
 class ReflowTextLayout @JvmOverloads constructor(
@@ -98,8 +97,8 @@ class ReflowTextLayout @JvmOverloads constructor(
                     textStart.forceAutoSizeCalculation()
                     textEnd.forceAutoSizeCalculation()
 
-                    val reflowAnimator = ReflowAnimator(textEnd, textStart)
-                    animator = reflowAnimator.createAnimator()
+//                    val reflowAnimator = ReflowAnimator(textEnd, textStart)
+//                    animator = reflowAnimator.createAnimator()
 
                     updateProgress()
                     textStart.viewTreeObserver.removeOnPreDrawListener(this)

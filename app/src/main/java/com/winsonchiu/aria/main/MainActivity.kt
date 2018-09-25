@@ -47,7 +47,7 @@ class MainActivity : LifecycleBoundActivity() {
                         bottomSheet: View,
                         slideOffset: Float
                 ) {
-                    viewNowPlaying.progress = 1f - slideOffset
+                    viewNowPlaying.setProgress(1f - slideOffset)
                 }
 
                 override fun onStateChanged(
@@ -55,8 +55,8 @@ class MainActivity : LifecycleBoundActivity() {
                         newState: Int
                 ) {
                     when (newState) {
-                        BottomSheetBehavior.STATE_COLLAPSED -> viewNowPlaying.progress = 1f
-                        BottomSheetBehavior.STATE_EXPANDED -> viewNowPlaying.progress = 0f
+                        BottomSheetBehavior.STATE_COLLAPSED -> viewNowPlaying.setProgress(1f)
+                        BottomSheetBehavior.STATE_EXPANDED -> viewNowPlaying.setProgress(0f)
                         BottomSheetBehavior.STATE_DRAGGING,
                         BottomSheetBehavior.STATE_HIDDEN,
                         BottomSheetBehavior.STATE_HALF_EXPANDED,

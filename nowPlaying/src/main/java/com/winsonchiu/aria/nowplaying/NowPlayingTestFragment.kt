@@ -1,13 +1,11 @@
 package com.winsonchiu.aria.nowplaying
 
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.SeekBar
 import androidx.fragment.app.Fragment
-import com.winsonchiu.aria.R
 import kotlinx.android.synthetic.main.now_playing_test_fragment.*
 
 class NowPlayingTestFragment : Fragment() {
@@ -24,7 +22,13 @@ class NowPlayingTestFragment : Fragment() {
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        textSongDescription.text = "Brave Shine - Aimer"
+        viewNowPlaying.bindData(
+                NowPlayingView.Model(
+                        "Brave Shine",
+                        "Description",
+                        null
+                )
+        )
 
         seekBarAnimation.setOnSeekBarChangeListener(object : SeekBar.OnSeekBarChangeListener {
             override fun onProgressChanged(
@@ -32,16 +36,13 @@ class NowPlayingTestFragment : Fragment() {
                     progress: Int,
                     fromUser: Boolean
             ) {
-                textSongDescription.progress = progress / 1000f
-                Log.d("NowPlayingTestFragment", "onProgressChanged called with textSongDescription.progress = ${textSongDescription.progress}")
+                viewNowPlaying.setProgress(progress / 1000f)
             }
 
             override fun onStartTrackingTouch(seekBar: SeekBar?) {
-                // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
             override fun onStopTrackingTouch(seekBar: SeekBar?) {
-                  // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
             }
 
         })

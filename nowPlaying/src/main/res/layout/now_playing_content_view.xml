@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.motion.widget.MotionLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layoutDescription="@xml/now_playing_view_scene"
+    >
+
+    <ImageView
+        android:id="@+id/imageArtwork"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:contentDescription="@string/now_playing_content_description_track_artwork"
+        android:scaleType="centerCrop"
+        tools:background="#D1020A"
+        />
+
+    <View
+        android:id="@+id/viewSquareBoundary"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        />
+
+    <View
+        android:id="@+id/viewSquareBoundaryBottom"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        />
+
+    <androidx.constraintlayout.widget.Barrier
+        android:id="@+id/barrierImage"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        />
+
+    <com.winsonchiu.aria.framework.view.ReflowDrawView
+        android:id="@+id/viewSongTitle"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_blue_light"
+        />
+
+    <com.winsonchiu.aria.framework.view.ReflowDrawView
+        android:id="@+id/viewSongDescription"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/holo_red_dark"
+        />
+
+    <ImageView
+        android:id="@+id/imageSkipPrevious"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="@string/now_playing_content_description_skip_to_previous"
+        android:padding="12dp"
+        app:srcCompat="@drawable/ic_skip_previous_24dp"
+        />
+
+    <ImageView
+        android:id="@+id/imagePlay"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="@string/now_playing_content_description_play"
+        android:padding="12dp"
+        app:srcCompat="@drawable/ic_play_arrow_24dp"
+        />
+
+    <ImageView
+        android:id="@+id/imageSkipNext"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:contentDescription="@string/now_playing_content_description_skip_to_next"
+        android:padding="12dp"
+        app:srcCompat="@drawable/ic_skip_next_24dp"
+        />
+
+</androidx.constraintlayout.motion.widget.MotionLayout>
