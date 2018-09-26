@@ -2,9 +2,11 @@ package com.winsonchiu.aria.queue
 
 import android.net.Uri
 import android.os.Parcelable
+import com.squareup.moshi.JsonClass
 import kotlinx.android.parcel.Parcelize
 
 @Parcelize
+@JsonClass(generateAdapter = true)
 data class QueueEntry(
         val content: Uri,
         val image: Uri?,
@@ -13,7 +15,8 @@ data class QueueEntry(
 ) : Parcelable {
 
     @Parcelize
-    class Metadata(
+    @JsonClass(generateAdapter = true)
+    data class Metadata(
             val title: CharSequence?,
             val description: CharSequence?,
             val album: CharSequence?,

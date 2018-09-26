@@ -66,6 +66,7 @@ object Versions {
         val okHttp = "3.11.0"
         val picasso = "2.71828"
         val retrofit2 = "2.4.0"
+        val moshi = "1.7.0"
     }
 
     object RxJava {
@@ -204,6 +205,18 @@ object Dependencies {
         val okHttp = "com.squareup.okhttp3:okhttp"(Versions.Square.okHttp)
         val picasso = "com.squareup.picasso:picasso"(Versions.Square.picasso)
         val retrofit2 = "com.squareup.retrofit2:retrofit"(Versions.Square.retrofit2)
+
+        val moshi = Multiple(
+                Moshi.runtime,
+                Moshi.adapters,
+                Moshi.kotlinCodegen
+        )
+
+        object Moshi {
+            val runtime = "com.squareup.moshi:moshi"(Versions.Square.moshi)
+            val adapters = "com.squareup.moshi:moshi-adapters"(Versions.Square.moshi)
+            val kotlinCodegen = kapt("com.squareup.moshi:moshi-kotlin-codegen", Versions.Square.moshi)
+        }
 
         object LeakCanary {
             val debug = "com.squareup.leakcanary:leakcanary-android"(Versions.Square.leakCanary)

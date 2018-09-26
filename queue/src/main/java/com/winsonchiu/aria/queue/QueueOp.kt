@@ -1,6 +1,7 @@
 package com.winsonchiu.aria.queue
 
 import android.os.Parcelable
+import com.squareup.moshi.JsonClass
 import kotlinx.android.parcel.Parcelize
 import java.util.Collections
 
@@ -24,7 +25,8 @@ sealed class QueueOp : Parcelable {
 
 
     @Parcelize
-    data class AddToEnd(private val newEntries: List<QueueEntry>) : QueueOp() {
+    @JsonClass(generateAdapter = true)
+    data class AddToEnd(internal val newEntries: List<QueueEntry>) : QueueOp() {
 
         constructor(newEntry: QueueEntry) : this(Collections.singletonList(newEntry))
 
@@ -45,9 +47,10 @@ sealed class QueueOp : Parcelable {
     }
 
     @Parcelize
-    data class AddNext private constructor(
-            private val newEntries: List<QueueEntry>,
-            private var insertedIndex: Int
+    @JsonClass(generateAdapter = true)
+    data class AddNext internal constructor(
+            internal val newEntries: List<QueueEntry>,
+            internal var insertedIndex: Int
     ) : QueueOp() {
 
         constructor(newEntry: QueueEntry) : this(Collections.singletonList(newEntry))
@@ -81,8 +84,9 @@ sealed class QueueOp : Parcelable {
     }
 
     @Parcelize
-    data class Shuffle private constructor(
-            private var oldInput: List<QueueEntry>?
+    @JsonClass(generateAdapter = true)
+    data class Shuffle internal constructor(
+            internal var oldInput: List<QueueEntry>?
     ) : QueueOp() {
 
         constructor() : this(null)
@@ -106,9 +110,10 @@ sealed class QueueOp : Parcelable {
     }
 
     @Parcelize
-    data class ReplaceAll private constructor(
-            private val newEntries: List<QueueEntry>,
-            private var oldInput: List<QueueEntry>?
+    @JsonClass(generateAdapter = true)
+    data class ReplaceAll internal constructor(
+            internal val newEntries: List<QueueEntry>,
+            internal var oldInput: List<QueueEntry>?
     ) : QueueOp() {
 
         constructor(
@@ -138,9 +143,10 @@ sealed class QueueOp : Parcelable {
     }
 
     @Parcelize
+    @JsonClass(generateAdapter = true)
     data class Move(
-            private val fromIndex: Int,
-            private val toIndex: Int
+            internal val fromIndex: Int,
+            internal val toIndex: Int
     ) : QueueOp() {
 
         override fun apply(
@@ -174,9 +180,10 @@ sealed class QueueOp : Parcelable {
     }
 
     @Parcelize
-    data class Remove private constructor(
-            private val removeIndex: Int,
-            private var removedEntry: QueueEntry?
+    @JsonClass(generateAdapter = true)
+    data class Remove internal constructor(
+            internal val removeIndex: Int,
+            internal var removedEntry: QueueEntry?
     ) : QueueOp() {
 
         constructor(removeIndex: Int): this(removeIndex, null)

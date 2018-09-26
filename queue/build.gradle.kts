@@ -14,4 +14,5 @@ Dependencies(this) {
     api(Dependencies.Airbnb.epoxy)
 
     api(Dependencies.JakeWharton.butterKnife)
+    implementation(Dependencies.Square.moshi)
 }

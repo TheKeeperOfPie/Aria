@@ -1,22 +1,41 @@
 package com.winsonchiu.aria.queue
 
+import android.app.Application
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
 import java.util.LinkedList
 import javax.inject.Inject
 
 @QueueScope
-class MediaQueue @Inject constructor() {
+class MediaQueue @Inject constructor(
+        application: Application
+) {
 
     // TODO: Move
     val playPauseActions = PublishRelay.create<Unit>()
 
     val queueUpdates = BehaviorRelay.createDefault(Model())
 
-    val model
+    internal val model
         get() = queueUpdates.value
 
-    private var opRecord = OpRecord()
+    private val queuePersister: QueuePersister = QueuePersister(application, this)
+
+    internal var opRecord = OpRecord()
+
+    init {
+        queuePersister.initialize()
+        queuePersister.read()?.let {
+            opRecord.record.addAll(it.record)
+            queueUpdates.accept(
+                    Model(
+                            queue = it.queue,
+                            currentIndex = it.currentIndex,
+                            currentEntry = it.currentEntry
+                    )
+            )
+        }
+    }
 
     fun currentItem() = model.currentEntry
 
@@ -69,7 +88,7 @@ class MediaQueue @Inject constructor() {
         fun copy() = copy(queue = queue.toList(), currentEntry = currentEntry?.copy(), currentIndex = currentIndex)
     }
 
-    private class OpRecord(
+    internal class OpRecord(
             private val maxSize: Int = DEFAULT_SIZE
     ) {
 
@@ -80,6 +99,16 @@ class MediaQueue @Inject constructor() {
         val record = LinkedList<QueueOp>()
 
         fun push(op: QueueOp) {
+            // Merge moves of the same target
+            if (op is QueueOp.Move) {
+                val lastOp = record.peek()
+                if (lastOp is QueueOp.Move && lastOp.toIndex == op.fromIndex) {
+                    record.pop()
+                    record.push(QueueOp.Move(lastOp.fromIndex, op.toIndex))
+                    return
+                }
+            }
+
             record.push(op)
             if (record.size > maxSize) {
                 record.removeLast()
@@ -87,7 +116,7 @@ class MediaQueue @Inject constructor() {
         }
 
         fun pop(): QueueOp? {
-            return record.pop()
+            return record.poll()
         }
     }
 }
