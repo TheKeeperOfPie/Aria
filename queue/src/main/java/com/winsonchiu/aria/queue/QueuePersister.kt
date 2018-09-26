@@ -3,11 +3,14 @@ package com.winsonchiu.aria.queue
 import android.annotation.SuppressLint
 import android.content.Context
 import com.squareup.moshi.JsonClass
+import io.reactivex.Maybe
 import io.reactivex.Observable
 import io.reactivex.schedulers.Schedulers
 import okio.Okio
 import java.io.FileNotFoundException
 import java.util.concurrent.TimeUnit
+import java.util.zip.GZIPInputStream
+import java.util.zip.GZIPOutputStream
 
 class QueuePersister(
         context: Context,
@@ -15,7 +18,8 @@ class QueuePersister(
 ) {
 
     companion object {
-        private const val FILE_NAME = "queue.json"
+        private const val FILE_NAME_DEBUG_JSON = "queue.json"
+        private const val FILE_NAME_COMPRESSED = "queueCompressed"
     }
 
     private val context = context.applicationContext
@@ -45,22 +49,36 @@ class QueuePersister(
                     }
                 }
                 .subscribe { wrapper ->
-                    context.openFileOutput(FILE_NAME, Context.MODE_PRIVATE).use {
-                        Okio.sink(it).use {
-                            Okio.buffer(it).use {
-                                wrapperAdapter.toJson(it, wrapper)
+                    if (BuildConfig.DEBUG) {
+                        context.openFileOutput(FILE_NAME_DEBUG_JSON, Context.MODE_PRIVATE).use {
+                            Okio.sink(it).use {
+                                Okio.buffer(it).use {
+                                    wrapperAdapter.toJson(it, wrapper)
+                                }
+                            }
+                        }
+                    }
+
+                    context.openFileOutput(FILE_NAME_COMPRESSED, Context.MODE_PRIVATE).use {
+                        GZIPOutputStream(it).use {
+                            Okio.sink(it).use {
+                                Okio.buffer(it).use {
+                                    wrapperAdapter.toJson(it, wrapper)
+                                }
                             }
                         }
                     }
                 }
     }
 
-    fun read(): Wrapper? {
-        return try {
-            context.openFileInput(FILE_NAME).use {
-                Okio.source(it).use {
-                    Okio.buffer(it).use {
-                        wrapperAdapter.fromJson(it)
+    fun read(): Maybe<Wrapper> = Maybe.fromCallable<Wrapper> {
+        try {
+            context.openFileInput(FILE_NAME_COMPRESSED).use {
+                GZIPInputStream(it).use {
+                    Okio.source(it).use {
+                        Okio.buffer(it).use {
+                            wrapperAdapter.fromJson(it)
+                        }
                     }
                 }
             }
@@ -73,6 +91,7 @@ class QueuePersister(
             null
         }
     }
+            .subscribeOn(Schedulers.io())
 
     @JsonClass(generateAdapter = true)
     class Wrapper(

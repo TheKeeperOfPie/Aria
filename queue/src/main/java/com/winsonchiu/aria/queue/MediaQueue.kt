@@ -1,5 +1,6 @@
 package com.winsonchiu.aria.queue
 
+import android.annotation.SuppressLint
 import android.app.Application
 import com.jakewharton.rxrelay2.BehaviorRelay
 import com.jakewharton.rxrelay2.PublishRelay
@@ -24,17 +25,23 @@ class MediaQueue @Inject constructor(
     internal var opRecord = OpRecord()
 
     init {
+        initialize()
+    }
+
+    @SuppressLint("CheckResult")
+    private fun initialize() {
         queuePersister.initialize()
-        queuePersister.read()?.let {
-            opRecord.record.addAll(it.record)
-            queueUpdates.accept(
-                    Model(
-                            queue = it.queue,
-                            currentIndex = it.currentIndex,
-                            currentEntry = it.currentEntry
+        queuePersister.read()
+                .subscribe {
+                    opRecord.record.addAll(it.record)
+                    queueUpdates.accept(
+                            Model(
+                                    queue = it.queue,
+                                    currentIndex = it.currentIndex,
+                                    currentEntry = it.currentEntry
+                            )
                     )
-            )
-        }
+                }
     }
 
     fun currentItem() = model.currentEntry

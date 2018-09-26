@@ -96,6 +96,8 @@ class QueueFragment : BaseFragment<QueueFragmentDaggerComponent.ComponentProvide
         imagePlay.setOnClickListener {
             mediaQueue.playPauseActions.accept(Unit)
         }
+
+        imageShuffle.setOnClickListener { mediaQueue.push(QueueOp.Shuffle()) }
     }
 
     override fun onDestroyView() {
