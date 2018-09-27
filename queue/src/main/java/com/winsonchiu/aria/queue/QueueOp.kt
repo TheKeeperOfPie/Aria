@@ -4,9 +4,12 @@ import android.os.Parcelable
 import com.squareup.moshi.JsonClass
 import kotlinx.android.parcel.Parcelize
 import java.util.Collections
+import kotlin.random.Random
 
 @Suppress("DataClassPrivateConstructor")
 sealed class QueueOp : Parcelable {
+
+    // TODO: For ops that save their entries, create a global cache that prunes as ops are popped
 
     abstract fun apply(
             input: List<QueueEntry>,
@@ -86,65 +89,18 @@ sealed class QueueOp : Parcelable {
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class Shuffle internal constructor(
-            internal var indexMap: MutableMap<Int, Int?>
+            internal var seed: Long = -1,
+            internal var persistedIndex: Int = 0
     ) : QueueOp() {
-        constructor() : this(mutableMapOf())
+        constructor() : this(Random.nextLong())
 
         override fun apply(
                 input: List<QueueEntry>,
                 currentIndex: Int
         ): Output {
+            persistedIndex = currentIndex
 
-            val indexes = input.asSequence()
-                    .mapIndexed { index, _ -> index }
-                    .toMutableList()
-
-            indexes.shuffle()
-
-            val first = indexes.subList(0, indexes.size / 2)
-            val second = indexes.subList(indexes.size / 2, indexes.size)
-
-            second.forEachIndexed { indexInSublist, indexData ->
-                indexMap[indexData] = first.getOrNull(indexInSublist)
-            }
-
-            val currentEntry = input.getOrNull(currentIndex)
-
-            if (currentEntry != null) {
-                val currentIndexEntry = indexMap.entries.find { it.key == currentIndex || it.value == currentIndex }!!
-
-                if (currentIndexEntry.key != 0 || currentIndexEntry.value != 0) {
-                    val currentIndexTarget = if (currentIndexEntry.key == currentIndex) {
-                        currentIndexEntry.value ?: currentIndexEntry.key
-                    } else {
-                        currentIndexEntry.key
-                    }
-
-                    val zeroEntry = indexMap.entries.find { it.key == 0 || it.value == 0 }!!
-                    if (zeroEntry.key == 0) {
-                        val zeroTarget = zeroEntry.value
-                        indexMap.remove(0)
-                        indexMap[currentIndexTarget] = zeroTarget
-                    } else {
-                        indexMap[zeroEntry.key] = currentIndexTarget
-                    }
-
-                    if (currentIndexEntry.key == currentIndex) {
-                        indexMap[currentIndex] = 0
-                    } else {
-                        indexMap[0] = currentIndex
-                    }
-                }
-            }
-
-            val result = input.toMutableList()
-
-            indexMap.entries.forEach { (key, value) ->
-                if (value != null) {
-                    Collections.swap(result, key, value)
-                }
-            }
-
+            val result = shuffle(input)
             return Output(result, 0)
         }
 
@@ -152,17 +108,79 @@ sealed class QueueOp : Parcelable {
                 input: List<QueueEntry>,
                 currentIndex: Int
         ): Output {
-            val result = input.toMutableList()
-
-            indexMap.entries.forEach { (key, value) ->
-                if (value != null) {
-                    Collections.swap(result, value, key)
-                }
-            }
+            val result = shuffle(input)
 
             val currentItem = input[currentIndex]
             val newIndex = result.indexOf(currentItem).coerceIn(-1, result.size - 1)
             return Output(result, newIndex)
+        }
+
+        private fun shuffle(input: List<QueueEntry>): List<QueueEntry> {
+            val result = input.toMutableList()
+            val indexMap = buildIndexMap(input.size)
+
+            indexMap.entries.forEach { (key, value) ->
+                if (value != null) {
+                    Collections.swap(result, key, value)
+                }
+            }
+
+            return result
+        }
+
+        private fun buildIndexMap(size: Int): MutableMap<Int, Int?> {
+            val indexes = (0 until size).shuffled(Random(seed))
+
+            val first = indexes.subList(0, indexes.size / 2)
+            val second = indexes.subList(indexes.size / 2, indexes.size)
+
+            val indexMap = mutableMapOf<Int, Int?>()
+
+            second.forEachIndexed { indexInSublist, indexData ->
+                indexMap[indexData] = first.getOrNull(indexInSublist)
+            }
+
+            val currentEntry = indexes.getOrNull(persistedIndex)
+            if (currentEntry != null) {
+                val (persistedIndexKey, persistedIndexValue) = indexMap.entries.find { it.key == persistedIndex || it.value == persistedIndex }!!
+                val (zeroKey, zeroValue) = indexMap.entries.find { it.key == 0 || it.value == 0 }!!
+
+                if (persistedIndexKey == persistedIndex) {
+                    indexMap[persistedIndex] = 0
+                    indexMap.remove(zeroKey)
+
+                    if (persistedIndexValue != null && zeroValue != null) {
+                        if (zeroKey == 0) {
+                            indexMap[persistedIndexValue] = zeroValue
+                        } else {
+                            indexMap[persistedIndexValue] = zeroKey
+                        }
+                    } else if (persistedIndexValue == null && zeroValue != null) {
+                        if (zeroKey == 0) {
+                            indexMap[zeroValue] = null
+                        } else {
+                            indexMap[zeroKey] = null
+                        }
+                    } else if (persistedIndexValue != null && zeroValue == null) {
+                        indexMap[persistedIndexValue] = null
+                    }
+                } else if (persistedIndexValue == persistedIndex) {
+                    indexMap[0] = persistedIndex
+
+                    if (zeroValue != null) {
+                        if (zeroKey == 0) {
+                            indexMap[persistedIndexKey] = zeroValue
+                        } else {
+                            indexMap[zeroKey] = persistedIndexKey
+                            indexMap.remove(persistedIndexKey)
+                        }
+                    } else {
+                        indexMap[persistedIndexKey] = null
+                    }
+                }
+            }
+
+            return indexMap
         }
     }
 
