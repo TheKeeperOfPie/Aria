@@ -48,6 +48,11 @@ class SubModulePlugin implements Plugin<Project> {
                 kotlinOptions {
                     jvmTarget = "1.8"
                 }
+
+                packagingOptions {
+                    exclude "META-INF/CONTRIBUTORS.md"
+                    exclude "META-INF/LICENSE.md"
+                }
             }
 
             project.kapt {

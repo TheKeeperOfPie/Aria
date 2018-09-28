@@ -42,6 +42,9 @@ Dependencies(this) {
 
     api(Dependencies.Uber.autoDispose)
 
+    api(Dependencies.moji4j)
+    api(Dependencies.kuromojiIpadic)
+
     "debugApi"(Dependencies.Square.LeakCanary.debug)
     "releaseApi"(Dependencies.Square.LeakCanary.release)
 }

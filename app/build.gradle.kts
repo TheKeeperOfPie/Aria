@@ -71,6 +71,11 @@ android {
     kotlinOptions {
         (this as KotlinJvmOptions).jvmTarget = "1.8"
     }
+
+    packagingOptions {
+        exclude("META-INF/CONTRIBUTORS.md")
+        exclude("META-INF/LICENSE.md")
+    }
 }
 
 kapt {

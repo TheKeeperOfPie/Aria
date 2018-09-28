@@ -1,6 +1,7 @@
 package com.winsonchiu.aria.source.folder.util
 
 import android.content.Context
+import com.winsonchiu.aria.framework.text.TextConverter
 import com.winsonchiu.aria.source.folder.R
 import com.winsonchiu.aria.source.folder.inner.FolderController
 import java.io.File
@@ -38,15 +39,30 @@ object FileUtils {
 
     fun getFileDisplayTitle(fileSortKey: String?): String? {
         fileSortKey ?: return null
+        var foundSeparator = false
         val startIndex = fileSortKey.indexOfFirst {
             when (it) {
-                '-', '.' -> return@indexOfFirst false
+                '-', '.' -> {
+                    foundSeparator = true
+                    return@indexOfFirst false
+                }
+                ' ' -> foundSeparator = true
             }
 
-            !it.isDigit() && !it.isWhitespace()
+            if (foundSeparator) {
+                !it.isWhitespace()
+            } else {
+                !it.isWhitespace() && !it.isDigit()
+            }
         }
 
-        return fileSortKey.drop(startIndex.coerceAtLeast(0))
+        val text = if (foundSeparator) {
+            fileSortKey.drop(startIndex.coerceAtLeast(0))
+        } else {
+            fileSortKey
+        }
+
+        return TextConverter.translate(text.trim(), titleCase = true)
     }
 
     fun getFileDescription(
@@ -77,7 +93,7 @@ object FileUtils {
             artistShowable -> resources.getString(R.string.fileDescriptionFormatArtist, artist)
             albumShowable -> resources.getString(R.string.fileDescriptionFormatAlbum, album)
             else -> null
-        }
+        }.let { TextConverter.translate(it, titleCase = true)}
     }
 
     fun getFileDisplayAndSortMetadata(it: FolderController.FileMetadata): FileDisplayAndSortMetadata {

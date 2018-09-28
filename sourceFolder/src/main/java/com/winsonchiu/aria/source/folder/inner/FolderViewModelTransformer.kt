@@ -3,6 +3,7 @@ package com.winsonchiu.aria.source.folder.inner
 import android.content.Context
 import androidx.annotation.WorkerThread
 import com.airbnb.epoxy.EpoxyModel
+import com.winsonchiu.aria.framework.text.TextConverter
 import com.winsonchiu.aria.source.folder.R
 import com.winsonchiu.aria.source.folder.inner.view.FileItemView
 import com.winsonchiu.aria.source.folder.inner.view.FileItemViewModel_
@@ -56,7 +57,7 @@ object FolderViewModelTransformer {
             areArtistsEqual -> context.getString(R.string.fileDescriptionFormatArtist, firstArtist)
             areAlbumsEqual -> context.getString(R.string.fileDescriptionFormatAlbum, firstAlbum)
             else -> null
-        }
+        }.let { TextConverter.translate(it, titleCase = true) }
 
         if (!headerText.isNullOrBlank()) {
             epoxyModels += FileSectionHeaderViewModel_()

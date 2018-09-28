@@ -87,6 +87,10 @@ object Versions {
             val base = "1.0.0-RC2"
         }
     }
+
+    val moji4j = "1.2.0"
+
+    val kuromoji = "0.9.0"
 }
 
 object Dependencies {
@@ -258,6 +262,10 @@ object Dependencies {
             val base = "com.uber.autodispose:autodispose"(Versions.Uber.AutoDispose.base)
         }
     }
+
+    val moji4j = "com.andree-surya:moji4j"(Versions.moji4j)
+
+    val kuromojiIpadic = "com.atilika.kuromoji:kuromoji-ipadic"(Versions.kuromoji)
 
     private fun kapt(
             value: String,
