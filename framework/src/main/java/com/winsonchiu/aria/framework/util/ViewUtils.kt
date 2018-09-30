@@ -83,6 +83,23 @@ fun Float.dpToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(
 )
 
 
+fun Int.spToPx(view: View) = spToPx(view.context)
+fun Int.spToPx(context: Context) = spToPx(context.resources.displayMetrics)
+fun Int.spToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_SP,
+        this.toFloat(),
+        displayMetrics
+).roundToInt()
+
+fun Float.spToPx(view: View) = spToPx(view.context)
+fun Float.spToPx(context: Context) = spToPx(context.resources.displayMetrics)
+fun Float.spToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(
+        TypedValue.COMPLEX_UNIT_SP,
+        this,
+        displayMetrics
+)
+
+
 fun ViewGroup.findChild(block: (child: View) -> Boolean): View? {
     children.forEach {
         if (it is ViewGroup) {

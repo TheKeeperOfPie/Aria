@@ -165,7 +165,7 @@ internal class RuntimeJsonAdapterFactory<T>(
                             + ". Register this subtype.")
             )
             val adapter = labelToAdapter[label]
-            val jsonValue = adapter!!.toJsonValue(value) as Map<String, Any>
+            @Suppress("UNCHECKED_CAST") val jsonValue = adapter!!.toJsonValue(value) as Map<String, Any>
 
             val valueWithLabel = LinkedHashMap<String, Any>(1 + jsonValue.size)
             valueWithLabel[labelKey] = label

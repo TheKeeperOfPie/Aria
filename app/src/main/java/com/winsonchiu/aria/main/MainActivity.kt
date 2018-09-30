@@ -38,6 +38,20 @@ class MainActivity : LifecycleBoundActivity() {
                     .commitNow()
         }
 
+        viewNowPlaying.listener = object : NowPlayingView.Listener {
+            override fun onClickSkipPrevious() {
+                // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+
+            override fun onClickPlay() {
+                mediaQueue.playPauseActions.accept(Unit)
+            }
+
+            override fun onClickSkipNext() {
+                // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            }
+        }
+
         viewNowPlayingBehavior = BottomSheetBehavior.from(viewNowPlaying).apply {
             isHideable = true
             state = BottomSheetBehavior.STATE_HIDDEN

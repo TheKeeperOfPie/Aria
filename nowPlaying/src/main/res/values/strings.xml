@@ -2,6 +2,8 @@
 
     <string name="app_name">Aria Now Playing</string>
 
+    <string name="now_playing_view_behavior">com.winsonchiu.aria.nowplaying.NowPlayingView$Behavior</string>
+
     <string name="now_playing_content_description_track_artwork">Track artwork</string>
     <string name="now_playing_content_description_skip_to_previous">Skip to previous song</string>
     <string name="now_playing_content_description_play">Play</string>

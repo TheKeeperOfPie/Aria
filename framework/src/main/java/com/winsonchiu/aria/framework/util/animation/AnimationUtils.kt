@@ -28,3 +28,7 @@ object AnimationUtils {
         }
     }
 }
+
+fun Float.lerp(start: Float, end: Float) = start + (end - start) * this
+
+fun Float.lerp(start: Int, end: Int) = (start + (end - start) * this).toInt()

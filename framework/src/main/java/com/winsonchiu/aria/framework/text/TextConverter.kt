@@ -38,7 +38,6 @@ object TextConverter {
             tokens.joinTokens {
                 val reading = it.reading
                 val surface = it.surface
-                val pronunciation = it.pronunciation
 
                 val textToConvert = when {
                     !it.isKnown || reading == "*" -> surface
@@ -47,7 +46,6 @@ object TextConverter {
 
                 val romaji = converter.convertKanaToRomaji(textToConvert)
                 when {
-                    surface == pronunciation -> romaji.toUpperCase()
                     titleCase -> romaji.titleCase()
                     else -> romaji
                 }
@@ -163,6 +161,7 @@ object TextConverter {
                         "ba",
                         "da",
                         "de",
+                        "e",
                         "ga",
                         "ka",
                         "kai",

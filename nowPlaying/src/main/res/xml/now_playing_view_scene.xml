@@ -90,7 +90,7 @@
             motion:layout_constraintEnd_toStartOf="@+id/imagePlay"
             motion:layout_constraintHorizontal_chainStyle="packed"
             motion:layout_constraintStart_toStartOf="parent"
-            motion:layout_constraintTop_toBottomOf="@id/textSongDescription"
+            motion:layout_constraintTop_toBottomOf="@id/viewSongDescription"
             />
 
         <Constraint
@@ -158,39 +158,27 @@
         <Constraint
             android:id="@+id/viewSongTitle"
             android:layout_width="0dp"
-            android:layout_height="20sp"
+            android:layout_height="20dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="10dp"
             android:layout_marginEnd="16dp"
             motion:layout_constrainedWidth="true"
+            motion:layout_constraintEnd_toStartOf="@+id/imagePlay"
             motion:layout_constraintStart_toEndOf="@id/imageArtwork"
-            motion:layout_constraintEnd_toEndOf="parent"
             motion:layout_constraintTop_toTopOf="parent"
             />
 
         <Constraint
             android:id="@+id/viewSongDescription"
             android:layout_width="0dp"
-            android:layout_height="16sp"
+            android:layout_height="16dp"
             android:layout_marginStart="16dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="16dp"
-            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintEnd_toStartOf="@+id/imagePlay"
             motion:layout_constraintHorizontal_bias="0"
             motion:layout_constraintStart_toEndOf="@id/imageArtwork"
             motion:layout_constraintTop_toBottomOf="@id/viewSongTitle"
-            />
-
-        <Constraint
-            android:id="@+id/imageSkipPrevious"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="20dp"
-            android:layout_marginBottom="24dp"
-            motion:layout_constraintBottom_toBottomOf="parent"
-            motion:layout_constraintEnd_toStartOf="@+id/imagePlay"
-            motion:layout_constraintHorizontal_chainStyle="packed"
-            motion:layout_constraintStart_toStartOf="parent"
             />
 
         <Constraint
@@ -198,21 +186,34 @@
             android:layout_width="48dp"
             android:layout_height="48dp"
             android:layout_marginStart="12dp"
+            android:layout_marginTop="6dp"
             android:layout_marginEnd="12dp"
-            motion:layout_constraintBottom_toBottomOf="@id/imageSkipPrevious"
+            motion:layout_constraintTop_toTopOf="parent"
+            motion:layout_constraintEnd_toEndOf="parent"
+            />
+
+        <Constraint
+            android:id="@+id/imageSkipPrevious"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="44dp"
+            android:layout_marginBottom="24dp"
+            motion:layout_constraintBottom_toBottomOf="parent"
             motion:layout_constraintEnd_toStartOf="@+id/imageSkipNext"
-            motion:layout_constraintStart_toEndOf="@id/imageSkipPrevious"
+            motion:layout_constraintHorizontal_chainStyle="packed"
+            motion:layout_constraintStart_toStartOf="parent"
             />
 
         <Constraint
             android:id="@+id/imageSkipNext"
             android:layout_width="48dp"
             android:layout_height="48dp"
-            android:layout_marginStart="20dp"
+            android:layout_marginStart="44dp"
             android:layout_marginEnd="16dp"
             motion:layout_constraintBottom_toBottomOf="@id/imageSkipPrevious"
             motion:layout_constraintEnd_toEndOf="parent"
-            motion:layout_constraintStart_toEndOf="@id/imagePlay"
+            motion:layout_constraintStart_toEndOf="@id/imageSkipPrevious"
             />
 
     </ConstraintSet>

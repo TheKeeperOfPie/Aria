@@ -25,13 +25,14 @@
                 android:id="@+id/main_activity_fragment_container"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
+                android:nestedScrollingEnabled="true"
                 />
 
             <com.winsonchiu.aria.nowplaying.NowPlayingView
                 android:id="@+id/viewNowPlaying"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                app:layout_behavior="@string/bottom_sheet_behavior"
+                app:layout_behavior="@string/now_playing_view_behavior"
                 />
 
         </androidx.coordinatorlayout.widget.CoordinatorLayout>
@@ -45,21 +46,6 @@
             <fragment
                 android:id="@+id/queueFragment"
                 class="com.winsonchiu.aria.queue.ui.QueueFragment"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                />
-
-        </FrameLayout>
-
-        <FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_gravity="start"
-            >
-
-            <fragment
-                android:id="@+id/testFragment"
-                class="com.winsonchiu.aria.nowplaying.NowPlayingTestFragment"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 />

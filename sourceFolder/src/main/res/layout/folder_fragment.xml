@@ -36,7 +36,7 @@
             android:layout_height="0dp"
             android:background="@android:color/black"
             android:clipToPadding="false"
-            android:paddingBottom="72dp"
+            android:paddingBottom="144dp"
             app:fastScrollEnabled="true"
             app:fastScrollHorizontalThumbDrawable="@drawable/folder_fast_scroll_thumb_drawable"
             app:fastScrollHorizontalTrackDrawable="@drawable/folder_fast_scroll_track_drawable"
