@@ -1,0 +1,10 @@
+<resources>
+
+    <string name="app_name">Aria Media</string>
+
+    <string name="action_play">Play</string>
+    <string name="action_pause">Pause</string>
+    <string name="action_next">Next</string>
+    <string name="action_previous">Previous</string>
+
+</resources>

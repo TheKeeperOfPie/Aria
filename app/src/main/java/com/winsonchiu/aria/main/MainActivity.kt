@@ -1,5 +1,6 @@
 package com.winsonchiu.aria.main
 
+import android.media.audiofx.Visualizer
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.GravityCompat
@@ -11,8 +12,12 @@ import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.hasFragment
 import com.winsonchiu.aria.framework.util.mapNonNull
 import com.winsonchiu.aria.home.HomeFragment
+import com.winsonchiu.aria.media.MediaBrowserConnection
+import com.winsonchiu.aria.media.transport.MediaAction
+import com.winsonchiu.aria.media.transport.MediaTransport
 import com.winsonchiu.aria.nowplaying.NowPlayingView
 import com.winsonchiu.aria.queue.MediaQueue
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.*
 import javax.inject.Inject
 
@@ -23,7 +28,12 @@ class MainActivity : LifecycleBoundActivity() {
     @Inject
     lateinit var mediaQueue: MediaQueue
 
+    @Inject
+    lateinit var mediaBrowserConnection: MediaBrowserConnection
+
     private lateinit var viewNowPlayingBehavior: BottomSheetBehavior<NowPlayingView>
+
+    private var visualizer: Visualizer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,15 +50,19 @@ class MainActivity : LifecycleBoundActivity() {
 
         viewNowPlaying.listener = object : NowPlayingView.Listener {
             override fun onClickSkipPrevious() {
-                // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                MediaTransport.send(MediaAction.SkipPrevious)
             }
 
             override fun onClickPlay() {
-                mediaQueue.playPauseActions.accept(Unit)
+                MediaTransport.send(MediaAction.PlayPause)
             }
 
             override fun onClickSkipNext() {
-                // TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+                MediaTransport.send(MediaAction.SkipNext)
+            }
+
+            override fun onSeek(progress: Float) {
+                MediaTransport.send(MediaAction.Seek(progress))
             }
         }
 
@@ -96,12 +110,41 @@ class MainActivity : LifecycleBoundActivity() {
 
         mediaQueue.queueUpdates
                 .mapNonNull { it.currentEntry }
+                .observeOn(AndroidSchedulers.mainThread())
+                .bindToLifecycle()
+                .subscribe(viewNowPlaying::setQueueEntry)
+
+        mediaQueue.queueUpdates
+                .mapNonNull { it.currentEntry }
                 .map { NowPlayingView.Model(it.metadata.title, it.metadata.description, it.image) }
+                .observeOn(AndroidSchedulers.mainThread())
                 .bindToLifecycle()
                 .subscribe {
                     viewNowPlaying.bindData(it)
-                    viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                    viewNowPlayingBehavior.isHideable = false
+
+                    if (viewNowPlayingBehavior.isHideable) {
+                        viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                        viewNowPlayingBehavior.isHideable = false
+                    }
                 }
+
+        mediaBrowserConnection.playbackStateChanges
+                .observeOn(AndroidSchedulers.mainThread())
+                .bindToLifecycle()
+                .subscribe {
+                    if (it.isPresent) {
+                        viewNowPlaying.setPlaybackState(it.get())
+                    }
+                }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        viewNowPlaying.onResume()
+    }
+
+    override fun onPause() {
+        viewNowPlaying.onPause()
+        super.onPause()
     }
 }

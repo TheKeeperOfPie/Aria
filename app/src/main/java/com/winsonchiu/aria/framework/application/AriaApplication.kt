@@ -8,6 +8,7 @@ import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.framework.dagger.ApplicationModule
 import com.winsonchiu.aria.framework.dagger.DaggerApplicationComponent
+import com.winsonchiu.aria.framework.dagger.activity.DaggerConstants
 import com.winsonchiu.aria.main.MainActivity
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
@@ -17,8 +18,6 @@ class AriaApplication : LeakCanaryApplication() {
     companion object {
         private val PICASSO_DISK_CACHE_SIZE = 500L * 1024 * 1024
         private val PICASSO_MEMORY_CACHE_SIZE = 250 * 1024 * 1024
-
-        val APPLICATION_COMPONENT = "${AriaApplication::class.java.canonicalName}.APPLICATION_COMPONENT"
     }
 
     private val applicationComponent = DaggerApplicationComponent.builder()
@@ -53,13 +52,13 @@ class AriaApplication : LeakCanaryApplication() {
 
     @Suppress("HasPlatformType")
     override fun getSystemService(name: String) = when (name) {
-        APPLICATION_COMPONENT -> applicationComponent
+        DaggerConstants.APPLICATION_COMPONENT -> applicationComponent
         else -> super.getSystemService(name)
     }
 
     @Suppress("HasPlatformType")
     override fun getSystemServiceName(serviceClass: Class<*>) = when (serviceClass) {
-        ApplicationComponent::class.java -> APPLICATION_COMPONENT
+        ApplicationComponent::class.java -> DaggerConstants.APPLICATION_COMPONENT
         else -> super.getSystemServiceName(serviceClass)
     }
 }

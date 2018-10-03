@@ -4,8 +4,13 @@ import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.TimeInterpolator
 import android.content.Context
+import android.graphics.Bitmap
 import android.graphics.Outline
+import android.graphics.drawable.BitmapDrawable
+import android.media.audiofx.Visualizer
 import android.net.Uri
+import android.os.AsyncTask
+import android.support.v4.media.session.PlaybackStateCompat
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
@@ -17,16 +22,19 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.ViewCompat
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
+import androidx.palette.graphics.Palette
 import com.google.android.material.bottomsheet.BottomSheetBehavior
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.artwork.ArtworkTransformation
 import com.winsonchiu.aria.framework.animation.FirstLineTextAnimator
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.initialize
+import com.winsonchiu.aria.media.MediaPlayer
+import com.winsonchiu.aria.queue.QueueEntry
 import kotlinx.android.synthetic.main.now_playing_content_view.view.*
 import kotlinx.android.synthetic.main.now_playing_hidden_view.view.*
 import kotlinx.android.synthetic.main.now_playing_view.view.*
-
 
 class NowPlayingView @JvmOverloads constructor(
         context: Context,
@@ -44,6 +52,23 @@ class NowPlayingView @JvmOverloads constructor(
 
     private val animatorTitle: FirstLineTextAnimator
     private val animatorDescription: FirstLineTextAnimator
+
+    private var currentAudioSessionId = -1
+    private var visualizer: Visualizer? = null
+
+    private var isResumed = false
+
+    private var paletteTask: AsyncTask<Bitmap, Void, Palette>? = null
+
+    private var paletteListener = Palette.PaletteAsyncListener { palette -> viewContent?.viewWaveform?.setPalette(palette) }
+
+    private val paletteCallback = object : Callback.EmptyCallback() {
+        override fun onSuccess() {
+            (imageArtwork?.drawable as? BitmapDrawable)?.bitmap?.let {
+                paletteTask = Palette.from(it).generate(paletteListener)
+            }
+        }
+    }
 
     init {
         initialize(R.layout.now_playing_view)
@@ -81,7 +106,25 @@ class NowPlayingView @JvmOverloads constructor(
             }
         }
 
+        viewContent.viewWaveform.listener = object : AudioWaveformView.Listener {
+            override fun onSeek(progress: Float) {
+                listener?.onSeek(progress)
+            }
+        }
+
         setProgress(1f)
+    }
+
+    override fun onDetachedFromWindow() {
+        super.onDetachedFromWindow()
+
+        paletteTask?.cancel(true)
+
+        Picasso.get()
+                .cancelRequest(imageArtwork)
+
+        visualizer?.release()
+        visualizer = null
     }
 
     fun setProgress(progress: Float) {
@@ -91,17 +134,93 @@ class NowPlayingView @JvmOverloads constructor(
         animatorDescription.setProgress(progress)
     }
 
+    fun setQueueEntry(queueEntry: QueueEntry) {
+        viewContent.viewWaveform.setData(queueEntry)
+    }
+
     fun bindData(data: Model) {
         Picasso.get()
                 .load(data.image)
                 .transform(artworkTransformation)
-                .into(viewContent.imageArtwork)
+                .into(viewContent.imageArtwork, paletteCallback)
 
         viewHidden.layoutTitle.textTitleExpanded.text = data.title
         viewHidden.layoutDescription.textDescriptionExpanded.text = data.description
     }
 
     override fun getBehavior() = Behavior()
+
+    fun setPlaybackState(playbackState: PlaybackStateCompat) {
+        val isPlaying = when (playbackState.state) {
+            PlaybackStateCompat.STATE_PLAYING,
+            PlaybackStateCompat.STATE_FAST_FORWARDING,
+            PlaybackStateCompat.STATE_REWINDING,
+            PlaybackStateCompat.STATE_BUFFERING,
+            PlaybackStateCompat.STATE_SKIPPING_TO_PREVIOUS,
+            PlaybackStateCompat.STATE_SKIPPING_TO_NEXT,
+            PlaybackStateCompat.STATE_SKIPPING_TO_QUEUE_ITEM -> true
+            PlaybackStateCompat.STATE_NONE,
+            PlaybackStateCompat.STATE_STOPPED,
+            PlaybackStateCompat.STATE_PAUSED,
+            PlaybackStateCompat.STATE_ERROR,
+            PlaybackStateCompat.STATE_CONNECTING -> false
+            else -> false
+        }
+
+        val resource = if (isPlaying) R.drawable.ic_pause_24dp else R.drawable.ic_play_arrow_24dp
+        viewContent.imagePlay.setImageResource(resource)
+
+        viewContent.viewWaveform.setPlaybackState(playbackState)
+
+        val audioSessionId = playbackState.extras?.getInt(MediaPlayer.AUDIO_SESSION_ID, -1) ?: -1
+        if (currentAudioSessionId != audioSessionId) {
+            currentAudioSessionId = audioSessionId
+            visualizer?.release()
+
+//            try {
+//                visualizer = Visualizer(audioSessionId)
+//                visualizer?.let {
+//                    it.captureSize = Visualizer.getCaptureSizeRange()[0]
+//
+//                    it.setDataCaptureListener(object : Visualizer.OnDataCaptureListener {
+//                        override fun onFftDataCapture(
+//                                visualizer: Visualizer?,
+//                                fft: ByteArray?,
+//                                samplingRate: Int
+//                        ) {
+//                            Log.d("NowPlayingView", "onFftDataCapture called with ${fft?.contentToString()}")
+//                        }
+//
+//                        override fun onWaveFormDataCapture(
+//                                visualizer: Visualizer?,
+//                                waveform: ByteArray?,
+//                                samplingRate: Int
+//                        ) {
+//                            Log.d("NowPlayingView", "onWaveFormDataCapture called with ${waveform?.contentToString()}")
+//                        }
+//                    }, Visualizer.getMaxCaptureRate(), true, true)
+//                }
+//            } catch (e: Exception) {
+//                if (BuildConfig.DEBUG) {
+//                    throw e
+//                }
+//            }
+        }
+
+        if (isResumed) {
+            visualizer?.enabled = true
+        }
+    }
+
+    fun onResume() {
+        isResumed = true
+        visualizer?.enabled = true
+    }
+
+    fun onPause() {
+        visualizer?.enabled = false
+        isResumed = false
+    }
 
     data class Model(
             val title: CharSequence?,
@@ -113,6 +232,7 @@ class NowPlayingView @JvmOverloads constructor(
         fun onClickSkipPrevious()
         fun onClickPlay()
         fun onClickSkipNext()
+        fun onSeek(progress: Float)
     }
 
     open class Behavior : BottomSheetBehavior<NowPlayingView> {
@@ -153,7 +273,14 @@ class NowPlayingView @JvmOverloads constructor(
                 axes: Int,
                 type: Int
         ): Boolean {
-            return super.onStartNestedScroll(coordinatorLayout, child, directTargetChild, target, axes, type) || axes == ViewCompat.SCROLL_AXIS_VERTICAL
+            return super.onStartNestedScroll(
+                    coordinatorLayout,
+                    child,
+                    directTargetChild,
+                    target,
+                    axes,
+                    type
+            ) || axes == ViewCompat.SCROLL_AXIS_VERTICAL
         }
 
         override fun onNestedPreScroll(

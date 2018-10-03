@@ -3,7 +3,6 @@ package com.winsonchiu.aria.framework.dagger.activity
 import android.os.Bundle
 import androidx.annotation.CallSuper
 import com.winsonchiu.aria.dialog.DialogActivity
-import com.winsonchiu.aria.framework.application.AriaApplication
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.framework.dagger.activity.DaggerConstants.ACTIVITY_COMPONENT
 
@@ -19,7 +18,7 @@ abstract class DaggerComponentActivity : DialogActivity() {
     abstract fun injectSelf(activityComponent: ActivityComponent)
 
     private fun makeActivityComponent() : ActivityComponent {
-        val applicationComponent = application.getSystemService(AriaApplication.APPLICATION_COMPONENT) as ApplicationComponent
+        val applicationComponent = application.getSystemService(DaggerConstants.APPLICATION_COMPONENT) as ApplicationComponent
         val lastActivityComponent = lastCustomNonConfigurationInstance as ActivityComponent?
         return lastActivityComponent ?: applicationComponent.activityComponent()
     }

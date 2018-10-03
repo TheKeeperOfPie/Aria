@@ -53,16 +53,6 @@ android {
         preDexLibraries = true
     }
 
-    sourceSets {
-        getByName("main") {
-            res.srcDirs(
-                    "/src/main/res/home",
-                    "/src/main/res/media",
-                    "/src/main/res/res"
-            )
-        }
-    }
-
     compileOptions {
         setSourceCompatibility(JavaVersion.VERSION_1_8)
         setTargetCompatibility(JavaVersion.VERSION_1_8)
@@ -90,12 +80,10 @@ androidExtensions {
 }
 
 Dependencies(this) {
+    implementation(Modules.media)
     implementation(Modules.nowPlaying)
     implementation(Modules.queue)
     implementation(Modules.sourceFolder)
-
-    implementation(Dependencies.AndroidX.media)
-    implementation(Dependencies.AndroidX.media2)
 
     implementation(Dependencies.Google.dagger)
 }

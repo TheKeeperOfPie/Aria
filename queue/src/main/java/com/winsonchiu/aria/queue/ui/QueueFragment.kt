@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.SimpleEpoxyController
 import com.winsonchiu.aria.framework.fragment.subclass.BaseFragment
 import com.winsonchiu.aria.framework.util.setDataForView
+import com.winsonchiu.aria.media.transport.MediaAction
+import com.winsonchiu.aria.media.transport.MediaTransport
 import com.winsonchiu.aria.queue.MediaQueue
 import com.winsonchiu.aria.queue.QueueEntry
 import com.winsonchiu.aria.queue.QueueOp
@@ -94,7 +96,7 @@ class QueueFragment : BaseFragment<QueueFragmentDaggerComponent.ComponentProvide
         imageUndo.setOnClickListener { mediaQueue.pop() }
 
         imagePlay.setOnClickListener {
-            mediaQueue.playPauseActions.accept(Unit)
+            MediaTransport.send(MediaAction.PlayPause)
         }
 
         imageShuffle.setOnClickListener { mediaQueue.push(QueueOp.Shuffle()) }

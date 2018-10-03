@@ -286,6 +286,8 @@ object Modules {
     val dialog = Module("dialog")
     val framework = Module("framework")
     val itemSheet = Module("itemSheet")
+    val media = Module("media")
+    val mediaTransport = Module("mediaTransport")
     val nowPlaying = Module("nowPlaying")
     val queue = Module("queue")
     val sourceFolder = Module("sourceFolder")

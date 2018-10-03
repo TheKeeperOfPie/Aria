@@ -7,29 +7,29 @@
     android:layout_height="match_parent"
     tools:constraintSet="@layout/now_playing_view_constraint_expanded"
     tools:layoutDescription="@xml/now_playing_view_scene"
-    tools:parentTag="androidx.constraintlayout.motion.widget.MotionLayout"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
     >
 
     <include
-        layout="@layout/now_playing_hidden_view"
         android:id="@+id/viewHidden"
+        layout="@layout/now_playing_hidden_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
     <include
-        layout="@layout/now_playing_content_view"
         android:id="@+id/viewContent"
+        layout="@layout/now_playing_content_view"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         />
 
 </merge>

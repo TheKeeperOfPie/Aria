@@ -3,8 +3,7 @@ package com.winsonchiu.aria.framework.dagger
 import com.winsonchiu.aria.artwork.ArtworkRequestHandler
 import com.winsonchiu.aria.artwork.ArtworkScope
 import com.winsonchiu.aria.framework.dagger.activity.ActivityComponent
-import com.winsonchiu.aria.media.MediaPlayer
-import com.winsonchiu.aria.media.MediaService
+import com.winsonchiu.aria.media.MediaInjector
 import com.winsonchiu.aria.queue.QueueScope
 import com.winsonchiu.aria.source.folder.FolderScope
 import dagger.Component
@@ -22,7 +21,7 @@ annotation class ApplicationScope
             ApplicationModule::class
         ]
 )
-interface ApplicationComponent {
+interface ApplicationComponent : MediaInjector {
 
     @Component.Builder
     interface Builder {
@@ -33,10 +32,6 @@ interface ApplicationComponent {
     }
 
     fun activityComponent(): ActivityComponent
-
-    fun inject(mediaService: MediaService)
-
-    fun inject(mediaPlayer: MediaPlayer)
 
     fun artworkRequestHandler(): ArtworkRequestHandler
 }

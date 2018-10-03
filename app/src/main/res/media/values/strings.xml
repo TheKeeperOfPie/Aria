@@ -1,6 +1,0 @@
-<resources>
-    <string name="action_play">Play</string>
-    <string name="action_pause">Pause</string>
-    <string name="action_next">Next</string>
-    <string name="action_previous">Previous</string>
-</resources>

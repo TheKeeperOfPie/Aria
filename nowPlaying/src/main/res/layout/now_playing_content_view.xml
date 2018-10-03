@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:clipChildren="false"
     app:layoutDescription="@xml/now_playing_view_scene"
-    tools:currentState="@id/collapsed"
+    tools:currentState="@id/expanded"
     >
 
     <ImageView
@@ -17,6 +17,18 @@
         android:contentDescription="@string/now_playing_content_description_track_artwork"
         android:scaleType="centerCrop"
         tools:background="#D1020A"
+        />
+
+    <Space
+        android:id="@+id/spaceAboveWaveform"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        />
+
+    <com.winsonchiu.aria.nowplaying.AudioWaveformView
+        android:id="@+id/viewWaveform"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         />
 
     <View

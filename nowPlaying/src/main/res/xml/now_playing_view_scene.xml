@@ -24,6 +24,27 @@
             />
 
         <Constraint
+            android:id="@+id/spaceAboveWaveform"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toTopOf="@+id/viewWaveform"
+            motion:layout_constraintTop_toTopOf="@id/imageArtwork"
+            motion:layout_constraintVertical_chainStyle="spread"
+            motion:layout_constraintVertical_weight="0.75"
+            />
+
+        <Constraint
+            android:id="@+id/viewWaveform"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toBottomOf="@id/imageArtwork"
+            motion:layout_constraintEnd_toEndOf="@id/imageArtwork"
+            motion:layout_constraintStart_toStartOf="@id/imageArtwork"
+            motion:layout_constraintTop_toBottomOf="@id/spaceAboveWaveform"
+            motion:layout_constraintVertical_weight="0.25"
+            />
+
+        <Constraint
             android:id="@+id/viewSquareBoundary"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -131,6 +152,27 @@
             />
 
         <Constraint
+            android:id="@+id/spaceAboveWaveform"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toTopOf="@+id/viewWaveform"
+            motion:layout_constraintTop_toTopOf="@id/imageArtwork"
+            motion:layout_constraintVertical_chainStyle="spread"
+            motion:layout_constraintVertical_weight="0.75"
+            />
+
+        <Constraint
+            android:id="@+id/viewWaveform"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            motion:layout_constraintBottom_toBottomOf="@id/imageArtwork"
+            motion:layout_constraintEnd_toEndOf="@id/imageArtwork"
+            motion:layout_constraintStart_toStartOf="@id/imageArtwork"
+            motion:layout_constraintTop_toBottomOf="@id/spaceAboveWaveform"
+            motion:layout_constraintVertical_weight="0.25"
+            />
+
+        <Constraint
             android:id="@+id/viewSquareBoundary"
             android:layout_width="0dp"
             android:layout_height="0dp"
@@ -188,8 +230,8 @@
             android:layout_marginStart="12dp"
             android:layout_marginTop="6dp"
             android:layout_marginEnd="12dp"
-            motion:layout_constraintTop_toTopOf="parent"
             motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintTop_toTopOf="parent"
             />
 
         <Constraint

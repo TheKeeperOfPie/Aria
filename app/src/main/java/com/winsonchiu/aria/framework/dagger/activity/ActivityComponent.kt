@@ -6,6 +6,7 @@ import com.winsonchiu.aria.itemsheet.ItemsViewInjector
 import com.winsonchiu.aria.main.MainActivity
 import com.winsonchiu.aria.main.MainActivityViewModel
 import com.winsonchiu.aria.media.MediaBrowserConnection
+import com.winsonchiu.aria.media.MediaScreenScope
 import com.winsonchiu.aria.queue.ui.QueueFragmentDaggerComponent
 import dagger.Binds
 import dagger.Module
@@ -16,6 +17,7 @@ import javax.inject.Scope
 @Scope
 annotation class ActivityScreenScope
 
+@MediaScreenScope
 @ActivityScreenScope
 @Subcomponent(
         modules = [

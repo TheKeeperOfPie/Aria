@@ -12,9 +12,6 @@ class MediaQueue @Inject constructor(
         application: Application
 ) {
 
-    // TODO: Move
-    val playPauseActions = PublishRelay.create<Unit>()
-
     val queueUpdates = BehaviorRelay.createDefault(Model())
 
     internal val model
