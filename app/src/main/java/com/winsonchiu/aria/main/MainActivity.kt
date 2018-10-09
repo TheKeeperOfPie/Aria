@@ -1,6 +1,5 @@
 package com.winsonchiu.aria.main
 
-import android.media.audiofx.Visualizer
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.GravityCompat
@@ -33,8 +32,6 @@ class MainActivity : LifecycleBoundActivity() {
 
     private lateinit var viewNowPlayingBehavior: BottomSheetBehavior<NowPlayingView>
 
-    private var visualizer: Visualizer? = null
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,6 +60,17 @@ class MainActivity : LifecycleBoundActivity() {
 
             override fun onSeek(progress: Float) {
                 MediaTransport.send(MediaAction.Seek(progress))
+            }
+        }
+
+        viewNowPlaying.setOnClickListener {
+            when (viewNowPlayingBehavior.state) {
+                BottomSheetBehavior.STATE_COLLAPSED -> viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_EXPANDED
+                BottomSheetBehavior.STATE_EXPANDED -> viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                BottomSheetBehavior.STATE_DRAGGING,
+                BottomSheetBehavior.STATE_HIDDEN,
+                BottomSheetBehavior.STATE_HALF_EXPANDED,
+                BottomSheetBehavior.STATE_SETTLING -> {}
             }
         }
 
@@ -98,10 +106,10 @@ class MainActivity : LifecycleBoundActivity() {
     override fun injectSelf(activityComponent: ActivityComponent) = activityComponent.inject(this)
 
     override fun handleBackPressed() {
-        if (drawerMain.isDrawerOpen(GravityCompat.END)) {
-            drawerMain.closeDrawer(GravityCompat.END)
-        } else {
-            super.handleBackPressed()
+        when {
+            drawerMain.isDrawerOpen(GravityCompat.END) -> drawerMain.closeDrawer(GravityCompat.END)
+            viewNowPlayingBehavior.state != BottomSheetBehavior.STATE_COLLAPSED -> viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            else -> super.handleBackPressed()
         }
     }
 

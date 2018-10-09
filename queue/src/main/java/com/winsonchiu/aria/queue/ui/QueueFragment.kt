@@ -70,7 +70,12 @@ class QueueFragment : BaseFragment<QueueFragmentDaggerComponent.ComponentProvide
 
     private val listener = object : QueueItemView.Listener {
         override fun onClick(queueEntry: QueueEntry) {
-            mediaQueue.setCurrentItem(queueEntry)
+            if (queueEntry == currentQueue.currentEntry) {
+                MediaTransport.send(MediaAction.PlayPause)
+            } else {
+                mediaQueue.setCurrentItem(queueEntry)
+                MediaTransport.send(MediaAction.Play)
+            }
         }
 
         override fun onStartDrag(view: QueueItemView) {
@@ -95,9 +100,7 @@ class QueueFragment : BaseFragment<QueueFragmentDaggerComponent.ComponentProvide
 
         imageUndo.setOnClickListener { mediaQueue.pop() }
 
-        imagePlay.setOnClickListener {
-            MediaTransport.send(MediaAction.PlayPause)
-        }
+        imageClear.setOnClickListener { mediaQueue.push(QueueOp.Clear()) }
 
         imageShuffle.setOnClickListener { mediaQueue.push(QueueOp.Shuffle()) }
     }

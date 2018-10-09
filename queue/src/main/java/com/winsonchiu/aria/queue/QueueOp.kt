@@ -26,7 +26,6 @@ sealed class QueueOp : Parcelable {
             val currentIndex: Int
     )
 
-
     @Parcelize
     @JsonClass(generateAdapter = true)
     data class AddToEnd(internal val newEntries: List<QueueEntry>) : QueueOp() {
@@ -211,9 +210,35 @@ sealed class QueueOp : Parcelable {
                 input: List<QueueEntry>,
                 currentIndex: Int
         ): Output {
-            val currentItem = input[currentIndex]
+            val currentItem = input.getOrNull(currentIndex)
             val newIndex = oldInput!!.indexOf(currentItem).coerceIn(-1, oldInput!!.size - 1)
             return Output(oldInput!!, newIndex)
+        }
+    }
+
+    @Parcelize
+    @JsonClass(generateAdapter = true)
+    data class Clear internal constructor(
+            internal var oldInput: List<QueueEntry>?,
+            internal var oldIndex: Int = -1
+    ) : QueueOp() {
+
+        constructor() : this(null)
+
+        override fun apply(
+                input: List<QueueEntry>,
+                currentIndex: Int
+        ): Output {
+            this.oldInput = input
+            this.oldIndex = currentIndex
+            return Output(emptyList(), 0)
+        }
+
+        override fun reverse(
+                input: List<QueueEntry>,
+                currentIndex: Int
+        ): Output {
+            return Output(oldInput!!, oldIndex)
         }
     }
 

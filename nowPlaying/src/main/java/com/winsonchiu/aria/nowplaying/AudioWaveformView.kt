@@ -10,7 +10,6 @@ import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.Path
 import android.graphics.PorterDuff
-import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
 import android.media.MediaCodec
@@ -23,10 +22,10 @@ import android.os.SystemClock
 import android.support.v4.media.session.PlaybackStateCompat
 import android.util.AttributeSet
 import android.view.MotionEvent
-import android.view.TouchDelegate
 import android.view.View
 import android.view.animation.Animation
 import android.view.animation.Transformation
+import androidx.annotation.WorkerThread
 import androidx.core.graphics.ColorUtils
 import androidx.palette.graphics.Palette
 import com.winsonchiu.aria.framework.util.dpToPx
@@ -42,8 +41,15 @@ class AudioWaveformView @JvmOverloads constructor(
         defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
 
-    init {
-        setWillNotDraw(false)
+    companion object {
+        private const val STEP_DIVISOR = 1000
+        private const val HISTOGRAM_COUNT = 256
+        private const val HISTOGRAM_MIN_THRESHOLD = 0.05f
+        private const val HISTOGRAM_MAX_THRESHOLD = 0.01f
+        private const val ENTRANCE_ANIMATION_DURATION = 200
+        private const val EXIT_ANIMATION_DURATION = 200
+        private const val FOREGROUND_ALPHA = 128
+        private const val BACKGROUND_ALPHA = 128
     }
 
     var listener: Listener? = null
@@ -71,11 +77,19 @@ class AudioWaveformView @JvmOverloads constructor(
 
     private val paint = Paint()
 
-    private var playbackUpdatePosition = -1
+    private var playbackUpdatePosition = 0
     private var playbackUpdateTime = 0L
     private var playbackDuration = 0
 
     private var progressOverride = -1f
+
+    private var entranceAnimationStart = SystemClock.uptimeMillis()
+    private val entranceAnimationMatrix = Matrix()
+
+    private var exitAnimationStart = SystemClock.uptimeMillis()
+    private val exitAnimationMatrix = Matrix()
+    private var exitAnimationBasePath = Path()
+    private var exitAnimationSizedPath = Path()
 
     private val animation = object : Animation() {
         override fun applyTransformation(
@@ -95,6 +109,8 @@ class AudioWaveformView @JvmOverloads constructor(
     private val backgroundHandlerThread = HandlerThread("AudioWaveformProcess")
 
     init {
+        setWillNotDraw(false)
+
         backgroundHandlerThread.start()
         backgroundHandler = Handler(backgroundHandlerThread.looper)
 
@@ -109,22 +125,23 @@ class AudioWaveformView @JvmOverloads constructor(
     ) {
         super.onSizeChanged(width, height, oldWidth, oldHeight)
 
-        val bounds = Rect(0, (-144).dpToPx(this), width, height + 72.dpToPx(this))
-
-        touchDelegate = TouchDelegate(bounds, this)
-
         onChanged()
     }
 
     private fun onChanged() {
-        basePathUp.computeBounds(pathBoundsUp, true)
+        if (basePathUp.isEmpty) {
+            sizedPathUp.reset()
+            sizedPathUp.addRect(0f, height.toFloat() - 8f.dpToPx(context), width.toFloat(), height.toFloat(), Path.Direction.CW)
+        } else {
+            basePathUp.computeBounds(pathBoundsUp, true)
 
-        pathMatrixUp.setScale(
-                width / pathBoundsUp.right.coerceAtLeast(1f),
-                -height / pathBoundsUp.bottom.coerceAtLeast(1f)
-        )
-        pathMatrixUp.postTranslate(0f, height.toFloat())
-        basePathUp.transform(pathMatrixUp, sizedPathUp)
+            pathMatrixUp.setScale(
+                    width / pathBoundsUp.right.coerceAtLeast(1f),
+                    -height / pathBoundsUp.bottom.coerceAtLeast(1f)
+            )
+            pathMatrixUp.postTranslate(0f, height.toFloat())
+            basePathUp.transform(pathMatrixUp, sizedPathUp)
+        }
 
         invalidate()
     }
@@ -204,33 +221,71 @@ class AudioWaveformView @JvmOverloads constructor(
             }
         }
 
+        val entranceTimeDifference = SystemClock.uptimeMillis() - entranceAnimationStart
+
+        if (entranceTimeDifference < ENTRANCE_ANIMATION_DURATION) {
+            val progress = entranceTimeDifference.toFloat() / ENTRANCE_ANIMATION_DURATION
+            entranceAnimationMatrix.setScale(1f, progress)
+        } else {
+            entranceAnimationMatrix.reset()
+        }
+
+        val exitTimeDifference = SystemClock.uptimeMillis() - exitAnimationStart
+
+        if (exitTimeDifference < EXIT_ANIMATION_DURATION) {
+            val progress = exitTimeDifference.toFloat() / EXIT_ANIMATION_DURATION
+            exitAnimationMatrix.setScale(1f, 1f - progress)
+
+            exitAnimationBasePath.transform(exitAnimationMatrix, exitAnimationSizedPath)
+            exitAnimationSizedPath.transform(pathMatrixUp)
+
+            canvas.drawPath(exitAnimationSizedPath, paint)
+        } else {
+            exitAnimationBasePath.reset()
+            exitAnimationSizedPath.reset()
+            exitAnimationMatrix.reset()
+        }
+
+        basePathUp.transform(entranceAnimationMatrix, sizedPathUp)
+        sizedPathUp.transform(pathMatrixUp)
+
         canvas.drawPath(sizedPathUp, paint)
 
         super.onDraw(canvas)
     }
 
+    @WorkerThread
+    private fun release() {
+        try {
+            extractor?.release()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        try {
+            codec?.stop()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        try {
+            codec?.release()
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        extractor = null
+        codec = null
+    }
+
     private fun readSamples(file: File) {
         backgroundHandler.postAtFrontOfQueue {
-            try {
-                extractor?.release()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
+            release()
 
-            try {
-                codec?.stop()
-            } catch (e: Exception) {
-                e.printStackTrace()
+            if (!basePathUp.isEmpty && (exitAnimationStart + EXIT_ANIMATION_DURATION < SystemClock.uptimeMillis())) {
+                exitAnimationBasePath.set(basePathUp)
+                exitAnimationStart = SystemClock.uptimeMillis()
             }
-
-            try {
-                codec?.release()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-
-            extractor = null
-            codec = null
 
             basePathUp.reset()
             onChanged()
@@ -256,7 +311,6 @@ class AudioWaveformView @JvmOverloads constructor(
                 val channels = format.getInteger(MediaFormat.KEY_CHANNEL_COUNT)
 
                 val sampleArrayUp = mutableListOf<Double>()
-                val sampleArrayDown = mutableListOf<Double>()
 
                 codec = MediaCodec.createDecoderByType(format.getString(MediaFormat.KEY_MIME))
 
@@ -287,12 +341,13 @@ class AudioWaveformView @JvmOverloads constructor(
                         if (info.flags and MediaCodec.BUFFER_FLAG_END_OF_STREAM != 0) {
                             post {
                                 this@AudioWaveformView.basePathUp = generatePath(sampleArrayUp.toDoubleArray())
+                                entranceAnimationStart = SystemClock.uptimeMillis()
                                 onChanged()
                             }
 
                             codec.releaseOutputBuffer(index, false)
-                            codec.release()
-                            extractor.release()
+
+                            release()
 
                             if (isAttachedToWindow) {
                                 postInvalidate()
@@ -300,11 +355,11 @@ class AudioWaveformView @JvmOverloads constructor(
                         } else {
                             val outputBuffer = codec.getOutputBuffer(index)!!
 
-                            var upTotal = 0L
-                            var upCount = 0L
+                            var upTotal = 0.0
+                            var upCount = 0.0
 
-                            var downTotal = 0
-                            var downCount = 0
+                            var downTotal = 0.0
+                            var downCount = 0.0
 
                             while (outputBuffer.hasRemaining()) {
                                 val byte = outputBuffer.get()
@@ -318,9 +373,10 @@ class AudioWaveformView @JvmOverloads constructor(
                                 }
                             }
 
-                            sampleArrayUp += upTotal / upCount.coerceAtLeast(1).toDouble()//Math.sqrt(upTotal / upCount.coerceAtLeast(1).toDouble() / channels)
-                            sampleArrayDown += Math
-                                    .sqrt(downTotal.absoluteValue / downCount.coerceAtLeast(1).toDouble() / channels)
+                            val up = upTotal / upCount.coerceAtLeast(1.0) / channels
+                            val down = downTotal.absoluteValue / downCount.coerceAtLeast(1.0) / channels
+
+                            sampleArrayUp += up + down
 
                             codec.releaseOutputBuffer(index, false)
                         }
@@ -361,30 +417,30 @@ class AudioWaveformView @JvmOverloads constructor(
         val size = values.size
         val absoluteMax = values.max() ?: 1.0
 
-        val histogram = IntArray(256)
+        val histogram = IntArray(HISTOGRAM_COUNT)
         values.forEach {
-            val index = (it / absoluteMax * 256).toInt().coerceIn(0, 255)
+            val index = (it / absoluteMax * HISTOGRAM_COUNT).toInt().coerceIn(0, 255)
             histogram[index] = histogram[index] + 1
         }
 
-        val minThreshold = size / 20
+        val minThreshold = size * HISTOGRAM_MIN_THRESHOLD
         var minAdjusted = 0.0
         var minSum = 0
         for ((index, value) in histogram.withIndex()) {
             minSum += value
             if (minSum > minThreshold) {
-                minAdjusted = absoluteMax / 256f * index
+                minAdjusted = absoluteMax / HISTOGRAM_COUNT * index
                 break
             }
         }
 
-        val maxThreshold = size / 100
+        val maxThreshold = size * HISTOGRAM_MAX_THRESHOLD
         var maxAdjusted = 0.0
         var maxSum = 0
         for (index in 255 downTo 0) {
             maxSum += histogram[index]
             if (maxSum > maxThreshold) {
-                maxAdjusted = absoluteMax / 256f * index
+                maxAdjusted = absoluteMax / HISTOGRAM_COUNT * index
                 break
             }
         }
@@ -395,7 +451,7 @@ class AudioWaveformView @JvmOverloads constructor(
             values[index] = value * value
         }
 
-        val step = size / 100
+        val step = (size / STEP_DIVISOR).coerceAtLeast(1)
 
         val adjustedValues = values
                 .asSequence()
@@ -437,8 +493,8 @@ class AudioWaveformView @JvmOverloads constructor(
     }
 
     fun setPalette(palette: Palette?) {
-        val foreground = ColorUtils.setAlphaComponent(palette?.getLightVibrantColor(Color.WHITE) ?: Color.WHITE, 232)
-        val background = ColorUtils.setAlphaComponent(palette?.getMutedColor(Color.BLACK) ?: Color.BLACK, 232)
+        val foreground = ColorUtils.setAlphaComponent(palette?.getLightVibrantColor(Color.WHITE) ?: Color.WHITE, FOREGROUND_ALPHA)
+        val background = ColorUtils.setAlphaComponent(palette?.getMutedColor(Color.BLACK) ?: Color.BLACK, BACKGROUND_ALPHA)
 
         shaderOne = LinearGradient(
                 0f,
