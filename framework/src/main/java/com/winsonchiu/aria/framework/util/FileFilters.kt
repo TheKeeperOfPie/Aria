@@ -15,6 +15,13 @@ object FileFilters {
 
     val FOLDERS = FileFilter { file -> file.isDirectory }
 
+    val PLAYLIST = FileFilter { file ->
+        when (file.extension) {
+            "m3u", "m3u8" -> true
+            else -> false
+        }
+    }
+
     val AUDIO = FileFilter { file ->
         val contentType = tryContentType(file)
         contentType?.startsWith("audio") == true

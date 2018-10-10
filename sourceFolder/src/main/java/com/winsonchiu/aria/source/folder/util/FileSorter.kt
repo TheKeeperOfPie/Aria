@@ -1,5 +1,6 @@
 package com.winsonchiu.aria.source.folder.util
 
+import com.winsonchiu.aria.source.folder.FileEntry
 import com.winsonchiu.aria.source.folder.util.FileSorter.Method.BY_NAME
 import com.winsonchiu.aria.source.folder.util.FileSorter.Method.DEFAULT
 import java.io.File
@@ -19,8 +20,8 @@ object FileSorter {
         }
     }
 
-    private val caseInsensitiveSorter = Comparator<File> { first, second ->
-        first.name.fromFirstLetterOrDigit().compareTo(second.name.fromFirstLetterOrDigit(), ignoreCase = true)
+    private val caseInsensitiveSorter = Comparator<FileEntry> { first, second ->
+        first.file.name.fromFirstLetterOrDigit().compareTo(second.file.name.fromFirstLetterOrDigit(), ignoreCase = true)
     }
 
     private val fileDisplayAndSortMetadataSorter = Comparator.nullsLast<String> { first, second ->
@@ -28,10 +29,10 @@ object FileSorter {
     }.let { Comparator.comparing<FileDisplayAndSortMetadata, String?>(Function { it.sortKey }, it) }
 
     fun sort(
-            files: List<File>,
+            files: List<FileEntry>,
             method: Method,
             reverse: Boolean = false
-    ): List<File> {
+    ): List<FileEntry> {
         return if (reverse) {
             when (method) {
                 BY_NAME -> files.sortedWith(caseInsensitiveSorter.reversed())

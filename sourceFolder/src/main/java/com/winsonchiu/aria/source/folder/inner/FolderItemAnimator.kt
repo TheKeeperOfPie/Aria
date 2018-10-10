@@ -2,9 +2,9 @@ package com.winsonchiu.aria.source.folder.inner
 
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.EpoxyViewHolder
+import com.winsonchiu.aria.framework.util.animation.ValueAnimatorItemAnimator
 import com.winsonchiu.aria.source.folder.inner.view.FileItemView
 import com.winsonchiu.aria.source.folder.inner.view.FileItemViewModel_
-import com.winsonchiu.aria.framework.util.animation.ValueAnimatorItemAnimator
 import kotlinx.android.synthetic.main.file_item_view.view.*
 
 class FolderItemAnimator : ValueAnimatorItemAnimator<FolderItemAnimator.ItemInfo>() {
@@ -36,7 +36,7 @@ class FolderItemAnimator : ValueAnimatorItemAnimator<FolderItemAnimator.ItemInfo
             itemInfo: ItemInfo
     ) {
         val model = (viewHolder as? EpoxyViewHolder)?.model as? FileItemViewModel_ ?: return
-        itemInfo.imageAlpha = if (model.fileMetadata().image == null) 0 else 255
+        itemInfo.imageAlpha = if (model.entry().image == null) 0 else 255
     }
 
     override fun captureEndValues(
@@ -45,7 +45,7 @@ class FolderItemAnimator : ValueAnimatorItemAnimator<FolderItemAnimator.ItemInfo
             itemInfo: ItemInfo
     ) {
         val model = (viewHolder as? EpoxyViewHolder)?.model as? FileItemViewModel_ ?: return
-        itemInfo.imageAlpha = if (model.fileMetadata().image == null) 0 else 255
+        itemInfo.imageAlpha = if (model.entry().image == null) 0 else 255
     }
 
     data class ItemInfo(

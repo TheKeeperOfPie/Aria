@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.annotation.WorkerThread
 import com.airbnb.epoxy.EpoxyModel
 import com.winsonchiu.aria.framework.text.TextConverter
+import com.winsonchiu.aria.source.folder.FileEntry
 import com.winsonchiu.aria.source.folder.R
 import com.winsonchiu.aria.source.folder.inner.view.FileItemView
 import com.winsonchiu.aria.source.folder.inner.view.FileItemViewModel_
@@ -23,10 +24,10 @@ object FolderViewModelTransformer {
             listener: FileItemView.Listener,
             model: FolderController.Model
     ): FileViewModel {
-        val (folder, files) = model
+        val (folder, entries) = model
         val folderTitle = getFolderTitle(folder)
 
-        if (files.isEmpty()) {
+        if (entries.isEmpty()) {
             return FileViewModel(
                     folder,
                     folderTitle,
@@ -34,14 +35,16 @@ object FolderViewModelTransformer {
             )
         }
 
-        val firstMetadata = files.first().metadata
+        val firstMetadata = (entries.first() as? FileEntry.Audio)?.metadata
         val firstArtist = firstMetadata.artistDisplayValue()
         val firstAlbum = firstMetadata?.album
-        val areArtistsEqual = !firstArtist.isNullOrBlank() && files.asSequence()
+        val areArtistsEqual = !firstArtist.isNullOrBlank() && entries.asSequence()
+                .filterIsInstance<FileEntry.Audio>()
                 .fold(true) { matches, it ->
                     matches && firstArtist == it.metadata.artistDisplayValue()
                 }
-        val areAlbumsEqual = !firstAlbum.isNullOrBlank() && files.asSequence()
+        val areAlbumsEqual = !firstAlbum.isNullOrBlank() && entries.asSequence()
+                .filterIsInstance<FileEntry.Audio>()
                 .fold(true) { matches, it ->
                     matches && firstAlbum == it.metadata?.album
                 }
@@ -65,29 +68,30 @@ object FolderViewModelTransformer {
                     .text(headerText)
         }
 
-        files.map(FileUtils::getFileDisplayAndSortMetadata)
-
-        epoxyModels += files
+        epoxyModels += entries
                 .map(FileUtils::getFileDisplayAndSortMetadata)
                 .toList()
                 .let { sortFileItemViewModels(it, FileSorter.Method.BY_NAME, false) }
                 .map {
-                    val (fileMetadata, displayTitle, _) = it
-                    val (file, metadata) = fileMetadata
+                    val (entry, displayTitle, _) = it
+
+                    val description = when (entry) {
+                        is FileEntry.Folder,
+                        is FileEntry.Playlist -> entry.description(context)
+                        is FileEntry.Audio -> FileUtils.getFileDescription(
+                                context,
+                                entry.metadata,
+                                !areArtistsEqual,
+                                !areAlbumsEqual
+                        )
+                    }
 
                     FileItemViewModel_()
-                            .id(file.name)
-                            .fileMetadata(fileMetadata)
+                            .id(entry.file.absolutePath)
+                            .entry(entry)
                             .listener(listener)
                             .title(displayTitle)
-                            .description(
-                                    FileUtils.getFileDescription(
-                                            context,
-                                            metadata,
-                                            !areArtistsEqual,
-                                            !areAlbumsEqual
-                                    )
-                            )
+                            .description(description)
                 }
                 .toList()
 

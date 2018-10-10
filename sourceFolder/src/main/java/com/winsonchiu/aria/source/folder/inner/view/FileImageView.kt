@@ -14,8 +14,8 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.artwork.ArtworkTransformation
 import com.winsonchiu.aria.framework.util.dpToPx
+import com.winsonchiu.aria.source.folder.FileEntry
 import com.winsonchiu.aria.source.folder.R
-import com.winsonchiu.aria.source.folder.inner.FolderController
 
 class FileImageView @JvmOverloads constructor(
         context: Context,
@@ -36,10 +36,14 @@ class FileImageView @JvmOverloads constructor(
         isAntiAlias = true
     }
 
-    private var data: FolderController.FileMetadata? = null
+    private var data: FileEntry? = null
 
     val overlayImageMusic by lazy {
         AppCompatResources.getDrawable(context, R.drawable.folder_file_image_music)
+    }
+
+    val overlayImagePlaylist by lazy {
+        AppCompatResources.getDrawable(context, R.drawable.folder_file_image_playlist)
     }
 
     private val artworkTransformation = ArtworkTransformation(70.dpToPx(context))
@@ -88,13 +92,17 @@ class FileImageView @JvmOverloads constructor(
         }
     }
 
-    fun setData(data: FolderController.FileMetadata) {
+    fun setData(data: FileEntry) {
         this.data = data
 
         val image = data.image
 
         foreground = when (image) {
-            null -> overlayImageMusic
+            null -> when (data) {
+                is FileEntry.Folder -> null
+                is FileEntry.Playlist -> overlayImagePlaylist
+                is FileEntry.Audio -> overlayImageMusic
+            }
             else -> null
         }
 

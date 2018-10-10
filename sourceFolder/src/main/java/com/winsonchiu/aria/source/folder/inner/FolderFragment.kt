@@ -7,7 +7,6 @@ import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.epoxy.SimpleEpoxyController
-import com.google.android.material.snackbar.Snackbar
 import com.winsonchiu.aria.framework.async.RequestState
 import com.winsonchiu.aria.framework.fragment.FragmentInitializer
 import com.winsonchiu.aria.framework.fragment.build
@@ -18,15 +17,13 @@ import com.winsonchiu.aria.itemsheet.ItemsMenuDialogFragment
 import com.winsonchiu.aria.itemsheet.ItemsMenuItem
 import com.winsonchiu.aria.itemsheet.view.ItemsMenuFileHeaderView
 import com.winsonchiu.aria.itemsheet.view.ItemsMenuIconWithTextView
-import com.winsonchiu.aria.queue.MediaQueue
-import com.winsonchiu.aria.queue.QueueOp
+import com.winsonchiu.aria.source.folder.FileEntry
 import com.winsonchiu.aria.source.folder.R
 import com.winsonchiu.aria.source.folder.inner.view.FileItemView
 import com.winsonchiu.aria.source.folder.root.FolderRootFragmentDaggerComponent
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.parcel.Parcelize
 import kotlinx.android.synthetic.main.folder_fragment.*
-import java.io.File
 import javax.inject.Inject
 
 class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFragmentDaggerComponent>()  {
@@ -52,39 +49,32 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
     @Inject
     lateinit var folderController: FolderController
 
-    @Inject
-    lateinit var mediaQueue: MediaQueue
-
     private val listener = object : FileItemView.Listener {
-        override fun onClick(fileMetadata: FolderController.FileMetadata) {
-            val file = fileMetadata.file
-            if (file.isDirectory) {
-                fragmentManager?.run {
-                    val newFragment = Builder().build { folder put file.absolutePath }
-                    FolderToFolderTransition.applyToFragment(newFragment)
-                    FolderToFolderTransition.applyToFragment(this@FolderFragment)
+        override fun onClick(entry: FileEntry) {
+            when (entry) {
+                is FileEntry.Folder -> {
+                    fragmentManager?.run {
+                        val newFragment = Builder().build { folder put entry.file.absolutePath }
+                        FolderToFolderTransition.applyToFragment(newFragment)
+                        FolderToFolderTransition.applyToFragment(this@FolderFragment)
 
-                    beginTransaction().setReorderingAllowed(true)
-                            .replace(id, newFragment)
-                            .addToBackStack(null)
-                            .commit()
+                        beginTransaction().setReorderingAllowed(true)
+                                .replace(id, newFragment)
+                                .addToBackStack(null)
+                                .commit()
+                    }
                 }
-            } else {
-                view?.run {
-                    mediaQueue.push(QueueOp.AddNext(fileMetadata.toQueueEntry(context)))
-                    Snackbar.make(this, getString(R.string.item_added, fileMetadata.file.name), Snackbar.LENGTH_SHORT)
-                            .show()
-                }
+                is FileEntry.Playlist,
+                is FileEntry.Audio -> folderController.playNext(entry)
             }
         }
 
-        override fun onLongClick(fileMetadata: FolderController.FileMetadata) {
-            val file = fileMetadata.file
+        override fun onLongClick(entry: FileEntry) {
             ItemsMenuDialogFragment.newInstance(
                     listOf(
-                            FolderItemOption.Header(context!!, fileMetadata),
-                            FolderItemOption.PlayNext(file),
-                            FolderItemOption.AddToQueue(file)
+                            FolderItemOption.Header(context!!, entry),
+                            FolderItemOption.PlayNext(entry),
+                            FolderItemOption.AddToQueue(entry)
                     )
             )
                     .show(this@FolderFragment, ITEM_OPTION_REQUEST_CODE)
@@ -143,8 +133,8 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
 
             when (item) {
                 is FolderFragment.FolderItemOption.Header -> Unit
-                is FolderFragment.FolderItemOption.PlayNext -> folderController.playNext(item.file)
-                is FolderFragment.FolderItemOption.AddToQueue -> folderController.addToQueue(item.file)
+                is FolderFragment.FolderItemOption.PlayNext -> folderController.playNext(item.entry)
+                is FolderFragment.FolderItemOption.AddToQueue -> folderController.addToQueue(item.entry)
                 null -> {}
             }.run { }
         }
@@ -160,19 +150,19 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
         ) : FolderItemOption(), ItemsMenuFileHeaderView.Model {
             constructor(
                     context: Context,
-                    fileMetadata: FolderController.FileMetadata
+                    entry: FileEntry
             ) : this(
                     ItemsMenuFileHeaderView.Model.Data(
-                            fileMetadata.title,
-                            fileMetadata.description(context),
-                            fileMetadata.image
+                            entry.title,
+                            entry.description(context),
+                            entry.image
                     )
             )
         }
 
         @Parcelize
         data class PlayNext(
-                val file: File,
+                val entry: FileEntry,
                 override val data: ItemsMenuIconWithTextView.Model.Data = ItemsMenuIconWithTextView.Model.Data(
                         R.drawable.ic_queue_play_next_24dp,
                         R.string.play_next
@@ -181,7 +171,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
 
         @Parcelize
         data class AddToQueue(
-                val file: File,
+                val entry: FileEntry,
                 override val data: ItemsMenuIconWithTextView.Model.Data = ItemsMenuIconWithTextView.Model.Data(
                         R.drawable.ic_playlist_add_24dp,
                         R.string.add_to_queue

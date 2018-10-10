@@ -1,9 +1,9 @@
 package com.winsonchiu.aria.source.folder.util
 
-import com.winsonchiu.aria.source.folder.inner.FolderController
+import com.winsonchiu.aria.source.folder.FileEntry
 
 data class FileDisplayAndSortMetadata(
-        val fileMetadata: FolderController.FileMetadata,
+        val entry: FileEntry,
         val displayTitle: String?,
         val sortKey: String?
 )

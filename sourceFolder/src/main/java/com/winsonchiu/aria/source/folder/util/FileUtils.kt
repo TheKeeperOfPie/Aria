@@ -2,8 +2,8 @@ package com.winsonchiu.aria.source.folder.util
 
 import android.content.Context
 import com.winsonchiu.aria.framework.text.TextConverter
+import com.winsonchiu.aria.source.folder.FileEntry
 import com.winsonchiu.aria.source.folder.R
-import com.winsonchiu.aria.source.folder.inner.FolderController
 import java.io.File
 
 object FileUtils {
@@ -96,10 +96,10 @@ object FileUtils {
         }.let { TextConverter.translate(it, titleCase = true)}
     }
 
-    fun getFileDisplayAndSortMetadata(it: FolderController.FileMetadata): FileDisplayAndSortMetadata {
-        val fileSortKey = FileUtils.getFileSortKey(it.file)
+    fun getFileDisplayAndSortMetadata(entry: FileEntry): FileDisplayAndSortMetadata {
+        val fileSortKey = FileUtils.getFileSortKey(entry.file)
         val fileDisplayTitle = FileUtils.getFileDisplayTitle(fileSortKey?.substringBeforeLast("."))
-        return FileDisplayAndSortMetadata(it, fileDisplayTitle, fileSortKey)
+        return FileDisplayAndSortMetadata(entry, fileDisplayTitle, fileSortKey)
     }
 
     fun getFolderTitle(folder: File) = folder.invariantSeparatorsPath
