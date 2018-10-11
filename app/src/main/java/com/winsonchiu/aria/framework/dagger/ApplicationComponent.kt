@@ -5,7 +5,7 @@ import com.winsonchiu.aria.artwork.ArtworkScope
 import com.winsonchiu.aria.framework.dagger.activity.ActivityComponent
 import com.winsonchiu.aria.media.MediaInjector
 import com.winsonchiu.aria.queue.QueueScope
-import com.winsonchiu.aria.source.folder.FolderScope
+import com.winsonchiu.aria.source.folders.FolderScope
 import dagger.Component
 import javax.inject.Scope
 

@@ -1,5 +1,8 @@
 <resources>
+
     <string name="app_name">Aria</string>
+
+    <string name="page_title_artists">Artists</string>
     <string name="page_title_folders">Folders</string>
 
 </resources>

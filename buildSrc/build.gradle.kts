@@ -28,5 +28,5 @@ dependencies {
     implementation(gradleApi())
     implementation(localGroovy())
 
-    implementation("com.android.tools.build:gradle:3.3.0-alpha11")
+    implementation("com.android.tools.build:gradle:3.3.0-alpha13")
 }

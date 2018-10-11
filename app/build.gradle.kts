@@ -6,6 +6,7 @@ import org.jetbrains.kotlin.gradle.internal.AndroidExtensionsExtension
 import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 import com.winsonchiu.aria.Dependencies
 import com.winsonchiu.aria.Modules
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 
 plugins {
     id("com.android.application")
@@ -83,7 +84,8 @@ Dependencies(this) {
     implementation(Modules.media)
     implementation(Modules.nowPlaying)
     implementation(Modules.queue)
-    implementation(Modules.sourceFolder)
+    implementation(Modules.sourceArtists)
+    implementation(Modules.sourceFolders)
 
     implementation(Dependencies.Google.dagger)
 }

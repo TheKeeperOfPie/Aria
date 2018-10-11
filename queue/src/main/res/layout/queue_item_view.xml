@@ -40,29 +40,16 @@
         android:id="@+id/itemTitleText"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="24dp"
-        android:layout_marginEnd="8dp"
+        android:layout_marginStart="12dp"
+        android:layout_marginEnd="16dp"
         android:ellipsize="end"
         android:singleLine="true"
         android:textAppearance="@style/TextAppearance.AppCompat.Subhead"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/itemMoreImage"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/itemImage"
         app:layout_constraintTop_toTopOf="parent"
         tools:text="FileName.ext"
-        />
-
-    <ImageView
-        android:id="@+id/itemMoreImage"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:layout_marginEnd="12dp"
-        android:layout_marginBottom="4dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:contentDescription="TODO" app:srcCompat="@drawable/ic_more_vert_24dp"
         />
 
 </merge>

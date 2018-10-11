@@ -2,7 +2,8 @@ package com.winsonchiu.aria.home
 
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentDefaultBoundModule
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
-import com.winsonchiu.aria.source.folder.root.FolderRootFragmentDaggerComponent
+import com.winsonchiu.aria.source.artists.ArtistsFragmentDaggerComponent
+import com.winsonchiu.aria.source.folders.root.FolderRootFragmentDaggerComponent
 import dagger.Module
 import dagger.Provides
 import dagger.Subcomponent
@@ -16,7 +17,7 @@ annotation class HomeFragmentScreenScope
 @Subcomponent(
         modules = [HomeFragmentModule::class]
 )
-interface HomeFragmentDaggerComponent : FolderRootFragmentDaggerComponent.ComponentProvider {
+interface HomeFragmentDaggerComponent : ArtistsFragmentDaggerComponent.ComponentProvider, FolderRootFragmentDaggerComponent.ComponentProvider {
 
     fun inject(homeFragment: HomeFragment)
 

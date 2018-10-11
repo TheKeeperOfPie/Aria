@@ -6,7 +6,8 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.source.folder.root.FolderRootFragment
+import com.winsonchiu.aria.source.artists.ArtistsFragment
+import com.winsonchiu.aria.source.folders.root.FolderRootFragment
 
 class HomePagerAdapter(
         private val context: Context,
@@ -14,7 +15,11 @@ class HomePagerAdapter(
 ) : FragmentStatePagerAdapter(fragmentManager) {
 
     override fun getItem(position: Int): Fragment {
-        return FolderRootFragment()
+        return when (position) {
+            0 -> ArtistsFragment()
+            1 -> FolderRootFragment()
+            else -> throw IllegalArgumentException("Invalid pager position")
+        }
     }
 
     override fun setPrimaryItem(container: ViewGroup, position: Int, item: Any) {
@@ -26,9 +31,10 @@ class HomePagerAdapter(
 
     @Suppress("HasPlatformType")
     override fun getPageTitle(position: Int) = when (position) {
-        0 -> R.string.page_title_folders
+        0 -> R.string.page_title_artists
+        1 -> R.string.page_title_folders
         else -> throw IllegalArgumentException("Invalid pager position")
     }.let(context::getString)
 
-    override fun getCount() = 1
+    override fun getCount() = 2
 }

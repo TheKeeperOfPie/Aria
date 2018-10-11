@@ -10,9 +10,9 @@ buildscript {
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.3.0-alpha11")
+        classpath("com.android.tools.build:gradle:3.3.0-alpha13")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.0-rc-57")
-        classpath("com.jakewharton:butterknife-gradle-plugin:9.0.0-SNAPSHOT")
+        classpath("com.jakewharton:butterknife-gradle-plugin:9.0.0-rc1")
     }
 }
 

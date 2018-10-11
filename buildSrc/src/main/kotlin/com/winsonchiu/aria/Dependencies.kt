@@ -56,7 +56,7 @@ object Versions {
     }
 
     object JakeWharton {
-        val butterKnife = "9.0.0-SNAPSHOT"
+        val butterKnife = "9.0.0-rc1"
         val rxRelay = "2.0.0"
     }
 
@@ -290,7 +290,8 @@ object Modules {
     val mediaTransport = Module("mediaTransport")
     val nowPlaying = Module("nowPlaying")
     val queue = Module("queue")
-    val sourceFolder = Module("sourceFolder")
+    val sourceArtists = Module("sourceArtists")
+    val sourceFolders = Module("sourceFolders")
 }
 
 abstract class Dependency {

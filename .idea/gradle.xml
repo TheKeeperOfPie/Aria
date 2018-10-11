@@ -19,7 +19,8 @@
             <option value="$PROJECT_DIR$/mediaTransport" />
             <option value="$PROJECT_DIR$/nowPlaying" />
             <option value="$PROJECT_DIR$/queue" />
-            <option value="$PROJECT_DIR$/sourceFolder" />
+            <option value="$PROJECT_DIR$/sourceArtists" />
+            <option value="$PROJECT_DIR$/sourceFolders" />
           </set>
         </option>
         <option name="resolveModulePerSourceSet" value="false" />
