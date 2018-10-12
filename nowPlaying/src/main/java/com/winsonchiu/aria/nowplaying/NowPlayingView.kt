@@ -44,7 +44,11 @@ class NowPlayingView @JvmOverloads constructor(
 
     var listener: Listener? = null
 
-    private val artworkTransformation = ArtworkTransformation()
+    private val artworkTransformation = ArtworkTransformation(
+            context.resources.displayMetrics.heightPixels.coerceAtLeast(
+                    context.resources.displayMetrics.widthPixels
+            )
+    )
 
     private var progress = 0f
 
@@ -60,7 +64,8 @@ class NowPlayingView @JvmOverloads constructor(
 
     private var paletteTask: AsyncTask<Bitmap, Void, Palette>? = null
 
-    private var paletteListener = Palette.PaletteAsyncListener { palette -> viewContent?.viewWaveform?.setPalette(palette) }
+    private var paletteListener = Palette
+            .PaletteAsyncListener { palette -> viewContent?.viewWaveform?.setPalette(palette) }
 
     private val paletteCallback = object : Callback.EmptyCallback() {
         override fun onSuccess() {

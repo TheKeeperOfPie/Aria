@@ -32,7 +32,7 @@ class ArtworkExtractor @Inject constructor(
         }
     })
 
-    private val mediaMetadataRetriever = object : ThreadLocal<MediaMetadataRetriever>() {
+    private val mediaMetadataRetriever: ThreadLocal<MediaMetadataRetriever> = object : ThreadLocal<MediaMetadataRetriever>() {
         override fun initialValue(): MediaMetadataRetriever {
             return MediaMetadataRetriever()
         }

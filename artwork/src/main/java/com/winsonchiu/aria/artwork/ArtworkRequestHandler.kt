@@ -9,16 +9,23 @@ import android.provider.MediaStore
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Request
 import com.squareup.picasso.RequestHandler
+import com.winsonchiu.aria.artwork.lastfm.LastFmApi
 import java.io.File
 import javax.inject.Inject
 
 @ArtworkScope
 class ArtworkRequestHandler @Inject constructor(
-        val application: Application,
-        val artworkExtractor: ArtworkExtractor
+        private val application: Application,
+        private val artworkExtractor: ArtworkExtractor,
+        private val lastFmApi: LastFmApi
 ) : RequestHandler() {
 
     companion object {
+
+        private val ARTIST_NAME_PROJECTION = arrayOf(
+                MediaStore.Audio.Artists._ID,
+                MediaStore.Audio.Artists.ARTIST
+        )
 
         private val ARTIST_ALBUMS_PROJECTION = arrayOf(
                 MediaStore.Audio.Albums._ID,
@@ -57,7 +64,7 @@ class ArtworkRequestHandler @Inject constructor(
                 .build()
     }
 
-    private val mediaMetadataRetriever = object : ThreadLocal<MediaMetadataRetriever>() {
+    private val mediaMetadataRetriever: ThreadLocal<MediaMetadataRetriever> = object : ThreadLocal<MediaMetadataRetriever>() {
         override fun initialValue(): MediaMetadataRetriever {
             return MediaMetadataRetriever()
         }
@@ -89,10 +96,53 @@ class ArtworkRequestHandler @Inject constructor(
 
     private fun getArtist(uri: Uri): Bitmap? {
         val artistId = uri.lastPathSegment ?: return null
-        return tryArtistAlbums(artistId) ?: tryArtistMedia(artistId)
+        return tryArtistLastFm(artistId) ?: tryArtistAlbums(artistId) ?: tryArtistMedia(artistId)
     }
 
-    private fun tryArtistAlbums(artistId: String): Bitmap? {
+    private fun tryArtistLastFm(artistId: String): Bitmap? = runCatching {
+        return application.contentResolver.query(
+                MediaStore.Audio.Artists.EXTERNAL_CONTENT_URI,
+                ARTIST_NAME_PROJECTION,
+                "${MediaStore.Audio.Artists._ID}=?",
+                arrayOf(artistId),
+                null
+        )?.use {
+            if (it.moveToFirst()) {
+                val nameIndex = it.getColumnIndex(MediaStore.Audio.Artists.ARTIST)
+
+                val locales = application.resources.configuration.locales
+                val lang = if (locales.isEmpty) "" else locales[0].language
+
+                do {
+                    val name = it.getString(nameIndex)
+                    if (!name.isNullOrEmpty()) {
+                        try {
+                            val response = lastFmApi.artist(name, lang).execute()
+
+                            if (response.isSuccessful) {
+                                // TODO: Image fallbacks?
+                                val imageUrl = response.body()
+                                        ?.artist
+                                        ?.images
+                                        ?.lastOrNull()
+                                        ?.url
+
+                                if (!imageUrl.isNullOrEmpty()) {
+                                    return@use Picasso.get().load(imageUrl).get()
+                                }
+                            }
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                } while (it.moveToNext())
+            }
+
+            null
+        }
+    }.getOrNull()
+
+    private fun tryArtistAlbums(artistId: String): Bitmap? = runCatching {
         val idLong = artistId.toLongOrNull() ?: return null
         return application.contentResolver.query(
                 MediaStore.Audio.Artists.Albums.getContentUri("external", idLong),
@@ -109,7 +159,8 @@ class ArtworkRequestHandler @Inject constructor(
                     if (!albumArt.isNullOrEmpty()) {
                         try {
                             return@use BitmapFactory.decodeFile(albumArt)
-                        } catch (ignored: Exception) {
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     }
                 } while (it.moveToNext())
@@ -117,9 +168,9 @@ class ArtworkRequestHandler @Inject constructor(
 
             null
         }
-    }
+    }.getOrNull()
 
-    private fun tryArtistMedia(artistId: String): Bitmap? {
+    private fun tryArtistMedia(artistId: String): Bitmap? = runCatching {
         return application.contentResolver.query(
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
                 ARTIST_MEDIA_PROJECTION,
@@ -148,7 +199,8 @@ class ArtworkRequestHandler @Inject constructor(
                                     }
                                 }
                             }
-                        } catch (ignored: Exception) {
+                        } catch (e: Exception) {
+                            e.printStackTrace()
                         }
                     }
                 } while (it.moveToNext())
@@ -156,7 +208,7 @@ class ArtworkRequestHandler @Inject constructor(
 
             null
         }
-    }
+    }.getOrNull()
 
     private fun getEmbedded(uri: Uri): Bitmap? {
         return mediaMetadataRetriever.get()!!.run {

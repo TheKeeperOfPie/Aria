@@ -206,9 +206,29 @@ object Dependencies {
 
     object Square {
         val javaPoet = "com.squareup:javapoet"(Versions.Square.javapoet)
-        val okHttp = "com.squareup.okhttp3:okhttp"(Versions.Square.okHttp)
         val picasso = "com.squareup.picasso:picasso"(Versions.Square.picasso)
-        val retrofit2 = "com.squareup.retrofit2:retrofit"(Versions.Square.retrofit2)
+
+        val okHttp = Multiple(
+                OkHttp.main,
+                OkHttp.loggingInterceptor
+        )
+
+        object OkHttp {
+            val main = "com.squareup.okhttp3:okhttp"(Versions.Square.okHttp)
+            val loggingInterceptor = "com.squareup.okhttp3:logging-interceptor"(Versions.Square.okHttp)
+        }
+
+        val retrofit2 = Multiple(
+                Retrofit2.main,
+                Retrofit2.adapters,
+                rxJava
+        )
+
+        object Retrofit2 {
+            val main = "com.squareup.retrofit2:retrofit"(Versions.Square.retrofit2)
+            val adapters = "com.squareup.retrofit2:adapter-rxjava2"(Versions.Square.retrofit2)
+            val converterMoshi = "com.squareup.retrofit2:converter-moshi"(Versions.Square.retrofit2)
+        }
 
         val moshi = Multiple(
                 Moshi.runtime,

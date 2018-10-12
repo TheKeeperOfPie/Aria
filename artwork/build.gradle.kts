@@ -11,4 +11,8 @@ apply {
 
 Dependencies(this) {
     api(Modules.framework)
+
+    implementation(Dependencies.Square.moshi)
+    implementation(Dependencies.Square.retrofit2)
+    implementation(Dependencies.Square.Retrofit2.converterMoshi)
 }
