@@ -5,6 +5,7 @@ import android.os.StrictMode
 import com.squareup.picasso.LruCache
 import com.squareup.picasso.OkHttp3Downloader
 import com.squareup.picasso.Picasso
+import com.winsonchiu.aria.BuildConfig
 import com.winsonchiu.aria.framework.dagger.ApplicationComponent
 import com.winsonchiu.aria.framework.dagger.ApplicationModule
 import com.winsonchiu.aria.framework.dagger.DaggerApplicationComponent
@@ -33,6 +34,7 @@ class AriaApplication : LeakCanaryApplication() {
 
         Picasso.setSingletonInstance(
                 Picasso.Builder(this)
+                        .indicatorsEnabled(BuildConfig.DEBUG)
                         .memoryCache(LruCache(PICASSO_MEMORY_CACHE_SIZE))
                         .downloader(OkHttp3Downloader(this, PICASSO_DISK_CACHE_SIZE))
                         .addRequestHandler(applicationComponent.artworkRequestHandler())

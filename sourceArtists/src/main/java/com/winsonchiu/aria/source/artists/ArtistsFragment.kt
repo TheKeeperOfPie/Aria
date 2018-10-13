@@ -9,6 +9,7 @@ import com.winsonchiu.aria.framework.async.RequestState
 import com.winsonchiu.aria.framework.fragment.subclass.BaseFragment
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.setDataForView
+import com.winsonchiu.aria.framework.view.recyclerview.GridSpacingItemDecoration
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.artists_fragment.*
 import javax.inject.Inject
@@ -52,6 +53,7 @@ class ArtistsFragment : BaseFragment<ArtistsFragmentDaggerComponent.ComponentPro
 
         artistsRecyclerView.layoutManager = layoutManager
         artistsRecyclerView.setHasFixedSize(true)
+        artistsRecyclerView.addItemDecoration(GridSpacingItemDecoration(12.dpToPx(view), true))
 
         postponeEnterTransition(150)
 

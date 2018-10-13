@@ -2,4 +2,6 @@
 
     <string name="app_name">Aria Source Artists</string>
 
+    <string name="content_description_artist_artwork">Artist artwork</string>
+
 </resources>
