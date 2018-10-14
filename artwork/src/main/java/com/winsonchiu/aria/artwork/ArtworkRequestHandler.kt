@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory
 import android.media.MediaMetadataRetriever
 import android.net.Uri
 import android.provider.MediaStore
+import androidx.collection.LruCache
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Request
 import com.squareup.picasso.RequestHandler
@@ -21,6 +22,8 @@ class ArtworkRequestHandler @Inject constructor(
 ) : RequestHandler() {
 
     companion object {
+
+        private const val BITMAP_CACHE_SIZE = 500 * 1024 * 1024
 
         private val ARTIST_NAME_PROJECTION = arrayOf(
                 MediaStore.Audio.Artists._ID,
@@ -64,6 +67,25 @@ class ArtworkRequestHandler @Inject constructor(
                 .build()
     }
 
+    private val memoryCache: LruCache<String, Bitmap> = object : LruCache<String, Bitmap>(BITMAP_CACHE_SIZE) {
+        override fun sizeOf(
+                key: String,
+                value: Bitmap
+        ): Int {
+            return value.byteCount
+        }
+
+        override fun entryRemoved(
+                evicted: Boolean,
+                key: String,
+                oldValue: Bitmap,
+                newValue: Bitmap?
+        ) {
+            super.entryRemoved(evicted, key, oldValue, newValue)
+            oldValue.recycle()
+        }
+    }
+
     private val mediaMetadataRetriever: ThreadLocal<MediaMetadataRetriever> = object : ThreadLocal<MediaMetadataRetriever>() {
         override fun initialValue(): MediaMetadataRetriever {
             return MediaMetadataRetriever()
@@ -84,11 +106,29 @@ class ArtworkRequestHandler @Inject constructor(
             networkPolicy: Int
     ): Result? {
         val uri = request?.uri
+
+        val cached = memoryCache[uri.toString()]
+        if (cached != null) {
+            try {
+                return Result(cached.copy(cached.config, true), Picasso.LoadedFrom.MEMORY)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+
         val bitmap = when (uri?.authority) {
             ARTIST_AUTHORITY -> getArtist(uri)
             EMBEDDED_FILE_AUTHORITY -> getEmbedded(uri)
             MUSIC_FILE_AUTHORITY -> getMusicFile(uri)
             else -> Picasso.get().load(uri).get()
+        }
+
+        try {
+            bitmap?.let {
+                memoryCache.put(uri.toString(), bitmap.copy(bitmap.config, true))
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
         }
 
         return bitmap?.let { Result(bitmap, Picasso.LoadedFrom.DISK) }

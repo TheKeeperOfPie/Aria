@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.source.artists
+package com.winsonchiu.aria.source.artists.artists
 
 import android.app.Application
 import android.provider.MediaStore
@@ -7,6 +7,9 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.winsonchiu.aria.artwork.ArtworkRequestHandler
 import com.winsonchiu.aria.framework.async.RequestState
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
+import com.winsonchiu.aria.source.artists.Artist
+import com.winsonchiu.aria.source.artists.ArtistId
+import com.winsonchiu.aria.source.artists.ArtistKey
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
@@ -80,7 +83,7 @@ class ArtistsController @Inject constructor(
                     .doOnSubscribe { stateChange.accept(RequestState.LOADING) }
                     .doFinally { stateChange.accept(RequestState.DONE) }
         }
-                .map(::Model)
+                .map(ArtistsController::Model)
                 .subscribeOn(Schedulers.io())
                 .bindToLifecycle()
                 .subscribe(model)

@@ -21,7 +21,7 @@ class FolderRootFragment : BaseFragment<FolderRootFragmentDaggerComponent.Compon
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        if (!childFragmentManager.hasFragment(R.id.folder_root_fragment_container)) {
+        if (!childFragmentManager.hasFragment(R.id.folderRootFragmentContainer)) {
             buildAndCommitInitialBackStack()
         }
     }
@@ -45,7 +45,7 @@ class FolderRootFragment : BaseFragment<FolderRootFragmentDaggerComponent.Compon
                     FolderToFolderTransition.applyToFragment(fragment)
 
                     childFragmentManager.beginTransaction()
-                            .replace(R.id.folder_root_fragment_container, fragment)
+                            .replace(R.id.folderRootFragmentContainer, fragment)
                             .apply {
                                 if (index > 0) {
                                     addToBackStack(file.absolutePath)

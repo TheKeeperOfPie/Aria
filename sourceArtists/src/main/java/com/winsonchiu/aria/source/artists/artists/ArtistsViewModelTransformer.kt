@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.source.artists
+package com.winsonchiu.aria.source.artists.artists
 
 import android.content.Context
 import com.airbnb.epoxy.EpoxyModel

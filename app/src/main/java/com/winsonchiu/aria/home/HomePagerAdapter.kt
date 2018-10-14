@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import com.winsonchiu.aria.R
-import com.winsonchiu.aria.source.artists.ArtistsFragment
+import com.winsonchiu.aria.source.artists.ArtistsRootFragment
 import com.winsonchiu.aria.source.folders.root.FolderRootFragment
 
 class HomePagerAdapter(
@@ -16,7 +16,7 @@ class HomePagerAdapter(
 
     override fun getItem(position: Int): Fragment {
         return when (position) {
-            0 -> ArtistsFragment()
+            0 -> ArtistsRootFragment()
             1 -> FolderRootFragment()
             else -> throw IllegalArgumentException("Invalid pager position")
         }

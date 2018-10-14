@@ -10,14 +10,15 @@ import androidx.core.graphics.withSave
 import com.winsonchiu.aria.framework.R
 import com.winsonchiu.aria.framework.util.dpToPx
 
-class MaskedImageView @JvmOverloads constructor(
+open class MaskedImageView @JvmOverloads constructor(
         context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : AppCompatImageView(context, attrs, defStyleAttr) {
 
     private var path = Path()
-    private var radius = 4f.dpToPx(this)
+    private var radius = 4f.dpToPx(context)
 
     init {
+        @Suppress("Recycle")
         context.obtainStyledAttributes(R.styleable.MaskedImageView).use {
             radius = it.getDimension(R.styleable.MaskedImageView_radius, radius)
         }

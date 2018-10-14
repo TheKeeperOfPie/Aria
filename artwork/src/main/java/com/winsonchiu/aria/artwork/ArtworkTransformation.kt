@@ -6,7 +6,7 @@ import androidx.annotation.Px
 import com.squareup.picasso.Transformation
 
 class ArtworkTransformation(
-        @Px val targetSize: Int = 0
+        @Px private val targetSize: Int = 0
 ) : Transformation {
 
     companion object {

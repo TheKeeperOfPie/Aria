@@ -1,36 +1,44 @@
-package com.winsonchiu.aria.source.artists
+package com.winsonchiu.aria.source.artists.artists
 
 import android.content.Context
+import android.content.res.ColorStateList
 import android.graphics.Bitmap
 import android.graphics.Color
 import android.graphics.drawable.BitmapDrawable
+import android.graphics.drawable.RippleDrawable
 import android.os.AsyncTask
 import android.util.AttributeSet
 import android.view.animation.Animation
 import android.view.animation.Transformation
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.palette.graphics.Palette
 import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
-import com.google.android.material.card.MaterialCardView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.artwork.ArtworkTransformation
 import com.winsonchiu.aria.framework.util.ColorUtils
+import com.winsonchiu.aria.framework.util.RoundedOutlineProvider
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.initialize
 import com.winsonchiu.aria.framework.util.mostPopulous
+import com.winsonchiu.aria.framework.util.multiplyValue
 import com.winsonchiu.aria.framework.util.withAlpha
 import com.winsonchiu.aria.framework.util.withMaxAlpha
+import com.winsonchiu.aria.source.artists.Artist
+import com.winsonchiu.aria.source.artists.ArtistsToArtistTransition
+import com.winsonchiu.aria.source.artists.ArtistsUtils
+import com.winsonchiu.aria.source.artists.R
 import kotlinx.android.synthetic.main.artist_item_view.view.*
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
 class ArtistItemView @JvmOverloads constructor(
         context: Context,
         attrs: AttributeSet? = null,
-        defStyleAttr: Int = com.google.android.material.R.attr.materialCardViewStyle
-) : MaterialCardView(context, attrs, defStyleAttr) {
+        defStyleAttr: Int = -1
+) : ConstraintLayout(context, attrs, defStyleAttr) {
 
     companion object {
         private val INTERPOLATOR = FastOutSlowInInterpolator()
@@ -49,6 +57,7 @@ class ArtistItemView @JvmOverloads constructor(
     private var paletteListener = Palette
             .PaletteAsyncListener {
                 it?.mostPopulous()?.let {
+                    drawable.setColor(ColorStateList.valueOf(it.rgb.multiplyValue(1.2f)))
                     startAnimation(PaletteResultAnimation(it))
                 }
             }
@@ -61,11 +70,17 @@ class ArtistItemView @JvmOverloads constructor(
         }
     }
 
+    private val drawable = RippleDrawable(ColorStateList.valueOf(Color.WHITE), null, null)
+
     init {
         initialize(R.layout.artist_item_view)
-        radius = 4f.dpToPx(context)
 
-        setOnClickListener { listener?.onClick(artist) }
+        foreground = drawable
+
+        outlineProvider = RoundedOutlineProvider(4f.dpToPx(context))
+        clipToOutline = true
+
+        setOnClickListener { listener?.onClick(this, artist) }
     }
 
     override fun onDetachedFromWindow() {
@@ -77,13 +92,15 @@ class ArtistItemView @JvmOverloads constructor(
     fun onChanged() {
         val changed = this.lastArtist?.id != artist.id
         if (changed) {
-            setCardBackgroundColor(Color.TRANSPARENT)
+            setBackgroundColor(Color.TRANSPARENT)
             textName.setTextColor(Color.WHITE)
         }
 
         clearAnimation()
 
         this.lastArtist = artist
+
+        image.transitionName = ArtistsToArtistTransition.image(artist.id)
 
         textName.text = artist.name
 
@@ -114,7 +131,7 @@ class ArtistItemView @JvmOverloads constructor(
         ) {
             super.applyTransformation(interpolatedTime, t)
 
-            setCardBackgroundColor(finalBackgroundColor.withAlpha(interpolatedTime))
+            this@ArtistItemView.setBackgroundColor(finalBackgroundColor.withAlpha(interpolatedTime))
 
             textName.setTextColor(
                     ColorUtils.crossFadeOver(
@@ -131,6 +148,6 @@ class ArtistItemView @JvmOverloads constructor(
     }
 
     interface Listener {
-        fun onClick(artist: Artist)
+        fun onClick(view: ArtistItemView, artist: Artist)
     }
 }

@@ -13,12 +13,15 @@ import com.winsonchiu.aria.framework.dagger.activity.DaggerConstants
 import com.winsonchiu.aria.main.MainActivity
 import io.reactivex.android.plugins.RxAndroidPlugins
 import io.reactivex.android.schedulers.AndroidSchedulers
+import okhttp3.Cache
+import okhttp3.OkHttpClient
+import java.io.File
 
 class AriaApplication : LeakCanaryApplication() {
 
     companion object {
-        private val PICASSO_DISK_CACHE_SIZE = 500L * 1024 * 1024
-        private val PICASSO_MEMORY_CACHE_SIZE = 250 * 1024 * 1024
+        private const val PICASSO_DISK_CACHE_SIZE = 500L * 1024 * 1024
+        private const val PICASSO_MEMORY_CACHE_SIZE = 250 * 1024 * 1024
     }
 
     private val applicationComponent = DaggerApplicationComponent.builder()
@@ -32,11 +35,18 @@ class AriaApplication : LeakCanaryApplication() {
             AndroidSchedulers.from(Looper.getMainLooper(), true)
         }
 
+
+        val cache = File(cacheDir, "picasso-cache")
+        val okHttpClient = OkHttpClient.Builder()
+                .cache(Cache(cache, PICASSO_DISK_CACHE_SIZE))
+                .build()
+        val downloader = OkHttp3Downloader(okHttpClient)
+
         Picasso.setSingletonInstance(
                 Picasso.Builder(this)
                         .indicatorsEnabled(BuildConfig.DEBUG)
                         .memoryCache(LruCache(PICASSO_MEMORY_CACHE_SIZE))
-                        .downloader(OkHttp3Downloader(this, PICASSO_DISK_CACHE_SIZE))
+                        .downloader(downloader)
                         .addRequestHandler(applicationComponent.artworkRequestHandler())
                         .build()
         )

@@ -1,4 +1,4 @@
-package com.winsonchiu.aria.source.artists
+package com.winsonchiu.aria.source.artists.artists
 
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentDefaultBoundModule
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
@@ -20,10 +20,6 @@ annotation class ArtistsFragmentScreenScope
 interface ArtistsFragmentDaggerComponent {
 
     fun inject(fragment: ArtistsFragment)
-
-    interface ComponentProvider {
-        fun artistsFragmentComponent(): ArtistsFragmentDaggerComponent
-    }
 }
 
 @Module

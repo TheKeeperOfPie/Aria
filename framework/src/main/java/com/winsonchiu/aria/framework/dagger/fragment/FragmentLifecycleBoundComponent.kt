@@ -22,7 +22,7 @@ import kotlin.reflect.KProperty
 
 abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, FragmentManager.OnBackStackChangedListener, ScopeProvider {
 
-    private val args = mutableListOf<ArgumentDelegate<*>>()
+    private val args = mutableListOf<ArgumentDelegate<*, *, *>>()
 
     private var initialized = false
 
@@ -93,7 +93,7 @@ abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, Fragm
         super.onDestroy(owner)
     }
 
-    fun <T : Any?> arg(arg: FragmentInitializer<*>.Arg<T?>) = ArgumentDelegate(arg).also {
+    fun <Input, Type, Output> arg(arg: FragmentInitializer<*>.Arg<Input, Type, Output>) = ArgumentDelegate(arg).also {
         args.add(it)
     }
 
@@ -109,20 +109,20 @@ abstract class FragmentLifecycleBoundComponent : LoggingLifecycleObserver, Fragm
         return `as`(AutoDispose.autoDisposable(this@FragmentLifecycleBoundComponent))
     }
 
-    class ArgumentDelegate<Type>(
-            private val arg: FragmentInitializer<*>.Arg<Type>
+    class ArgumentDelegate<Input, Type, Output>(
+            private val arg: FragmentInitializer<*>.Arg<Input, Type, Output>
     ) {
 
-        var value: Type? = null
+        var value: Output? = null
 
         @Suppress("UNCHECKED_CAST")
         fun initialize(arguments: Bundle) {
-            value = arguments.get(arg.key) as Type
+            value = arg.retrieve(arguments)
         }
 
         @Suppress("UNCHECKED_CAST")
-        operator fun getValue(thisRef: Any?, property: KProperty<*>): Type {
-            return value as Type
+        operator fun getValue(thisRef: Any?, property: KProperty<*>): Output {
+            return value as Output
         }
     }
 }

@@ -1,25 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
+<merge
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical"
     android:foreground="?selectableItemBackground"
+    android:orientation="vertical"
     tools:layout_width="132dp"
+    tools:parentTag="androidx.constraintlayout.widget.ConstraintLayout"
     >
 
     <ImageView
         android:id="@+id/image"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:contentDescription="@string/content_description_artist_artwork"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         tools:srcCompat="@tools:sample/avatars"
-        android:contentDescription="@string/content_description_artist_artwork"
         />
 
     <TextView
@@ -28,8 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="10dp"
         android:layout_marginVertical="6dp"
-        android:lines="2"
         android:ellipsize="end"
+        android:lines="2"
         android:textAppearance="@style/TextAppearance.AppCompat.Body2"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -39,4 +40,4 @@
         tools:text="Artist name"
         />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</merge>
