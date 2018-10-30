@@ -37,6 +37,6 @@ object ColorUtils {
             progress: Float
     ) = ColorUtils.compositeColors(
             end.withAlpha(progress),
-            start.withAlpha(1f - progress)
+            start
     )
 }

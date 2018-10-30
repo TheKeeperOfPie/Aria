@@ -1,11 +1,13 @@
 package com.winsonchiu.aria.framework.util
 
 import android.content.Context
+import android.graphics.Rect
 import android.util.DisplayMetrics
 import android.util.TypedValue
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.children
@@ -99,6 +101,21 @@ fun Float.spToPx(displayMetrics: DisplayMetrics) = TypedValue.applyDimension(
         displayMetrics
 )
 
+fun View.findParent(block: (parent: ViewGroup) -> Boolean): ViewGroup? {
+    var currentParent = parent as? ViewGroup
+    while (currentParent != null) {
+        if (block(currentParent)) {
+            return currentParent
+        }
+        currentParent = currentParent.parent as? ViewGroup
+    }
+
+    return null
+}
+
+fun View.findParent(@IdRes viewId: Int) = findParent { it.id == viewId }
+
+fun View.hasParent(@IdRes viewId: Int) = findParent(viewId) != null
 
 fun ViewGroup.findChild(block: (child: View) -> Boolean): View? {
     children.forEach {
@@ -114,12 +131,15 @@ fun ViewGroup.findChild(block: (child: View) -> Boolean): View? {
     return null
 }
 
+fun View.boundsAsRect(rect: Rect = Rect()) = Rect(left, top, right, bottom)
+
 private var constraintLayoutUpdateHierarchyMethod: Method? = null
 
 fun ConstraintLayout.forceUpdateHierarchy() {
     try {
         if (constraintLayoutUpdateHierarchyMethod == null) {
-            constraintLayoutUpdateHierarchyMethod = ConstraintLayout::class.java.getDeclaredMethod("setChildrenConstraints")
+            constraintLayoutUpdateHierarchyMethod = ConstraintLayout::class.java
+                    .getDeclaredMethod("setChildrenConstraints")
             constraintLayoutUpdateHierarchyMethod?.isAccessible = true
         }
 
@@ -136,7 +156,8 @@ private var constraintLayoutHorizontalDimensionFixedField: Field? = null
 fun ConstraintLayout.LayoutParams.horizontalDimensionFixed(fixed: Boolean) {
     try {
         if (constraintLayoutHorizontalDimensionFixedField == null) {
-            constraintLayoutHorizontalDimensionFixedField = ConstraintLayout.LayoutParams::class.java.getDeclaredField("horizontalDimensionFixed")
+            constraintLayoutHorizontalDimensionFixedField = ConstraintLayout.LayoutParams::class.java
+                    .getDeclaredField("horizontalDimensionFixed")
             constraintLayoutHorizontalDimensionFixedField?.isAccessible = true
         }
 
@@ -151,7 +172,8 @@ fun ConstraintLayout.LayoutParams.horizontalDimensionFixed(fixed: Boolean) {
 fun ConstraintLayout.LayoutParams.getHorizontalDimensionFixed(): Boolean {
     try {
         if (constraintLayoutHorizontalDimensionFixedField == null) {
-            constraintLayoutHorizontalDimensionFixedField = ConstraintLayout.LayoutParams::class.java.getDeclaredField("horizontalDimensionFixed")
+            constraintLayoutHorizontalDimensionFixedField = ConstraintLayout.LayoutParams::class.java
+                    .getDeclaredField("horizontalDimensionFixed")
             constraintLayoutHorizontalDimensionFixedField?.isAccessible = true
         }
 

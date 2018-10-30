@@ -10,8 +10,8 @@ import com.winsonchiu.aria.framework.fragment.arg
 import com.winsonchiu.aria.framework.fragment.subclass.BaseFragment
 import com.winsonchiu.aria.source.artists.ArtistId
 import com.winsonchiu.aria.source.artists.ArtistsRootFragmentDaggerComponent
-import com.winsonchiu.aria.source.artists.ArtistsToArtistTransition
 import com.winsonchiu.aria.source.artists.R
+import com.winsonchiu.aria.source.artists.transition.ArtistsToArtistTransition
 import kotlinx.android.synthetic.main.artist_fragment.*
 
 class ArtistFragment : BaseFragment<ArtistsRootFragmentDaggerComponent, ArtistFragmentDaggerComponent>() {
@@ -35,7 +35,9 @@ class ArtistFragment : BaseFragment<ArtistsRootFragmentDaggerComponent, ArtistFr
 
     private val imageCallback = object : Callback {
         override fun onSuccess() {
-            startPostponedEnterTransition()
+            view?.postOnAnimation {
+                startPostponedEnterTransition()
+            }
         }
 
         override fun onError(e: Exception?) {
@@ -49,10 +51,15 @@ class ArtistFragment : BaseFragment<ArtistsRootFragmentDaggerComponent, ArtistFr
     ) {
         super.onViewCreated(view, savedInstanceState)
 
-        postponeEnterTransition(150)
+        postponeEnterTransition(300)
 
         val artistId = Args.artistId.retrieve(arguments)
-        imageArtist.transitionName = ArtistsToArtistTransition.image(artistId)
-        Picasso.get().load(imageUri).into(imageArtist, imageCallback)
+        layoutAppBar.transitionName = ArtistsToArtistTransition.header(artistId)
+        imageArtistLayout.clipToOutline = true
+        Picasso.get()
+                .load(imageUri)
+                .resize(resources.displayMetrics.widthPixels, 0)
+                .onlyScaleDown()
+                .into(imageArtist, imageCallback)
     }
 }

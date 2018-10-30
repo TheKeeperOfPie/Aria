@@ -5,7 +5,7 @@ import android.view.View
 import android.view.ViewOutlineProvider
 
 class RoundedOutlineProvider(
-        private val radius: Float
+        var radius: Float
 ) : ViewOutlineProvider() {
 
     override fun getOutline(

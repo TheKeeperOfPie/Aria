@@ -5,34 +5,42 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@null"
+    android:transitionGroup="false"
+    android:transitionName="artistFragmentRoot"
     >
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/layoutAppBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@null"
+        android:transitionGroup="true"
         >
 
         <com.google.android.material.appbar.CollapsingToolbarLayout
+            android:id="@+id/layoutCollapsingToolbar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@null"
             >
 
             <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/imageArtistLayout"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 >
 
-                <com.winsonchiu.aria.framework.view.MaskedImageView
+                <ImageView
                     android:id="@+id/imageArtist"
                     android:layout_width="0dp"
                     android:layout_height="0dp"
+                    android:background="@android:color/holo_blue_bright"
                     android:scaleType="centerCrop"
                     app:layout_constraintDimensionRatio="5:4"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
-                    app:radius="8dp"
                     tools:srcCompat="@tools:sample/avatars"
                     />
 

@@ -6,14 +6,22 @@ import androidx.annotation.Px
 import com.squareup.picasso.Transformation
 
 class ArtworkTransformation(
-        @Px private val targetSize: Int = 0
+        @Px private val targetWidth: Int = 0,
+        @Px private val targetHeight: Int = 0
 ) : Transformation {
+
+    constructor(
+            @Px targetSize: Int = 0
+    ) : this(
+            targetWidth = targetSize,
+            targetHeight = targetSize
+    )
 
     companion object {
         private val RATIO_RANGE = 1.5..2.5
     }
 
-    override fun key() = "${ArtworkTransformation::class.java.canonicalName}:$targetSize"
+    override fun key() = "${ArtworkTransformation::class.java.canonicalName}:$targetWidth:$targetHeight"
 
     private fun shouldResize(
             inWidth: Int,
@@ -28,7 +36,7 @@ class ArtworkTransformation(
         val inWidth = source.width
         val inHeight = source.height
 
-        if (targetSize == inWidth && targetSize == inHeight) {
+        if (targetWidth == inWidth && targetHeight == inHeight) {
             return source
         }
 
@@ -40,9 +48,6 @@ class ArtworkTransformation(
         var drawHeight = inHeight
 
         val matrix = Matrix()
-
-        val targetWidth = targetSize
-        val targetHeight = targetSize
 
         // Keep aspect ratio if one dimension is set to 0
         val widthRatio = if (targetWidth != 0) targetWidth / inWidth.toFloat() else targetHeight / inHeight.toFloat()
@@ -78,7 +83,7 @@ class ArtworkTransformation(
                 scaleX = scaleY
             }
         }
-        if (shouldResize( inWidth, inHeight, targetWidth, targetHeight)) {
+        if (shouldResize(inWidth, inHeight, targetWidth, targetHeight)) {
             matrix.preScale(scaleX, scaleY)
         }
 

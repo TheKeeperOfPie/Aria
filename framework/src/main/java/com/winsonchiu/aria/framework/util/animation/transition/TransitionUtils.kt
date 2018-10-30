@@ -1,12 +1,11 @@
 package com.winsonchiu.aria.framework.util.animation.transition
 
 import android.graphics.Rect
-import android.transition.Transition
 import android.view.View
 import android.view.ViewGroup
-import android.view.Window
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import androidx.transition.TransitionValues
 import com.winsonchiu.aria.framework.BuildConfig
 import java.lang.reflect.Method
 
@@ -18,7 +17,12 @@ private var SUPPRESS_LAYOUT_METHOD: Method? = null
  * but are left public so a refactor to a separate module wasn't necessary.
  */
 
-fun View.setLeftTopRightBottom(left: Int, top: Int, right: Int, bottom: Int) {
+fun View.setLeftTopRightBottom(
+        left: Int,
+        top: Int,
+        right: Int,
+        bottom: Int
+) {
     setLeft(left)
     setTop(top)
     setRight(right)
@@ -55,110 +59,66 @@ fun View.setTransitionAlpha(alpha: Float) {
     }
 }
 
-class WindowTransitionHolder(
-        private val sharedElementEnterTransition: Transition? = null,
-        private val sharedElementReturnTransition: Transition? = null,
-        private val enterTransition: Transition? = null,
-        private val returnTransition: Transition? = null,
-        private val transitionBackgroundFadeDuration: Long = 0,
-        private val allowEnterTransitionOverlap: Boolean = true,
-        private val allowReturnTransitionOverlap: Boolean = true
-) {
+operator fun TransitionValues.component1() = view
+operator fun TransitionValues.component2() = values
 
-    fun applyTo(window: Window) {
-        window.sharedElementEnterTransition = sharedElementEnterTransition
-        window.sharedElementReturnTransition = sharedElementReturnTransition
-        window.enterTransition = enterTransition
-        window.returnTransition = returnTransition
-        window.transitionBackgroundFadeDuration = transitionBackgroundFadeDuration
-        window.allowEnterTransitionOverlap = allowEnterTransitionOverlap
-        window.allowReturnTransitionOverlap = allowReturnTransitionOverlap
-    }
-}
+object TransitionUtils {
+    fun makeParentLayoutSupressionTransitionListener(
+            view: View?,
+            innerListener: GeneralizedTransitionListener? = null,
+            removeFunction: () -> Unit
+    ): GeneralizedTransitionListener? {
+        return (view?.parent as? ViewGroup)?.let {
+            it.suppressLayout(true)
+            return object : GeneralizedTransitionListener(innerListener) {
+                private var canceled = false
 
-class FragmentTransitionHolder<in PreviousFragment : Fragment, in NewFragment : Fragment>(
-        private val previousExitTransition: androidx.transition.Transition? = null,
-        private val previousReenterTransition: androidx.transition.Transition? = null,
-        private val newSharedElementEnterTransition: androidx.transition.Transition? = null,
-        private val newSharedElementReturnTransition: androidx.transition.Transition? = null,
-        private val newEnterTransition: androidx.transition.Transition? = null,
-        private val newReturnTransition: androidx.transition.Transition? = null
-) {
-
-    fun applyTo(previousFragment: PreviousFragment, newFragment: NewFragment) {
-        previousFragment.exitTransition = previousExitTransition
-        previousFragment.reenterTransition = previousReenterTransition
-        previousFragment.allowEnterTransitionOverlap = true
-        previousFragment.allowReturnTransitionOverlap = true
-
-        applyToNew(newFragment)
-    }
-
-    fun applyToNew(newFragment: NewFragment) {
-        newFragment.sharedElementEnterTransition = newSharedElementEnterTransition
-        newFragment.sharedElementReturnTransition = newSharedElementReturnTransition
-        newFragment.enterTransition = newEnterTransition
-        newFragment.returnTransition = newReturnTransition
-        newFragment.allowEnterTransitionOverlap = true
-        newFragment.allowReturnTransitionOverlap = true
-    }
-}
-
-class TransitionUtils {
-    companion object {
-        fun makeParentLayoutSupressionTransitionListener(
-                view: View?,
-                innerListener: GeneralizedTransitionListener? = null,
-                removeFunction: () -> Unit
-        ): GeneralizedTransitionListener? {
-            return (view?.parent as? ViewGroup)?.let {
-                it.suppressLayout(true)
-                return object : GeneralizedTransitionListener(innerListener) {
-                    private var canceled = false
-
-                    override fun onTransitionEnd() {
-                        if (!canceled) {
-                            it.suppressLayout(false)
-                        }
-                        removeFunction()
-                    }
-
-                    override fun onTransitionCancel() {
-                        it.suppressLayout(false)
-                        canceled = true
-                    }
-
-                    override fun onTransitionPause() {
+                override fun onTransitionEnd() {
+                    if (!canceled) {
                         it.suppressLayout(false)
                     }
+                    removeFunction()
+                }
 
-                    override fun onTransitionResume() {
-                        it.suppressLayout(true)
-                    }
+                override fun onTransitionCancel() {
+                    it.suppressLayout(false)
+                    canceled = true
+                }
+
+                override fun onTransitionPause() {
+                    it.suppressLayout(false)
+                }
+
+                override fun onTransitionResume() {
+                    it.suppressLayout(true)
                 }
             }
         }
+    }
 
-        fun performFragmentTransitionWithViewRemoval(previousFragment: Fragment, vararg excludedViews: View?, block: (FragmentTransaction) -> Unit) {
-            val viewGroup = previousFragment.view as? ViewGroup ?: return
-            val fragmentManager = previousFragment.fragmentManager ?: return
+    fun performFragmentTransitionWithViewRemoval(
+            previousFragment: Fragment,
+            vararg excludedViews: View?,
+            block: (FragmentTransaction) -> Unit
+    ) {
+        val viewGroup = previousFragment.view as? ViewGroup ?: return
+        val fragmentManager = previousFragment.fragmentManager ?: return
 
-            val transaction = fragmentManager.beginTransaction()
+        val transaction = fragmentManager.beginTransaction()
 
-            block(transaction)
+        block(transaction)
 
 //            fragmentManager.executePendingTransactions()
 
-            /*
-                To prevent the system from using low res snapshots, we can remove them
-                from the hierarchy.
-            */
+        /*
+            To prevent the system from using low res snapshots, we can remove them
+            from the hierarchy.
+        */
 //            viewGroup.postDelayed(1) {
 //                (viewGroup.childCount - 1 downTo 0)
 //                        .map(viewGroup::getChildAt)
 //                        .filterNot(excludedViews::contains)
 //                        .forEach(viewGroup::removeView)
 //            }
-        }
     }
 }

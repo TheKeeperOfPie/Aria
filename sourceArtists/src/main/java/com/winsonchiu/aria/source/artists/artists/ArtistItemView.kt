@@ -11,6 +11,7 @@ import android.util.AttributeSet
 import android.view.animation.Animation
 import android.view.animation.Transformation
 import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.core.view.isVisible
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.palette.graphics.Palette
 import com.airbnb.epoxy.AfterPropsSet
@@ -18,7 +19,6 @@ import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
-import com.winsonchiu.aria.artwork.ArtworkTransformation
 import com.winsonchiu.aria.framework.util.ColorUtils
 import com.winsonchiu.aria.framework.util.RoundedOutlineProvider
 import com.winsonchiu.aria.framework.util.dpToPx
@@ -28,9 +28,9 @@ import com.winsonchiu.aria.framework.util.multiplyValue
 import com.winsonchiu.aria.framework.util.withAlpha
 import com.winsonchiu.aria.framework.util.withMaxAlpha
 import com.winsonchiu.aria.source.artists.Artist
-import com.winsonchiu.aria.source.artists.ArtistsToArtistTransition
 import com.winsonchiu.aria.source.artists.ArtistsUtils
 import com.winsonchiu.aria.source.artists.R
+import com.winsonchiu.aria.source.artists.transition.ArtistsToArtistTransition
 import kotlinx.android.synthetic.main.artist_item_view.view.*
 
 @ModelView(autoLayout = ModelView.Size.MATCH_WIDTH_WRAP_HEIGHT)
@@ -52,12 +52,18 @@ class ArtistItemView @JvmOverloads constructor(
     @set:ModelProp(ModelProp.Option.DoNotHash)
     var listener: Listener? = null
 
+    var paletteBackgroundColor = Color.TRANSPARENT
+
+    private val drawable = RippleDrawable(ColorStateList.valueOf(Color.WHITE), null, null)
+
     private var paletteTask: AsyncTask<Bitmap, Void, Palette>? = null
 
     private var paletteListener = Palette
             .PaletteAsyncListener {
                 it?.mostPopulous()?.let {
-                    drawable.setColor(ColorStateList.valueOf(it.rgb.multiplyValue(1.2f)))
+                    paletteBackgroundColor = it.rgb
+                    drawable.setColor(ColorStateList.valueOf(paletteBackgroundColor.multiplyValue(1.2f)))
+                    clearAnimation()
                     startAnimation(PaletteResultAnimation(it))
                 }
             }
@@ -70,12 +76,11 @@ class ArtistItemView @JvmOverloads constructor(
         }
     }
 
-    private val drawable = RippleDrawable(ColorStateList.valueOf(Color.WHITE), null, null)
-
     init {
         initialize(R.layout.artist_item_view)
 
         foreground = drawable
+        isTransitionGroup = true
 
         outlineProvider = RoundedOutlineProvider(4f.dpToPx(context))
         clipToOutline = true
@@ -86,6 +91,7 @@ class ArtistItemView @JvmOverloads constructor(
     override fun onDetachedFromWindow() {
         super.onDetachedFromWindow()
         paletteTask?.cancel(true)
+        Picasso.get().cancelRequest(image)
     }
 
     @AfterPropsSet
@@ -100,17 +106,26 @@ class ArtistItemView @JvmOverloads constructor(
 
         this.lastArtist = artist
 
+        transitionName = ArtistsToArtistTransition.header(artist.id)
         image.transitionName = ArtistsToArtistTransition.image(artist.id)
+        image.alpha = 1f
+        image.isVisible = true
 
         textName.text = artist.name
 
         val spanCount = ArtistsUtils.spanCount(context)
-        val targetSize = resources.displayMetrics.widthPixels / spanCount
+        val targetWidth = resources.displayMetrics.widthPixels / spanCount
 
         Picasso.get()
                 .load(artist.image)
-                .transform(ArtworkTransformation(targetSize))
+                .resize(targetWidth, 0)
+                .onlyScaleDown()
+//                .transform(ArtworkTransformation(targetWidth = targetWidth))
                 .into(image, paletteCallback)
+
+        Picasso.get()
+                .load(artist.image)
+                .fetch()
     }
 
     private inner class PaletteResultAnimation(
@@ -121,7 +136,7 @@ class ArtistItemView @JvmOverloads constructor(
         private val finalTextColor = swatch.bodyTextColor.withMaxAlpha()
 
         init {
-            duration = 300
+            duration = 200
             interpolator = INTERPOLATOR
         }
 

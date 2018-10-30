@@ -23,7 +23,7 @@ class ArtworkRequestHandler @Inject constructor(
 
     companion object {
 
-        private const val BITMAP_CACHE_SIZE = 500 * 1024 * 1024
+        private const val BITMAP_CACHE_SIZE = 250 * 1024 * 1024
 
         private val ARTIST_NAME_PROJECTION = arrayOf(
                 MediaStore.Audio.Artists._ID,

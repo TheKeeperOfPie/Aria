@@ -69,7 +69,7 @@ abstract class GhostViewOverlay(
             return parentListener
         }
 
-        val view = startView ?: endView ?: return parentListener
+        val view = endView ?: startView ?: return parentListener
         val ghostView = GhostViewImpl.addGhost(view, sceneRoot) ?: return parentListener
 
         return object : GeneralizedTransitionListener(parentListener) {

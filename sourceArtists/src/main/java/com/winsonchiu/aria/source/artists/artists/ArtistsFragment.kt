@@ -13,12 +13,11 @@ import com.winsonchiu.aria.framework.util.setDataForView
 import com.winsonchiu.aria.framework.view.recyclerview.GridSpacingItemDecoration
 import com.winsonchiu.aria.source.artists.Artist
 import com.winsonchiu.aria.source.artists.ArtistsRootFragmentDaggerComponent
-import com.winsonchiu.aria.source.artists.ArtistsToArtistTransition
+import com.winsonchiu.aria.source.artists.transition.ArtistsToArtistTransition
 import com.winsonchiu.aria.source.artists.ArtistsUtils
 import com.winsonchiu.aria.source.artists.R
 import com.winsonchiu.aria.source.artists.artist.ArtistFragment
 import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.artist_item_view.view.*
 import kotlinx.android.synthetic.main.artists_fragment.*
 import javax.inject.Inject
 
@@ -44,11 +43,13 @@ class ArtistsFragment : BaseFragment<ArtistsRootFragmentDaggerComponent, Artists
                     artistId put artist.id
                     imageUri put artist.image
                 }
-                ArtistsToArtistTransition.applyTo(this@ArtistsFragment, fragment)
+
+                ArtistsToArtistTransition
+                        .applyTo(view, this@ArtistsFragment, fragment)
 
                 beginTransaction()
                         .setReorderingAllowed(true)
-                        .addSharedElement(view.image, view.image.transitionName)
+                        .addSharedElement(view, view.transitionName)
                         .replace(R.id.artistsRootFragmentContainer, fragment)
                         .addToBackStack(null)
                         .commit()
