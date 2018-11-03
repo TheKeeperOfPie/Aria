@@ -108,7 +108,10 @@ class MainActivity : LifecycleBoundActivity() {
     override fun handleBackPressed() {
         when {
             drawerMain.isDrawerOpen(GravityCompat.END) -> drawerMain.closeDrawer(GravityCompat.END)
-            viewNowPlayingBehavior.state != BottomSheetBehavior.STATE_COLLAPSED -> viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            viewNowPlayingBehavior.state != BottomSheetBehavior.STATE_COLLAPSED
+                    && viewNowPlayingBehavior.state != BottomSheetBehavior.STATE_HIDDEN -> {
+                viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+            }
             else -> super.handleBackPressed()
         }
     }

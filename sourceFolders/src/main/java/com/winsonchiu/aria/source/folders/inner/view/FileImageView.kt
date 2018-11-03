@@ -9,7 +9,6 @@ import android.util.AttributeSet
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.appcompat.widget.AppCompatImageView
 import androidx.core.graphics.withSave
-import butterknife.ButterKnife
 import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.artwork.ArtworkTransformation
@@ -55,10 +54,6 @@ class FileImageView @JvmOverloads constructor(
                 else -> overlayImageMusic
             }
         }
-    }
-
-    init {
-        ButterKnife.bind(this)
     }
 
     override fun onDetachedFromWindow() {

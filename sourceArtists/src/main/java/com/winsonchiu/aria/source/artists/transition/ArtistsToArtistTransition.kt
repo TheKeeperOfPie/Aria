@@ -1,23 +1,10 @@
 package com.winsonchiu.aria.source.artists.transition
 
-import android.animation.Animator
-import android.animation.RectEvaluator
-import android.animation.ValueAnimator
-import android.graphics.Rect
-import android.view.View
-import android.view.ViewGroup
-import android.widget.ImageView
-import androidx.core.animation.doOnEnd
 import androidx.transition.TransitionSet
-import com.google.android.material.animation.MatrixEvaluator
 import com.winsonchiu.aria.framework.fragment.arg
-import com.winsonchiu.aria.framework.util.ImageViewUtils
-import com.winsonchiu.aria.framework.util.MatrixUtils
 import com.winsonchiu.aria.framework.util.animation.transition.GhostViewOverlay
 import com.winsonchiu.aria.framework.util.animation.transition.SlideAndFade
-import com.winsonchiu.aria.framework.util.animation.transition.setLeftTopRightBottom
 import com.winsonchiu.aria.source.artists.ArtistId
-import com.winsonchiu.aria.source.artists.R
 import com.winsonchiu.aria.source.artists.artist.ArtistFragment
 import com.winsonchiu.aria.source.artists.artists.ArtistItemView
 import com.winsonchiu.aria.source.artists.artists.ArtistsFragment
@@ -34,7 +21,7 @@ object ArtistsToArtistTransition {
     ) {
         after.postponeEnterTransition()
 
-        val artistId = after.arg(ArtistFragment.Args.artistId).value
+        val artistId = ArtistId(after.arg(ArtistFragment.Args.artistId).value)
         before.exitTransition = TransitionSet().apply {
             SlideAndFade(
                     fadeFrom = 1f,

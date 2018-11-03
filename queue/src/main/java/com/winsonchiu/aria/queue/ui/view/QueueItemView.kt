@@ -6,7 +6,6 @@ import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.MotionEvent
 import androidx.constraintlayout.widget.ConstraintLayout
-import butterknife.OnClick
 import com.airbnb.epoxy.AfterPropsSet
 import com.airbnb.epoxy.ModelProp
 import com.airbnb.epoxy.ModelView
@@ -59,6 +58,8 @@ class QueueItemView @JvmOverloads constructor(
 
             false
         }
+
+        setOnClickListener { listener?.onClick(queueEntry) }
     }
 
     @AfterPropsSet
@@ -75,11 +76,6 @@ class QueueItemView @JvmOverloads constructor(
         } else {
             null
         }
-    }
-
-    @OnClick()
-    fun onClick() {
-        listener?.onClick(queueEntry)
     }
 
     interface Listener {

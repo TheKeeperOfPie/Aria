@@ -86,6 +86,7 @@ class ArtistItemView @JvmOverloads constructor(
         clipToOutline = true
 
         setOnClickListener { listener?.onClick(this, artist) }
+        setOnLongClickListener { listener?.onLongClick(artist); true }
     }
 
     override fun onDetachedFromWindow() {
@@ -164,5 +165,6 @@ class ArtistItemView @JvmOverloads constructor(
 
     interface Listener {
         fun onClick(view: ArtistItemView, artist: Artist)
+        fun onLongClick(artist: Artist)
     }
 }

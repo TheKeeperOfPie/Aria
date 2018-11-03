@@ -1,5 +1,4 @@
 import org.gradle.internal.impldep.aQute.bnd.osgi.Constants.options
-import org.gradle.kotlin.dsl.support.kotlinEap
 
 buildscript {
     repositories {
@@ -11,8 +10,7 @@ buildscript {
     }
     dependencies {
         classpath("com.android.tools.build:gradle:3.4.0-alpha02")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.0-rc-57")
-        classpath("com.jakewharton:butterknife-gradle-plugin:9.0.0-rc1")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.0")
     }
 }
 

@@ -3,7 +3,6 @@ import com.winsonchiu.aria.Modules
 
 apply {
     plugin("submodule")
-    plugin("com.jakewharton.butterknife")
 }
 
 Dependencies(this) {

@@ -8,7 +8,6 @@ import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
 
 apply {
     plugin("submodule")
-    plugin("com.jakewharton.butterknife")
 }
 
 Dependencies(this) {

@@ -17,7 +17,7 @@ object Versions {
         val targetSdk = 28
     }
 
-    val kotlin = "1.3.0-rc-57"
+    val kotlin = "1.3.0"
 
     object Airbnb {
         val epoxy = "3.0.0-rc1"
@@ -191,16 +191,16 @@ object Dependencies {
         val butterKnife = if (useButterKnifeReflect) {
             ButterKnife.reflect
         } else {
-            Multiple(
-                    ButterKnife.compiler,
-                    ButterKnife.runtime
-            )
+            ButterKnife.reflect
+//            Multiple(
+//                    ButterKnife.compiler,
+//                    ButterKnife.runtime
+//            )
         }
 
         object ButterKnife {
             val reflect = "com.jakewharton:butterknife-reflect"(Versions.JakeWharton.butterKnife)
             val runtime = "com.jakewharton:butterknife"(Versions.JakeWharton.butterKnife)
-            val compiler = kapt("com.jakewharton:butterknife-compiler", Versions.JakeWharton.butterKnife)
         }
     }
 

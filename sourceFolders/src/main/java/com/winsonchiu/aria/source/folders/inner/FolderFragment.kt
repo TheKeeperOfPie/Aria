@@ -30,7 +30,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
 
     companion object {
 
-        val ITEM_OPTION_REQUEST_CODE = 12452
+        private const val ITEM_OPTION_REQUEST_CODE = 12452
     }
 
     override fun makeComponent(parentComponent: FolderRootFragmentDaggerComponent): FolderFragmentDaggerComponent {
@@ -142,7 +142,7 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
         super.onActivityResult(requestCode, resultCode, data)
     }
 
-    sealed class FolderItemOption : ItemsMenuItem {
+    private sealed class FolderItemOption : ItemsMenuItem {
 
         @Parcelize
         data class Header(

@@ -42,16 +42,33 @@ class ArtworkRequestHandler @Inject constructor(
                 MediaStore.Audio.Media.DATA
         )
 
+        private val ALBUM_PROJECTION = arrayOf(
+                MediaStore.Audio.Albums._ID,
+                MediaStore.Audio.Artists.Albums.ALBUM_ART
+        )
+
         private const val ARTIST_AUTHORITY = "${BuildConfig.APPLICATION_ID}.artist"
+
+        private const val ALBUM_OR_ARTIST_AUTHORITY = "${BuildConfig.APPLICATION_ID}.albumOrArtist"
 
         private const val MUSIC_FILE_AUTHORITY = "${BuildConfig.APPLICATION_ID}.musicFile"
 
         private const val EMBEDDED_FILE_AUTHORITY = "${BuildConfig.APPLICATION_ID}.embedded"
 
+        private const val QUERY_ALBUM_ID = "albumId"
+        private const val QUERY_ARTIST_ID = "artistId"
+
         fun artistUri(artistId: String) = Uri.Builder()
                 .scheme("image")
                 .authority(ARTIST_AUTHORITY)
                 .path(artistId)
+                .build()
+
+        fun albumOrArtistUri(albumId: String?, artistId: String?) = Uri.Builder()
+                .scheme("image")
+                .authority(ALBUM_OR_ARTIST_AUTHORITY)
+                .appendQueryParameter(QUERY_ALBUM_ID, albumId)
+                .appendQueryParameter(QUERY_ARTIST_ID, artistId)
                 .build()
 
         fun musicFileUri(file: File) = Uri.Builder()
@@ -95,6 +112,7 @@ class ArtworkRequestHandler @Inject constructor(
     override fun canHandleRequest(data: Request?): Boolean {
         return when (data?.uri?.authority) {
             ARTIST_AUTHORITY,
+            ALBUM_OR_ARTIST_AUTHORITY,
             EMBEDDED_FILE_AUTHORITY,
             MUSIC_FILE_AUTHORITY -> true
             else -> false
@@ -118,6 +136,7 @@ class ArtworkRequestHandler @Inject constructor(
 
         val bitmap = when (uri?.authority) {
             ARTIST_AUTHORITY -> getArtist(uri)
+            ALBUM_OR_ARTIST_AUTHORITY -> getAlbumOrArtist(uri)
             EMBEDDED_FILE_AUTHORITY -> getEmbedded(uri)
             MUSIC_FILE_AUTHORITY -> getMusicFile(uri)
             else -> Picasso.get().load(uri).get()
@@ -133,6 +152,43 @@ class ArtworkRequestHandler @Inject constructor(
 
         return bitmap?.let { Result(bitmap, Picasso.LoadedFrom.DISK) }
     }
+
+    private fun getAlbumOrArtist(uri: Uri): Bitmap? {
+        val albumId = uri.getQueryParameter(QUERY_ALBUM_ID)
+        val artistId = uri.getQueryParameter(QUERY_ARTIST_ID)
+
+        return tryAlbum(albumId) ?: artistId?.let {
+            tryArtistLastFm(artistId) ?: tryArtistAlbums(artistId) ?: tryArtistMedia(artistId)
+        }
+    }
+
+    private fun tryAlbum(albumId: String?): Bitmap? = runCatching {
+        albumId ?: return null
+        return application.contentResolver.query(
+                MediaStore.Audio.Albums.EXTERNAL_CONTENT_URI,
+                ALBUM_PROJECTION,
+                "${MediaStore.Audio.Albums._ID}=?",
+                arrayOf(albumId),
+                null
+        )?.use {
+            if (it.moveToFirst()) {
+                val albumArtIndex = it.getColumnIndex(MediaStore.Audio.Artists.Albums.ALBUM_ART)
+
+                do {
+                    val albumArt = it.getString(albumArtIndex)
+                    if (!albumArt.isNullOrEmpty()) {
+                        try {
+                            return@use BitmapFactory.decodeFile(albumArt)
+                        } catch (e: Exception) {
+                            e.printStackTrace()
+                        }
+                    }
+                } while (it.moveToNext())
+            }
+
+            null
+        }
+    }.getOrNull()
 
     private fun getArtist(uri: Uri): Bitmap? {
         val artistId = uri.lastPathSegment ?: return null

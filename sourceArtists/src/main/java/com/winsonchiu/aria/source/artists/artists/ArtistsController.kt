@@ -7,9 +7,14 @@ import com.jakewharton.rxrelay2.BehaviorRelay
 import com.winsonchiu.aria.artwork.ArtworkRequestHandler
 import com.winsonchiu.aria.framework.async.RequestState
 import com.winsonchiu.aria.framework.dagger.fragment.FragmentLifecycleBoundComponent
+import com.winsonchiu.aria.queue.MediaQueue
+import com.winsonchiu.aria.queue.QueueEntry
+import com.winsonchiu.aria.queue.QueueOp
 import com.winsonchiu.aria.source.artists.Artist
 import com.winsonchiu.aria.source.artists.ArtistId
 import com.winsonchiu.aria.source.artists.ArtistKey
+import com.winsonchiu.aria.source.artists.ArtistsUtils
+import com.winsonchiu.aria.source.artists.artist.media.ArtistMedia
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
@@ -17,7 +22,8 @@ import javax.inject.Inject
 
 @ArtistsFragmentScreenScope
 class ArtistsController @Inject constructor(
-        private val application: Application
+        private val application: Application,
+        private val mediaQueue: MediaQueue
 ) : FragmentLifecycleBoundComponent() {
 
     companion object {
@@ -87,6 +93,19 @@ class ArtistsController @Inject constructor(
                 .subscribeOn(Schedulers.io())
                 .bindToLifecycle()
                 .subscribe(model)
+    }
+
+    fun playNext(artist: Artist) {
+        mediaQueue.push(QueueOp.AddNext(buildEntries(artist)))
+    }
+
+    fun addToQueue(artist: Artist) {
+        mediaQueue.push(QueueOp.AddToEnd(buildEntries(artist)))
+    }
+
+    private fun buildEntries(artist: Artist): List<QueueEntry> {
+        return ArtistsUtils.readMedia(application, artist.id)
+                .map(ArtistMedia::toQueueEntry)
     }
 
     data class Model(

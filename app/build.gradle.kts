@@ -15,10 +15,6 @@ plugins {
     id("kotlin-kapt")
 }
 
-apply {
-    plugin("com.jakewharton.butterknife")
-}
-
 android {
     compileSdkVersion(28)
 

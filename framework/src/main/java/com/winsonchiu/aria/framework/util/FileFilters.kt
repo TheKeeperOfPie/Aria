@@ -23,13 +23,11 @@ object FileFilters {
     }
 
     val AUDIO = FileFilter { file ->
-        val contentType = tryContentType(file)
-        contentType?.startsWith("audio") == true
+        file.isFile && tryContentType(file)?.startsWith("audio") == true
     }
 
     val IMAGES = FileFilter { file ->
-        val contentType = tryContentType(file)
-        contentType?.startsWith("image") == true
+        file.isFile && tryContentType(file)?.startsWith("image") == true
     }
 
     fun foldersRecursiveNonEmpty(fileFilter: FileFilter) = and(

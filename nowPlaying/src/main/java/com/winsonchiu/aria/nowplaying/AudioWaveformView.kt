@@ -111,6 +111,9 @@ class AudioWaveformView @JvmOverloads constructor(
     init {
         setWillNotDraw(false)
 
+        backgroundHandlerThread.setUncaughtExceptionHandler { _, e ->
+            e.printStackTrace()
+        }
         backgroundHandlerThread.start()
         backgroundHandler = Handler(backgroundHandlerThread.looper)
 
