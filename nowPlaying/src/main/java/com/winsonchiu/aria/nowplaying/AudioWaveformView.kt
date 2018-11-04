@@ -149,13 +149,14 @@ class AudioWaveformView @JvmOverloads constructor(
         invalidate()
     }
 
-    fun setData(queueEntry: QueueEntry) {
-        if (this.content == queueEntry.content) {
+    fun setData(queueEntry: QueueEntry?) {
+        val content = queueEntry?.content
+        if (this.content == content || content == null) {
             return
         }
 
-        this.content = queueEntry.content
-        readSamples(File(File(queueEntry.content.path).absolutePath))
+        this.content = content
+        readSamples(File(File(content.path).absolutePath))
     }
 
     @SuppressLint("ClickableViewAccessibility")

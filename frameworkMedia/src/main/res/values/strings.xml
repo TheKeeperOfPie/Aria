@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Aria Framework Media</string>
+
+    <string name="audioMetadataFormatArtistAndAlbum">%1$s - %2$s</string>
+    <string name="audioMetadataFormatArtist">%1$s</string>
+    <string name="audioMetadataFormatAlbum">%1$s</string>
+</resources>

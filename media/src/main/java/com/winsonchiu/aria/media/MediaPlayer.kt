@@ -9,14 +9,15 @@ import android.os.SystemClock
 import android.support.v4.media.session.PlaybackStateCompat
 import com.uber.autodispose.AutoDispose
 import com.uber.autodispose.android.lifecycle.AndroidLifecycleScopeProvider
+import com.uber.autodispose.autoDisposable
 import com.winsonchiu.aria.framework.dagger.activity.DaggerConstants
 import com.winsonchiu.aria.framework.util.arch.LoggingLifecycleObserver
-import com.winsonchiu.aria.framework.util.mapNonNull
 import com.winsonchiu.aria.media.transport.MediaAction
 import com.winsonchiu.aria.media.transport.MediaTransport
 import com.winsonchiu.aria.media.util.LoggingMediaSessionCallback
 import com.winsonchiu.aria.queue.MediaQueue
 import com.winsonchiu.aria.queue.QueueEntry
+import java.util.Optional
 import javax.inject.Inject
 
 // TODO: Rename?
@@ -86,14 +87,18 @@ class MediaPlayer(
                 }
 
         mediaQueue.queueUpdates
-                .mapNonNull { it.currentEntry }
+                .map { Optional.ofNullable(it.currentEntry) }
                 .distinctUntilChanged()
-                .`as`(AutoDispose.autoDisposable(AndroidLifecycleScopeProvider.from(service)))
+                .autoDisposable(AndroidLifecycleScopeProvider.from(service))
                 .subscribe {
-                    if (player.isPlaying) {
+                    if (!it.isPresent) {
+                        if (player.isPlaying) {
+                            onStop()
+                        }
+                    } else if (player.isPlaying) {
                         onPlay()
                     } else {
-                        setEntry(it)
+                        setEntry(it.get())
                     }
                 }
 

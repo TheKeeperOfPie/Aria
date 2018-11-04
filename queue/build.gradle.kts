@@ -7,7 +7,7 @@ apply {
 
 Dependencies(this) {
     api(Modules.artwork)
-    api(Modules.framework)
+    api(Modules.frameworkMedia)
     api(Modules.mediaTransport)
 
     api(Dependencies.Google.dagger)

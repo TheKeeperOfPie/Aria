@@ -52,11 +52,11 @@ class ArtistController @Inject constructor(
     }
 
     fun playNext(media: ArtistMedia) {
-        mediaQueue.push(QueueOp.AddNext(media.toQueueEntry()))
+        mediaQueue.push(QueueOp.AddNext(media.toQueueEntry(application)))
     }
 
     fun addToQueue(media: ArtistMedia) {
-        mediaQueue.push(QueueOp.AddToEnd(media.toQueueEntry()))
+        mediaQueue.push(QueueOp.AddToEnd(media.toQueueEntry(application)))
     }
 
     data class Model(

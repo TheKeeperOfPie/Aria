@@ -139,18 +139,18 @@ class NowPlayingView @JvmOverloads constructor(
         animatorDescription.setProgress(progress)
     }
 
-    fun setQueueEntry(queueEntry: QueueEntry) {
+    fun setQueueEntry(queueEntry: QueueEntry?) {
         viewContent.viewWaveform.setData(queueEntry)
     }
 
-    fun bindData(data: Model) {
+    fun bindData(data: Model?) {
         Picasso.get()
-                .load(data.image)
+                .load(data?.image)
                 .transform(artworkTransformation)
                 .into(viewContent.imageArtwork, paletteCallback)
 
-        viewHidden.layoutTitle.textTitleExpanded.text = data.title
-        viewHidden.layoutDescription.textDescriptionExpanded.text = data.description
+        viewHidden.layoutTitle.textTitleExpanded.text = data?.title
+        viewHidden.layoutDescription.textDescriptionExpanded.text = data?.description
     }
 
     override fun getBehavior() = Behavior()

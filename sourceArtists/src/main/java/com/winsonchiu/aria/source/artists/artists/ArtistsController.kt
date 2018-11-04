@@ -14,7 +14,6 @@ import com.winsonchiu.aria.source.artists.Artist
 import com.winsonchiu.aria.source.artists.ArtistId
 import com.winsonchiu.aria.source.artists.ArtistKey
 import com.winsonchiu.aria.source.artists.ArtistsUtils
-import com.winsonchiu.aria.source.artists.artist.media.ArtistMedia
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.concurrent.TimeUnit
@@ -105,7 +104,7 @@ class ArtistsController @Inject constructor(
 
     private fun buildEntries(artist: Artist): List<QueueEntry> {
         return ArtistsUtils.readMedia(application, artist.id)
-                .map(ArtistMedia::toQueueEntry)
+                .map { it.toQueueEntry(application) }
     }
 
     data class Model(

@@ -9,7 +9,7 @@ import com.winsonchiu.aria.framework.dagger.activity.ActivityComponent
 import com.winsonchiu.aria.framework.dagger.activity.LifecycleBoundActivity
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.hasFragment
-import com.winsonchiu.aria.framework.util.mapNonNull
+import com.winsonchiu.aria.framework.util.orNull
 import com.winsonchiu.aria.home.HomeFragment
 import com.winsonchiu.aria.media.MediaBrowserConnection
 import com.winsonchiu.aria.media.transport.MediaAction
@@ -18,6 +18,7 @@ import com.winsonchiu.aria.nowplaying.NowPlayingView
 import com.winsonchiu.aria.queue.MediaQueue
 import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.activity_main.*
+import java.util.Optional
 import javax.inject.Inject
 
 class MainActivity : LifecycleBoundActivity() {
@@ -120,22 +121,31 @@ class MainActivity : LifecycleBoundActivity() {
         super.onStart()
 
         mediaQueue.queueUpdates
-                .mapNonNull { it.currentEntry }
-                .observeOn(AndroidSchedulers.mainThread())
-                .bindToLifecycle()
-                .subscribe(viewNowPlaying::setQueueEntry)
-
-        mediaQueue.queueUpdates
-                .mapNonNull { it.currentEntry }
-                .map { NowPlayingView.Model(it.metadata.title, it.metadata.description, it.image) }
+                .map { Optional.ofNullable(it.currentEntry) }
                 .observeOn(AndroidSchedulers.mainThread())
                 .bindToLifecycle()
                 .subscribe {
-                    viewNowPlaying.bindData(it)
+                    viewNowPlaying.setQueueEntry(it.orNull())
+                }
 
-                    if (viewNowPlayingBehavior.isHideable) {
-                        viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
-                        viewNowPlayingBehavior.isHideable = false
+        mediaQueue.queueUpdates
+                .map { Optional.ofNullable(it.currentEntry) }
+                .map { it.map { NowPlayingView.Model(it.metadata.title, it.metadata.description, it.image) } }
+                .observeOn(AndroidSchedulers.mainThread())
+                .bindToLifecycle()
+                .subscribe {
+                    viewNowPlaying.bindData(it.orNull())
+
+                    if (it.isPresent) {
+                        if (viewNowPlayingBehavior.isHideable) {
+                            viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_COLLAPSED
+                            viewNowPlayingBehavior.isHideable = false
+                        }
+                    } else {
+                        if (!viewNowPlayingBehavior.isHideable) {
+                            viewNowPlayingBehavior.isHideable = true
+                            viewNowPlayingBehavior.state = BottomSheetBehavior.STATE_HIDDEN
+                        }
                     }
                 }
 

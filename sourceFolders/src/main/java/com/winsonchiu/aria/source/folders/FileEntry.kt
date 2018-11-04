@@ -4,21 +4,23 @@ import android.content.Context
 import android.net.Uri
 import android.os.Parcelable
 import com.winsonchiu.aria.artwork.ArtworkRequestHandler
+import com.winsonchiu.aria.framework.media.AudioMetadata
+import com.winsonchiu.aria.framework.media.AudioMetadataInterface
 import com.winsonchiu.aria.queue.QueueEntry
 import com.winsonchiu.aria.source.folders.util.FileUtils
-import com.winsonchiu.aria.source.folders.util.MetadataExtractor
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 import java.io.File
 
 sealed class FileEntry(
         open val file: File
-): Parcelable {
+) : Parcelable {
+
     abstract val image: Uri?
 
-    abstract val title: CharSequence?
+    abstract fun getDisplayTitle(context: Context): CharSequence?
 
-    abstract fun description(context: Context): CharSequence?
+    abstract fun getDescription(context: Context): CharSequence?
 
     abstract override fun equals(other: Any?): Boolean
 
@@ -35,7 +37,7 @@ sealed class FileEntry(
         }
 
         @IgnoredOnParcel
-        override val title by lazy {
+        private val displayTitle by lazy {
             FileUtils.getFileDisplayTitle(
                     FileUtils.getFileSortKey(file)?.substringBeforeLast(
                             "."
@@ -43,7 +45,9 @@ sealed class FileEntry(
             )
         }
 
-        override fun description(context: Context): CharSequence? = null
+        override fun getDisplayTitle(context: Context) = displayTitle
+
+        override fun getDescription(context: Context): CharSequence? = null
     }
 
     @Parcelize
@@ -55,7 +59,7 @@ sealed class FileEntry(
         override val image: Uri? = null
 
         @IgnoredOnParcel
-        override val title by lazy {
+        private val displayTitle by lazy {
             FileUtils.getFileDisplayTitle(
                     FileUtils.getFileSortKey(file)?.substringBeforeLast(
                             "."
@@ -63,14 +67,16 @@ sealed class FileEntry(
             )
         }
 
-        override fun description(context: Context): CharSequence? = null
+        override fun getDisplayTitle(context: Context) = displayTitle
+
+        override fun getDescription(context: Context): CharSequence? = null
     }
 
     @Parcelize
     data class Audio(
             override val file: File,
-            val metadata: MetadataExtractor.Metadata?
-    ) : FileEntry(file) {
+            val metadata: AudioMetadata?
+    ) : FileEntry(file), AudioMetadataInterface by metadata ?: AudioMetadata.EMPTY {
 
         @IgnoredOnParcel
         override val image by lazy {
@@ -78,7 +84,7 @@ sealed class FileEntry(
         }
 
         @IgnoredOnParcel
-        override val title by lazy {
+        private val displayTitle by lazy {
             FileUtils.getFileDisplayTitle(
                     FileUtils.getFileSortKey(file)?.substringBeforeLast(
                             "."
@@ -86,23 +92,18 @@ sealed class FileEntry(
             )
         }
 
-        @IgnoredOnParcel
-        private var description: CharSequence? = null
+        override fun getDisplayTitle(context: Context) = displayTitle
 
-        override fun description(context: Context): CharSequence? {
-            if (description == null) {
-                description = FileUtils.getFileDescription(context, metadata, true, true)
-            }
-
-            return description
+        override fun getDescription(context: Context): CharSequence? {
+            return metadata?.getDescription(context)
         }
 
         fun toQueueEntry(context: Context) = QueueEntry(
                 content = Uri.fromFile(file),
                 image = image,
                 metadata = QueueEntry.Metadata(
-                        title = title,
-                        description = description(context),
+                        title = getDisplayTitle(context),
+                        description = getDescription(context),
                         album = metadata?.album,
                         artist = metadata?.artist,
                         genre = metadata?.genre,

@@ -1,11 +1,10 @@
 package com.winsonchiu.aria.source.folders.util
 
 import android.media.MediaMetadataRetriever
-import android.os.Parcelable
 import androidx.annotation.WorkerThread
+import com.winsonchiu.aria.framework.media.AudioMetadata
 import com.winsonchiu.aria.framework.util.Failsafe
 import com.winsonchiu.aria.source.folders.FolderScope
-import kotlinx.android.parcel.Parcelize
 import java.io.File
 import javax.inject.Inject
 
@@ -13,7 +12,7 @@ import javax.inject.Inject
 class MetadataExtractor @Inject constructor() {
 
     companion object {
-        val EMPTY = Metadata()
+        val EMPTY = AudioMetadata()
     }
 
     private val mediaMetadataRetriever: ThreadLocal<MediaMetadataRetriever> = object : ThreadLocal<MediaMetadataRetriever>() {
@@ -23,7 +22,7 @@ class MetadataExtractor @Inject constructor() {
     }
 
     @WorkerThread
-    fun extract(file: File): Metadata {
+    fun extract(file: File): AudioMetadata {
         if (file.isDirectory) {
             return EMPTY
         }
@@ -31,69 +30,35 @@ class MetadataExtractor @Inject constructor() {
         return Failsafe.withDefault(EMPTY) {
             mediaMetadataRetriever.get()!!.run {
                 setDataSource(file.absolutePath)
-                Metadata(
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLongOrNull() ?: -1,
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPILATION),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE),
-                        extractMetadata(21), // Hidden METADATA_KEY_TIMED_TEXT_LANGUAGES
-                        extractMetadata(22), // Hidden METADATA_KEY_IS_DRM
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION),
-                        extractMetadata(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE)
+                AudioMetadata(
+                        cdTrackNumber = extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER),
+                        album = extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM),
+                        artist = extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
+                        author = extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR),
+                        composer = extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPOSER),
+                        date = extractMetadata(MediaMetadataRetriever.METADATA_KEY_DATE),
+                        genre = extractMetadata(MediaMetadataRetriever.METADATA_KEY_GENRE),
+                        title = extractMetadata(MediaMetadataRetriever.METADATA_KEY_TITLE),
+                        year = extractMetadata(MediaMetadataRetriever.METADATA_KEY_YEAR),
+                        duration = extractMetadata(MediaMetadataRetriever.METADATA_KEY_DURATION).toLongOrNull() ?: -1,
+                        numTracks = extractMetadata(MediaMetadataRetriever.METADATA_KEY_NUM_TRACKS),
+                        writer = extractMetadata(MediaMetadataRetriever.METADATA_KEY_WRITER),
+                        mimeType = extractMetadata(MediaMetadataRetriever.METADATA_KEY_MIMETYPE),
+                        albumArtist = extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUMARTIST),
+                        discNumber = extractMetadata(MediaMetadataRetriever.METADATA_KEY_DISC_NUMBER),
+                        compilation = extractMetadata(MediaMetadataRetriever.METADATA_KEY_COMPILATION),
+                        hasAudio = extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_AUDIO),
+                        hasVideo = extractMetadata(MediaMetadataRetriever.METADATA_KEY_HAS_VIDEO),
+                        videoWidth = extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_WIDTH),
+                        videoHeight = extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_HEIGHT),
+                        bitrate = extractMetadata(MediaMetadataRetriever.METADATA_KEY_BITRATE),
+                        timedTextLanguages = extractMetadata(21), // Hidden METADATA_KEY_TIMED_TEXT_LANGUAGES
+                        isDrm = extractMetadata(22), // Hidden METADATA_KEY_IS_DRM
+                        location = extractMetadata(MediaMetadataRetriever.METADATA_KEY_LOCATION),
+                        videoRotation = extractMetadata(MediaMetadataRetriever.METADATA_KEY_VIDEO_ROTATION),
+                        captureFrameRate = extractMetadata(MediaMetadataRetriever.METADATA_KEY_CAPTURE_FRAMERATE)
                 )
             }
         }
     }
-
-    @Parcelize
-    data class Metadata(
-            val cdTrackNumber: String? = null,
-            val album: String? = null,
-            val artist: String? = null,
-            val author: String? = null,
-            val composer: String? = null,
-            val date: String? = null,
-            val genre: String? = null,
-            val title: String? = null,
-            val year: String? = null,
-            val duration: Long = -1,
-            val numTracks: String? = null,
-            val writer: String? = null,
-            val mimeType: String? = null,
-            val albumArtist: String? = null,
-            val discNumber: String? = null,
-            val compilation: String? = null,
-            val hasAudio: String? = null,
-            val hasVideo: String? = null,
-            val videoWidth: String? = null,
-            val videoHeight: String? = null,
-            val bitrate: String? = null,
-            val timedTextLanguages: String? = null,
-            val isDrm: String? = null,
-            val location: String? = null,
-            val videoRotation: String? = null,
-            val captureFrameRate: String? = null
-    ) : Parcelable
-}
-
-fun MetadataExtractor.Metadata?.artistDisplayValue(): String? {
-    return (this ?: return null).artist ?: albumArtist ?: author
 }

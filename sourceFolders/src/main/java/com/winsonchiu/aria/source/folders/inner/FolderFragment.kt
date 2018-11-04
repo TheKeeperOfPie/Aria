@@ -153,8 +153,8 @@ class FolderFragment : BaseFragment<FolderRootFragmentDaggerComponent, FolderFra
                     entry: FileEntry
             ) : this(
                     ItemsMenuFileHeaderView.Model.Data(
-                            entry.title,
-                            entry.description(context),
+                            entry.getDisplayTitle(context),
+                            entry.getDescription(context),
                             entry.image
                     )
             )

@@ -1,8 +1,10 @@
 package com.winsonchiu.aria.source.artists.artist.media
 
+import android.content.Context
 import android.net.Uri
 import android.os.Parcelable
 import com.winsonchiu.aria.artwork.ArtworkRequestHandler
+import com.winsonchiu.aria.framework.media.AudioMetadataUtils
 import com.winsonchiu.aria.queue.QueueEntry
 import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
@@ -36,15 +38,19 @@ data class ArtistMedia(
     @IgnoredOnParcel
     var description = album ?: albumKey
 
-    fun toQueueEntry() = QueueEntry(
+    fun toQueueEntry(context: Context) = QueueEntry(
             content = Uri.parse(data),
             image = ArtworkRequestHandler.albumOrArtistUri(albumId, artistId),
             metadata = QueueEntry.Metadata(
                     // Prefer title without media prefix
                     title = _title ?: titleKey ?: _displayName,
-                    description = null,
-                    album = album,
-                    artist = artist,
+                    description = AudioMetadataUtils.getDescription(
+                            context = context,
+                            artist = artist ?: artistKey,
+                            album = album ?: albumKey
+                    ),
+                    album = album ?: albumKey,
+                    artist = artist ?: artistKey,
                     genre = null, // TODO: Parse genre?
                     duration = duration ?: -1L
             )

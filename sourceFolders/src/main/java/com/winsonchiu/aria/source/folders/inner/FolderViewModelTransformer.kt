@@ -13,7 +13,6 @@ import com.winsonchiu.aria.source.folders.util.FileSorter
 import com.winsonchiu.aria.source.folders.util.FileSorter.sortFileItemViewModels
 import com.winsonchiu.aria.source.folders.util.FileUtils
 import com.winsonchiu.aria.source.folders.util.FileUtils.getFolderTitle
-import com.winsonchiu.aria.source.folders.util.artistDisplayValue
 import java.io.File
 
 object FolderViewModelTransformer {
@@ -36,12 +35,12 @@ object FolderViewModelTransformer {
         }
 
         val firstMetadata = (entries.first() as? FileEntry.Audio)?.metadata
-        val firstArtist = firstMetadata.artistDisplayValue()
+        val firstArtist = firstMetadata?.artistDisplayValue
         val firstAlbum = firstMetadata?.album
         val areArtistsEqual = !firstArtist.isNullOrBlank() && entries.asSequence()
                 .filterIsInstance<FileEntry.Audio>()
                 .fold(true) { matches, it ->
-                    matches && firstArtist == it.metadata.artistDisplayValue()
+                    matches && firstArtist == it.metadata?.artistDisplayValue
                 }
         val areAlbumsEqual = !firstAlbum.isNullOrBlank() && entries.asSequence()
                 .filterIsInstance<FileEntry.Audio>()
@@ -53,12 +52,12 @@ object FolderViewModelTransformer {
 
         val headerText = when {
             areArtistsEqual && areAlbumsEqual -> context.getString(
-                    R.string.fileDescriptionFormatArtistAndAlbum,
+                    R.string.audioMetadataFormatArtistAndAlbum,
                     firstArtist,
                     firstAlbum
             )
-            areArtistsEqual -> context.getString(R.string.fileDescriptionFormatArtist, firstArtist)
-            areAlbumsEqual -> context.getString(R.string.fileDescriptionFormatAlbum, firstAlbum)
+            areArtistsEqual -> context.getString(R.string.audioMetadataFormatArtist, firstArtist)
+            areAlbumsEqual -> context.getString(R.string.audioMetadataFormatAlbum, firstAlbum)
             else -> null
         }.let { TextConverter.translate(it, titleCase = true) }
 
@@ -77,10 +76,9 @@ object FolderViewModelTransformer {
 
                     val description = when (entry) {
                         is FileEntry.Folder,
-                        is FileEntry.Playlist -> entry.description(context)
-                        is FileEntry.Audio -> FileUtils.getFileDescription(
+                        is FileEntry.Playlist -> entry.getDescription(context)
+                        is FileEntry.Audio -> entry.metadata?.getDescription(
                                 context,
-                                entry.metadata,
                                 !areArtistsEqual,
                                 !areAlbumsEqual
                         )

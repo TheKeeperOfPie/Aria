@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
+<com.winsonchiu.aria.framework.view.NestedCoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/artistsRootFragmentContainer"
     android:layout_width="match_parent"

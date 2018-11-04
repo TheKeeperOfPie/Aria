@@ -305,6 +305,7 @@ object Modules {
     val artwork = Module("artwork")
     val dialog = Module("dialog")
     val framework = Module("framework")
+    val frameworkMedia = Module("frameworkMedia")
     val itemSheet = Module("itemSheet")
     val media = Module("media")
     val mediaTransport = Module("mediaTransport")

@@ -1,6 +1,7 @@
 package com.winsonchiu.aria.source.folders.util
 
 import android.content.Context
+import com.winsonchiu.aria.framework.media.AudioMetadata
 import com.winsonchiu.aria.framework.text.TextConverter
 import com.winsonchiu.aria.source.folders.FileEntry
 import com.winsonchiu.aria.source.folders.R
@@ -63,37 +64,6 @@ object FileUtils {
         }
 
         return TextConverter.translate(text.trim(), titleCase = true)
-    }
-
-    fun getFileDescription(
-            context: Context,
-            metadata: MetadataExtractor.Metadata?,
-            showArtist: Boolean,
-            showAlbum: Boolean
-    ): String? {
-        metadata ?: return null
-
-        val resources = context.resources
-        val artist = metadata.artistDisplayValue()
-        val album = metadata.album
-
-        fun String?.isShowable() = !isNullOrBlank()
-                && !equals("unknown", ignoreCase = true)
-                && !equals("null", ignoreCase = true)
-
-        val artistShowable = artist.isShowable() && showArtist
-        val albumShowable = album.isShowable() && showAlbum
-
-        return when {
-            artistShowable && albumShowable -> resources.getString(
-                    R.string.fileDescriptionFormatArtistAndAlbum,
-                    artist,
-                    album
-            )
-            artistShowable -> resources.getString(R.string.fileDescriptionFormatArtist, artist)
-            albumShowable -> resources.getString(R.string.fileDescriptionFormatAlbum, album)
-            else -> null
-        }.let { TextConverter.translate(it, titleCase = true)}
     }
 
     fun getFileDisplayAndSortMetadata(entry: FileEntry): FileDisplayAndSortMetadata {

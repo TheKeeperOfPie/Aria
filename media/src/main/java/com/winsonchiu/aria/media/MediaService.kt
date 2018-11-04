@@ -1,8 +1,11 @@
 package com.winsonchiu.aria.media
 
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
+import android.media.AudioManager
 import android.os.Bundle
-import android.os.IBinder
 import android.support.v4.media.MediaBrowserCompat
 import android.support.v4.media.MediaMetadataCompat
 import android.support.v4.media.session.MediaControllerCompat
@@ -10,6 +13,8 @@ import android.support.v4.media.session.MediaSessionCompat
 import android.support.v4.media.session.PlaybackStateCompat
 import androidx.media.MediaBrowserServiceCompat
 import com.winsonchiu.aria.framework.dagger.activity.DaggerConstants
+import com.winsonchiu.aria.media.transport.MediaAction
+import com.winsonchiu.aria.media.transport.MediaTransport
 import com.winsonchiu.aria.media.util.toMediaMetadata
 import com.winsonchiu.aria.queue.MediaQueue
 import javax.inject.Inject
@@ -107,6 +112,27 @@ class MediaService : LifecycleMediaBrowserService() {
             }
         }
     }
+    private val noisyIntentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
+    private val noisyBroadcastReceiver = object : BroadcastReceiver() {
+        override fun onReceive(
+                context: Context?,
+                intent: Intent?
+        ) {
+            MediaTransport.send(MediaAction.Pause)
+        }
+    }
+
+    private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
+        override fun onPlay() {
+            super.onPlay()
+            registerReceiver(noisyBroadcastReceiver, noisyIntentFilter)
+        }
+
+        override fun onStop() {
+            unregisterReceiver(noisyBroadcastReceiver)
+            super.onStop()
+        }
+    }
 
     private val musicList = mutableListOf<MediaBrowserCompat.MediaItem>()
 
@@ -132,14 +158,12 @@ class MediaService : LifecycleMediaBrowserService() {
 
         sessionToken = mediaSession.sessionToken
 
+        mediaSession.setCallback(mediaSessionCallback)
         mediaSession.controller.registerCallback(mediaControllerCallback)
     }
 
-    override fun onBind(intent: Intent): IBinder? {
-        return super.onBind(intent)
-    }
-
     override fun onDestroy() {
+        unregisterReceiver(noisyBroadcastReceiver)
         mediaSession.controller.unregisterCallback(mediaControllerCallback)
         mediaSession.setCallback(null)
         mediaSession.release()
