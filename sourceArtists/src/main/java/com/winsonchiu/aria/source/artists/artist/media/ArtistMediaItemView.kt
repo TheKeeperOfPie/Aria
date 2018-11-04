@@ -39,7 +39,7 @@ class ArtistMediaItemView @JvmOverloads constructor(
 
     @AfterPropsSet
     fun onChanged() {
-        textTitle.text = data.title
+        textTitle.text = data.displayTitle
         textDescription.textOrGone = data.description
         textDuration.textOrGone = data.duration?.let { DateUtils.formatElapsedTime(TimeUnit.MILLISECONDS.toSeconds(it)) }
     }

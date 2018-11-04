@@ -9,7 +9,55 @@
     <Transition
         motion:constraintSetEnd="@id/collapsed"
         motion:constraintSetStart="@id/expanded"
-        />
+        >
+
+        <KeyFrameSet>
+
+            <KeyPosition
+                motion:framePosition="25"
+                motion:keyPositionType="pathRelative"
+                motion:pathMotionArc="startHorizontal"
+                motion:percentX="0"
+                motion:sizePercent="0"
+                motion:target="@+id/imageArtwork"
+                />
+
+            <KeyPosition
+                motion:framePosition="25"
+                motion:keyPositionType="pathRelative"
+                motion:pathMotionArc="startHorizontal"
+                motion:percentX="0"
+                motion:sizePercent="0"
+                motion:target="@+id/viewWaveform"
+                />
+
+            <KeyPosition
+                motion:framePosition="75"
+                motion:keyPositionType="deltaRelative"
+                motion:percentX="0"
+                motion:percentY="0.75"
+                motion:target="@+id/viewSongTitle"
+                />
+
+            <KeyPosition
+                motion:framePosition="75"
+                motion:keyPositionType="deltaRelative"
+                motion:percentX="0"
+                motion:percentY="0.75"
+                motion:target="@+id/viewSongDescription"
+                />
+
+            <KeyPosition
+                motion:framePosition="5"
+                motion:keyPositionType="deltaRelative"
+                motion:pathMotionArc="startVertical"
+                motion:percentX="0"
+                motion:target="@+id/imagePlay"
+                />
+
+        </KeyFrameSet>
+
+    </Transition>
 
     <ConstraintSet android:id="@+id/expanded">
 

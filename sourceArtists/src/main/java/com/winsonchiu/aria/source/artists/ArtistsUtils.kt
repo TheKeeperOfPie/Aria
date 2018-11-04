@@ -72,9 +72,9 @@ internal object ArtistsUtils {
                                 artistId = it.getStringOrNull(artistIdIndex),
                                 data = it.getString(dataIndex),
                                 defaultSortOrder = it.getStringOrNull(defaultSortOrderIndex),
-                                _displayName = it.getStringOrNull(displayNameIndex),
+                                displayName = it.getStringOrNull(displayNameIndex),
                                 duration = it.getLongOrNull(durationIndex),
-                                _title = it.getStringOrNull(titleIndex),
+                                title = it.getStringOrNull(titleIndex),
                                 titleKey = it.getStringOrNull(titleKeyIndex),
                                 track = it.getLongOrNull(trackIndex)
                         )

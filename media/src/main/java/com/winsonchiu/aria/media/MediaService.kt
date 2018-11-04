@@ -68,6 +68,7 @@ class MediaService : LifecycleMediaBrowserService() {
 
     private val playerListener = object : MediaPlayer.Listener {
         override fun onPlaybackStateChange(newState: PlaybackStateCompat) {
+            val wasActive = mediaSession.isActive
 
             when (newState.state) {
                 PlaybackStateCompat.STATE_PLAYING -> mediaSession.isActive = true
@@ -110,6 +111,16 @@ class MediaService : LifecycleMediaBrowserService() {
                     }
                 }
             }
+
+            val isActive = mediaSession.isActive
+            if (!wasActive && isActive) {
+                registerReceiver(noisyBroadcastReceiver, noisyIntentFilter)
+            } else if (wasActive && !isActive) {
+                try {
+                    unregisterReceiver(noisyBroadcastReceiver)
+                } catch (ignored: IllegalArgumentException) {
+                }
+            }
         }
     }
     private val noisyIntentFilter = IntentFilter(AudioManager.ACTION_AUDIO_BECOMING_NOISY)
@@ -119,18 +130,6 @@ class MediaService : LifecycleMediaBrowserService() {
                 intent: Intent?
         ) {
             MediaTransport.send(MediaAction.Pause)
-        }
-    }
-
-    private val mediaSessionCallback = object : MediaSessionCompat.Callback() {
-        override fun onPlay() {
-            super.onPlay()
-            registerReceiver(noisyBroadcastReceiver, noisyIntentFilter)
-        }
-
-        override fun onStop() {
-            unregisterReceiver(noisyBroadcastReceiver)
-            super.onStop()
         }
     }
 
@@ -158,12 +157,15 @@ class MediaService : LifecycleMediaBrowserService() {
 
         sessionToken = mediaSession.sessionToken
 
-        mediaSession.setCallback(mediaSessionCallback)
         mediaSession.controller.registerCallback(mediaControllerCallback)
     }
 
     override fun onDestroy() {
-        unregisterReceiver(noisyBroadcastReceiver)
+        try {
+            unregisterReceiver(noisyBroadcastReceiver)
+        } catch (ignored: IllegalArgumentException) {
+        }
+
         mediaSession.controller.unregisterCallback(mediaControllerCallback)
         mediaSession.setCallback(null)
         mediaSession.release()

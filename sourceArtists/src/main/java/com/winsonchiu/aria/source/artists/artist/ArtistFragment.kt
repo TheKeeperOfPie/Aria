@@ -1,6 +1,5 @@
 package com.winsonchiu.aria.source.artists.artist
 
-import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
@@ -167,7 +166,7 @@ class ArtistFragment : BaseFragment<ArtistsRootFragmentDaggerComponent, ArtistFr
                     media: ArtistMedia
             ) : this(
                     ItemsMenuFileHeaderView.Model.Data(
-                            media.title,
+                            media.displayTitle,
                             media.description,
                             media.image
                     )

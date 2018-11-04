@@ -28,6 +28,7 @@ import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import com.winsonchiu.aria.artwork.ArtworkTransformation
 import com.winsonchiu.aria.framework.animation.FirstLineTextAnimator
+import com.winsonchiu.aria.framework.util.animation.AnimationUtils
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.initialize
 import com.winsonchiu.aria.media.MediaPlayer
@@ -135,8 +136,10 @@ class NowPlayingView @JvmOverloads constructor(
     fun setProgress(progress: Float) {
         this.progress = progress
         (viewContent as MotionLayout).progress = progress
-        animatorTitle.setProgress(progress)
-        animatorDescription.setProgress(progress)
+
+        val progressX = AnimationUtils.shiftRange(0.75f, 1f, progress)
+        animatorTitle.setProgress(progressX, progress)
+        animatorDescription.setProgress(progressX, progress)
     }
 
     fun setQueueEntry(queueEntry: QueueEntry?) {

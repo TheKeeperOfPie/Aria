@@ -28,7 +28,6 @@ import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.framework.util.setAlpha
 import com.winsonchiu.aria.framework.util.text.TextWatcherAdapter
 import com.winsonchiu.aria.framework.view.DrawableDrawView
-import kotlin.properties.Delegates
 
 class FirstLineTextAnimator(
         @Px private val targetHeight: Int,
@@ -97,8 +96,11 @@ class FirstLineTextAnimator(
         drawView.addDrawable(drawable)
     }
 
-    fun setProgress(progress: Float) {
-        drawable.progress = progress
+    fun setProgress(
+            progressHorizontal: Float,
+            progressVertical: Float
+    ) {
+        drawable.setProgress(progressHorizontal = progressHorizontal, progressVertical = progressVertical)
     }
 
     private fun schedulePreDraw() {
@@ -135,7 +137,7 @@ class FirstLineTextAnimator(
         private val gradientMatrix = Matrix()
 
         private val gradientShift = 56f.dpToPx(sourceView)
-        private val gradientLength= 24f.dpToPx(sourceView)
+        private val gradientLength = 24f.dpToPx(sourceView)
 
         private var canvasTranslateX = 0f
         private var canvasTranslateY = 0f
@@ -145,7 +147,17 @@ class FirstLineTextAnimator(
         private val bitmapBoundsStart = RectF()
         private val bitmapBoundsEnd = RectF()
 
-        var progress by Delegates.observable(0f) { _, _, _ -> updateProgress() }
+        private var progressHorizontal = 0f
+        private var progressVertical = 0f
+
+        fun setProgress(
+                progressHorizontal: Float,
+                progressVertical: Float
+        ) {
+            this.progressHorizontal = progressHorizontal
+            this.progressVertical = progressVertical
+            updateProgress()
+        }
 
         fun updateValues() {
             bitmap?.let {
@@ -156,7 +168,8 @@ class FirstLineTextAnimator(
 
                 bitmapBoundsEnd.set(bitmapBoundsStart)
                 bitmapBoundsEnd.bottom = bitmapBoundsEnd.top + targetHeight
-                bitmapBoundsEnd.right = bitmapBoundsStart.left + bitmapBoundsStart.width() * targetHeight / bitmapBoundsStart.height()
+                bitmapBoundsEnd
+                        .right = bitmapBoundsStart.left + bitmapBoundsStart.width() * targetHeight / bitmapBoundsStart.height()
 
                 val offsetLeft = sourceView.left
                 val offsetTop = sourceView.top
@@ -164,8 +177,10 @@ class FirstLineTextAnimator(
                 startBounds.set(bitmapBoundsStart.toRect())
                 startBounds.offset(sourceView.left, sourceView.top)
 
-                endBounds.set(0, 0,
-                        (bitmapBoundsStart.width() * targetHeight / bitmapBoundsStart.height()).toInt(), targetHeight)
+                endBounds.set(
+                        0, 0,
+                        (bitmapBoundsStart.width() * targetHeight / bitmapBoundsStart.height()).toInt(), targetHeight
+                )
 
                 remainingBounds.set(
                         0,
@@ -202,43 +217,40 @@ class FirstLineTextAnimator(
         }
 
         fun updateProgress() {
-            val horizontalProgress = 1f - interpolator.getInterpolation(interpolator.getInterpolation(1f - progress))
+            val left = progressHorizontal.lerp(startBounds.left, endBounds.left)
+            val top = progressHorizontal.lerp(startBounds.top, endBounds.top)
+            val right = progressHorizontal.lerp(startBounds.right, endBounds.right)
+            val bottom = progressHorizontal.lerp(startBounds.bottom, endBounds.bottom)
 
-            val left = horizontalProgress.lerp(startBounds.left, endBounds.left)
-            val top = horizontalProgress.lerp(startBounds.top, endBounds.top)
-            val right = horizontalProgress.lerp(startBounds.right, endBounds.right)
-            val bottom = horizontalProgress.lerp(startBounds.bottom, endBounds.bottom)
-
-            val verticalTop = startBounds.top + ((endBounds.top - startBounds.top) * progress).toInt()
+            val verticalTop = startBounds.top + ((endBounds.top - startBounds.top) * progressVertical).toInt()
             currentBounds.set(left, verticalTop, right, verticalTop + bottom - top)
             remainingDrawBounds.offsetTo(0, currentBounds.bottom)
 
-            remainingBoundsPaint.setAlpha(1f - progress)
+            remainingBoundsPaint.setAlpha(1f - progressVertical)
 
             updateFirstLineValues()
             invalidateSelf()
         }
 
         fun updateFirstLineValues() {
-            val left = progress.lerp(bitmapBoundsStart.left, bitmapBoundsEnd.left)
-            val top = progress.lerp(bitmapBoundsStart.top, bitmapBoundsEnd.top)
-            val right = progress.lerp(bitmapBoundsStart.right, bitmapBoundsEnd.right)
-            val bottom = progress.lerp(bitmapBoundsStart.bottom, bitmapBoundsEnd.bottom)
+            val left = progressHorizontal.lerp(bitmapBoundsStart.left, bitmapBoundsEnd.left)
+            val top = progressHorizontal.lerp(bitmapBoundsStart.top, bitmapBoundsEnd.top)
+            val right = progressHorizontal.lerp(bitmapBoundsStart.right, bitmapBoundsEnd.right)
+            val bottom = progressHorizontal.lerp(bitmapBoundsStart.bottom, bitmapBoundsEnd.bottom)
             bitmapBounds.set(left, top, right, bottom)
 
-            val scale = progress.lerp(1f, bitmapBoundsEnd.height() / bitmapBoundsStart.height())
+            val scale = progressHorizontal.lerp(1f, bitmapBoundsEnd.height() / bitmapBoundsStart.height())
             bitmapMatrix.setTranslate(-bitmapBoundsStart.left, -bitmapBoundsStart.top)
             bitmapMatrix.postScale(scale, scale)
             bitmapMatrix.postTranslate(bitmapBoundsStart.left, bitmapBoundsStart.top)
             paint.shader?.setLocalMatrix(bitmapMatrix)
 
-            val gradientTranslateX = progress.lerp(0f, -gradientShift)
+            val gradientTranslateX = progressHorizontal.lerp(0f, -gradientShift)
             gradientMatrix.setTranslate(gradientTranslateX, 0f)
             linearGradient?.setLocalMatrix(gradientMatrix)
 
-            val horizontalProgress = 1f - interpolator.getInterpolation(interpolator.getInterpolation(1f - progress))
-            canvasTranslateX = horizontalProgress.lerp(0f, -bitmapBoundsStart.left - sourceView.left)
-            canvasTranslateY = progress.lerp(0f, -bitmapBoundsStart.top - sourceView.top)
+            canvasTranslateX = progressHorizontal.lerp(0f, -bitmapBoundsStart.left - sourceView.left)
+            canvasTranslateY = progressVertical.lerp(0f, -bitmapBoundsStart.top - sourceView.top)
         }
 
         override fun draw(canvas: Canvas) {
