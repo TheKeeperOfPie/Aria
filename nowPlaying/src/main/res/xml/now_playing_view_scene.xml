@@ -13,6 +13,78 @@
 
         <KeyFrameSet>
 
+            <KeyAttribute
+                motion:framePosition="0"
+                motion:target="@id/imageArtwork"
+                >
+
+                <CustomAttribute
+                    motion:attributeName="bottomPadding"
+                    motion:customDimension="0dp"
+                    />
+
+            </KeyAttribute>
+
+            <KeyAttribute
+                motion:framePosition="50"
+                motion:target="@id/imageArtwork"
+                >
+
+                <CustomAttribute
+                    motion:attributeName="bottomPadding"
+                    motion:customDimension="80dp"
+                    />
+
+            </KeyAttribute>
+
+            <KeyAttribute
+                motion:framePosition="100"
+                motion:target="@id/imageArtwork"
+                >
+
+                <CustomAttribute
+                    motion:attributeName="bottomPadding"
+                    motion:customDimension="0dp"
+                    />
+
+            </KeyAttribute>
+
+            <KeyAttribute
+                motion:framePosition="0"
+                motion:target="@id/viewWaveform"
+                >
+
+                <CustomAttribute
+                    motion:attributeName="bottomPadding"
+                    motion:customDimension="0dp"
+                    />
+
+            </KeyAttribute>
+
+            <KeyAttribute
+                motion:framePosition="50"
+                motion:target="@id/viewWaveform"
+                >
+
+                <CustomAttribute
+                    motion:attributeName="bottomPadding"
+                    motion:customDimension="80dp"
+                    />
+
+            </KeyAttribute>
+
+            <KeyAttribute
+                motion:framePosition="100"
+                motion:target="@id/viewWaveform"
+                >
+
+                <CustomAttribute
+                    motion:attributeName="bottomPadding"
+                    motion:customDimension="0dp"
+                    />
+
+            </KeyAttribute>
+
             <KeyPosition
                 motion:framePosition="25"
                 motion:keyPositionType="pathRelative"
@@ -36,6 +108,7 @@
                 motion:keyPositionType="deltaRelative"
                 motion:percentX="0"
                 motion:percentY="0.75"
+                motion:sizePercent="0"
                 motion:target="@+id/viewSongTitle"
                 />
 
@@ -44,6 +117,7 @@
                 motion:keyPositionType="deltaRelative"
                 motion:percentX="0"
                 motion:percentY="0.75"
+                motion:sizePercent="0"
                 motion:target="@+id/viewSongDescription"
                 />
 
@@ -192,11 +266,8 @@
 
         <Constraint
             android:id="@+id/imageArtwork"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginBottom="10dp"
+            android:layout_width="72dp"
+            android:layout_height="72dp"
             motion:layout_constraintStart_toStartOf="parent"
             motion:layout_constraintTop_toTopOf="parent"
             />
@@ -254,7 +325,7 @@
             android:layout_width="0dp"
             android:layout_height="20dp"
             android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             motion:layout_constrainedWidth="true"
             motion:layout_constraintEnd_toStartOf="@+id/imagePlay"

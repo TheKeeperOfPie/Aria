@@ -136,7 +136,7 @@ class FirstLineTextAnimator(
         private val bitmapMatrix = Matrix()
         private val gradientMatrix = Matrix()
 
-        private val gradientShift = 56f.dpToPx(sourceView)
+        private val gradientShift = 72f.dpToPx(sourceView)
         private val gradientLength = 24f.dpToPx(sourceView)
 
         private var canvasTranslateX = 0f

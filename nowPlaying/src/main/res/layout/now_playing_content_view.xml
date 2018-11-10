@@ -10,11 +10,12 @@
     tools:currentState="@id/expanded"
     >
 
-    <ImageView
+    <com.winsonchiu.aria.nowplaying.NowPlayingImageView
         android:id="@+id/imageArtwork"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:contentDescription="@string/now_playing_content_description_track_artwork"
+        android:cropToPadding="true"
         android:scaleType="centerCrop"
         tools:background="#D1020A"
         />

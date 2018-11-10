@@ -5,7 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.TimeInterpolator
 import android.content.Context
 import android.graphics.Bitmap
-import android.graphics.Outline
 import android.graphics.drawable.BitmapDrawable
 import android.media.audiofx.Visualizer
 import android.net.Uri
@@ -14,7 +13,6 @@ import android.support.v4.media.session.PlaybackStateCompat
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
-import android.view.ViewOutlineProvider
 import android.view.ViewPropertyAnimator
 import androidx.constraintlayout.motion.widget.MotionLayout
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -52,8 +50,6 @@ class NowPlayingView @JvmOverloads constructor(
     )
 
     private var progress = 0f
-
-    private val imageRadius = 4f.dpToPx(context)
 
     private val animatorTitle: FirstLineTextAnimator
     private val animatorDescription: FirstLineTextAnimator
@@ -101,16 +97,6 @@ class NowPlayingView @JvmOverloads constructor(
         imageSkipPrevious.setOnClickListener { listener?.onClickSkipPrevious() }
         imagePlay.setOnClickListener { listener?.onClickPlay() }
         imageSkipNext.setOnClickListener { listener?.onClickSkipNext() }
-
-        viewContent.imageArtwork.clipToOutline = true
-        viewContent.imageArtwork.outlineProvider = object : ViewOutlineProvider() {
-            override fun getOutline(
-                    view: View,
-                    outline: Outline
-            ) {
-                outline.setRoundRect(0, 0, view.width, view.height, imageRadius * progress)
-            }
-        }
 
         viewContent.viewWaveform.listener = object : AudioWaveformView.Listener {
             override fun onSeek(progress: Float) {

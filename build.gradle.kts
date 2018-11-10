@@ -9,7 +9,7 @@ buildscript {
         maven("https://oss.sonatype.org/content/repositories/snapshots/")
     }
     dependencies {
-        classpath("com.android.tools.build:gradle:3.4.0-alpha02")
+        classpath("com.android.tools.build:gradle:3.4.0-alpha03")
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.3.0")
     }
 }

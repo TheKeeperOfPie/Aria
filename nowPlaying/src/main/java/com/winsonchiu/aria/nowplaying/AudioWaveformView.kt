@@ -27,6 +27,8 @@ import android.view.animation.Animation
 import android.view.animation.Transformation
 import androidx.annotation.WorkerThread
 import androidx.core.graphics.ColorUtils
+import androidx.core.graphics.withTranslation
+import androidx.core.view.updatePadding
 import androidx.palette.graphics.Palette
 import com.winsonchiu.aria.framework.util.dpToPx
 import com.winsonchiu.aria.media.MediaPlayer
@@ -214,48 +216,52 @@ class AudioWaveformView @JvmOverloads constructor(
         }
     }
 
+    fun setBottomPadding(bottomPadding: Float) {
+        updatePadding(bottom = bottomPadding.toInt())
+    }
+
     override fun onDraw(canvas: Canvas) {
-        when {
-            progressOverride >= 0f -> updateShader(progressOverride)
-            playbackUpdatePosition < 0 -> updateShader(0f)
-            else -> {
-                val currentPosition = playbackUpdatePosition + SystemClock.elapsedRealtime() - playbackUpdateTime
-                val progress = (currentPosition / playbackDuration.toFloat()).coerceIn(0f, 1f)
-                updateShader(progress)
+        canvas.withTranslation(y = -paddingBottom.toFloat()) {
+            when {
+                progressOverride >= 0f -> updateShader(progressOverride)
+                playbackUpdatePosition < 0 -> updateShader(0f)
+                else -> {
+                    val currentPosition = playbackUpdatePosition + SystemClock.elapsedRealtime() - playbackUpdateTime
+                    val progress = (currentPosition / playbackDuration.toFloat()).coerceIn(0f, 1f)
+                    updateShader(progress)
+                }
             }
+
+            val entranceTimeDifference = SystemClock.uptimeMillis() - entranceAnimationStart
+
+            if (entranceTimeDifference < ENTRANCE_ANIMATION_DURATION) {
+                val progress = entranceTimeDifference.toFloat() / ENTRANCE_ANIMATION_DURATION
+                entranceAnimationMatrix.setScale(1f, progress)
+            } else {
+                entranceAnimationMatrix.reset()
+            }
+
+            val exitTimeDifference = SystemClock.uptimeMillis() - exitAnimationStart
+
+            if (exitTimeDifference < EXIT_ANIMATION_DURATION) {
+                val progress = exitTimeDifference.toFloat() / EXIT_ANIMATION_DURATION
+                exitAnimationMatrix.setScale(1f, 1f - progress)
+
+                exitAnimationBasePath.transform(exitAnimationMatrix, exitAnimationSizedPath)
+                exitAnimationSizedPath.transform(pathMatrixUp)
+
+                canvas.drawPath(exitAnimationSizedPath, paint)
+            } else {
+                exitAnimationBasePath.reset()
+                exitAnimationSizedPath.reset()
+                exitAnimationMatrix.reset()
+            }
+
+            basePathUp.transform(entranceAnimationMatrix, sizedPathUp)
+            sizedPathUp.transform(pathMatrixUp)
+
+            canvas.drawPath(sizedPathUp, paint)
         }
-
-        val entranceTimeDifference = SystemClock.uptimeMillis() - entranceAnimationStart
-
-        if (entranceTimeDifference < ENTRANCE_ANIMATION_DURATION) {
-            val progress = entranceTimeDifference.toFloat() / ENTRANCE_ANIMATION_DURATION
-            entranceAnimationMatrix.setScale(1f, progress)
-        } else {
-            entranceAnimationMatrix.reset()
-        }
-
-        val exitTimeDifference = SystemClock.uptimeMillis() - exitAnimationStart
-
-        if (exitTimeDifference < EXIT_ANIMATION_DURATION) {
-            val progress = exitTimeDifference.toFloat() / EXIT_ANIMATION_DURATION
-            exitAnimationMatrix.setScale(1f, 1f - progress)
-
-            exitAnimationBasePath.transform(exitAnimationMatrix, exitAnimationSizedPath)
-            exitAnimationSizedPath.transform(pathMatrixUp)
-
-            canvas.drawPath(exitAnimationSizedPath, paint)
-        } else {
-            exitAnimationBasePath.reset()
-            exitAnimationSizedPath.reset()
-            exitAnimationMatrix.reset()
-        }
-
-        basePathUp.transform(entranceAnimationMatrix, sizedPathUp)
-        sizedPathUp.transform(pathMatrixUp)
-
-        canvas.drawPath(sizedPathUp, paint)
-
-        super.onDraw(canvas)
     }
 
     @WorkerThread
@@ -306,7 +312,7 @@ class AudioWaveformView @JvmOverloads constructor(
 
                 val (index, format) = (0 until extractor.trackCount)
                         .asSequence()
-                        .mapIndexed { index, it -> index to extractor.getTrackFormat(index) }
+                        .mapIndexed { index, _ -> index to extractor.getTrackFormat(index) }
                         .find { (_, format) -> format.getString(MediaFormat.KEY_MIME).startsWith("audio") }
                         ?: return@postAtFrontOfQueue
 
