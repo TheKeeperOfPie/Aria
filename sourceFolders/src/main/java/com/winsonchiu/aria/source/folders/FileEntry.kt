@@ -6,6 +6,7 @@ import android.os.Parcelable
 import com.winsonchiu.aria.artwork.ArtworkRequestHandler
 import com.winsonchiu.aria.framework.media.AudioMetadata
 import com.winsonchiu.aria.framework.media.AudioMetadataInterface
+import com.winsonchiu.aria.framework.text.TextConverter
 import com.winsonchiu.aria.queue.QueueEntry
 import com.winsonchiu.aria.source.folders.util.FileUtils
 import kotlinx.android.parcel.IgnoredOnParcel
@@ -84,18 +85,19 @@ sealed class FileEntry(
         }
 
         @IgnoredOnParcel
-        private val displayTitle by lazy {
-            FileUtils.getFileDisplayTitle(
-                    FileUtils.getFileSortKey(file)?.substringBeforeLast(
-                            "."
-                    )
-            )
+        private val displayAndSortMetadata by lazy {
+            FileUtils.getFileDisplayAndSortMetadata(this)
         }
 
-        override fun getDisplayTitle(context: Context) = displayTitle
+        @IgnoredOnParcel
+        private val parentFileName by lazy {
+            TextConverter.translate(file.parentFile?.name)
+        }
+
+        override fun getDisplayTitle(context: Context) = displayAndSortMetadata.displayTitle
 
         override fun getDescription(context: Context): CharSequence? {
-            return metadata?.getDescription(context)
+            return metadata?.getDescription(context) ?: parentFileName
         }
 
         fun toQueueEntry(context: Context) = QueueEntry(

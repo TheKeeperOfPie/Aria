@@ -24,6 +24,6 @@ object AudioMetadataUtils {
             artistShowable -> resources.getString(R.string.audioMetadataFormatArtist, artist)
             albumShowable -> resources.getString(R.string.audioMetadataFormatAlbum, album)
             else -> null
-        }.let { TextConverter.translate(it, titleCase = true) }
+        }.let { TextConverter.translate(it) }
     }
 }

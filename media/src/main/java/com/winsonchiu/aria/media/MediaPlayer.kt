@@ -113,17 +113,22 @@ class MediaPlayer(
         lastEntry = queueEntry
 
         player.reset()
-        player.setDataSource(service, queueEntry.content)
-        player.setAudioAttributes(
-                AudioAttributes.Builder()
-                        .setContentType(CONTENT_TYPE_MUSIC)
-                        .setUsage(USAGE_MEDIA)
-                        .build()
-        )
 
-        player.prepare()
+        try {
+            player.setDataSource(service, queueEntry.content)
+            player.setAudioAttributes(
+                    AudioAttributes.Builder()
+                            .setContentType(CONTENT_TYPE_MUSIC)
+                            .setUsage(USAGE_MEDIA)
+                            .build()
+            )
 
-        initializedPlayer = true
+            player.prepare()
+
+            initializedPlayer = true
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
     }
 
     private fun play(queueEntry: QueueEntry) {

@@ -73,7 +73,7 @@ class FolderController @Inject constructor(
                                     }
                                 }
                                 .toList()
-                                .let { FileSorter.sort(it, FileSorter.Method.BY_NAME) }
+                                .sortedWith(FileSorter.Method.DEFAULT.comparator)
 
                         Model(folder, entries)
                     }
@@ -102,6 +102,7 @@ class FolderController @Inject constructor(
                 entry.file.walkTopDown()
                         .filter { FileFilters.AUDIO.accept(it) }
                         .map { FileEntry.Audio(it, metadataExtractor.extract(it)) }
+                        .sortedWith(FileSorter.Method.DEFAULT.comparator)
                         .map { it.toQueueEntry(application) }
                         .toList()
             }
@@ -111,6 +112,7 @@ class FolderController @Inject constructor(
                             .mapNotNull { Failsafe.orNull { entry.file.resolve(it) } }
                             .filter { it.exists() && FileFilters.AUDIO.accept(it) }
                             .map { FileEntry.Audio(it, metadataExtractor.extract(it)) }
+                            .sortedWith(FileSorter.Method.DEFAULT.comparator)
                             .mapNotNull { it.toQueueEntry(application) }
                             .toList()
                 }

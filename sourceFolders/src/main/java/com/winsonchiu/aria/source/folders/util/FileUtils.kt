@@ -1,10 +1,7 @@
 package com.winsonchiu.aria.source.folders.util
 
-import android.content.Context
-import com.winsonchiu.aria.framework.media.AudioMetadata
 import com.winsonchiu.aria.framework.text.TextConverter
 import com.winsonchiu.aria.source.folders.FileEntry
-import com.winsonchiu.aria.source.folders.R
 import java.io.File
 
 object FileUtils {
@@ -63,13 +60,13 @@ object FileUtils {
             fileSortKey
         }
 
-        return TextConverter.translate(text.trim(), titleCase = true)
+        return TextConverter.translate(text.trim())
     }
 
     fun getFileDisplayAndSortMetadata(entry: FileEntry): FileDisplayAndSortMetadata {
         val fileSortKey = FileUtils.getFileSortKey(entry.file)
         val fileDisplayTitle = FileUtils.getFileDisplayTitle(fileSortKey?.substringBeforeLast("."))
-        return FileDisplayAndSortMetadata(entry, fileDisplayTitle, fileSortKey)
+        return FileDisplayAndSortMetadata(fileDisplayTitle, fileSortKey)
     }
 
     fun getFolderTitle(folder: File) = folder.invariantSeparatorsPath

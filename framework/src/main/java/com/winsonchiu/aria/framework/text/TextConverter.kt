@@ -21,7 +21,7 @@ object TextConverter {
     @WorkerThread
     fun translate(
             text: String?,
-            titleCase: Boolean = false
+            titleCase: Boolean = true
     ): String? {
         if (text?.hasJapanese() != true) {
             return text

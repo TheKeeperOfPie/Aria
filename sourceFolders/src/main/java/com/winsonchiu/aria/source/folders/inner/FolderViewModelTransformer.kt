@@ -9,9 +9,6 @@ import com.winsonchiu.aria.source.folders.R
 import com.winsonchiu.aria.source.folders.inner.view.FileItemView
 import com.winsonchiu.aria.source.folders.inner.view.FileItemViewModel_
 import com.winsonchiu.aria.source.folders.inner.view.FileSectionHeaderViewModel_
-import com.winsonchiu.aria.source.folders.util.FileSorter
-import com.winsonchiu.aria.source.folders.util.FileSorter.sortFileItemViewModels
-import com.winsonchiu.aria.source.folders.util.FileUtils
 import com.winsonchiu.aria.source.folders.util.FileUtils.getFolderTitle
 import java.io.File
 
@@ -59,7 +56,7 @@ object FolderViewModelTransformer {
             areArtistsEqual -> context.getString(R.string.audioMetadataFormatArtist, firstArtist)
             areAlbumsEqual -> context.getString(R.string.audioMetadataFormatAlbum, firstAlbum)
             else -> null
-        }.let { TextConverter.translate(it, titleCase = true) }
+        }.let { TextConverter.translate(it) }
 
         if (!headerText.isNullOrBlank()) {
             epoxyModels += FileSectionHeaderViewModel_()
@@ -68,16 +65,11 @@ object FolderViewModelTransformer {
         }
 
         epoxyModels += entries
-                .map(FileUtils::getFileDisplayAndSortMetadata)
-                .toList()
-                .let { sortFileItemViewModels(it, FileSorter.Method.BY_NAME, false) }
                 .map {
-                    val (entry, displayTitle, _) = it
-
-                    val description = when (entry) {
+                    val description = when (it) {
                         is FileEntry.Folder,
-                        is FileEntry.Playlist -> entry.getDescription(context)
-                        is FileEntry.Audio -> entry.metadata?.getDescription(
+                        is FileEntry.Playlist -> it.getDescription(context)
+                        is FileEntry.Audio -> it.metadata?.getDescription(
                                 context,
                                 !areArtistsEqual,
                                 !areAlbumsEqual
@@ -85,10 +77,10 @@ object FolderViewModelTransformer {
                     }
 
                     FileItemViewModel_()
-                            .id(entry.file.absolutePath)
-                            .entry(entry)
+                            .id(it.file.absolutePath)
+                            .entry(it)
                             .listener(listener)
-                            .title(displayTitle)
+                            .title(it.getDisplayTitle(context))
                             .description(description)
                 }
                 .toList()
