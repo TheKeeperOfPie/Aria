@@ -17,8 +17,6 @@ object Versions {
         val targetSdk = 28
     }
 
-    val kotlin = "1.3.0"
-
     object Airbnb {
         val epoxy = "3.0.0-rc1"
     }
@@ -58,6 +56,11 @@ object Versions {
     object JakeWharton {
         val butterKnife = "9.0.0-rc1"
         val rxRelay = "2.0.0"
+    }
+
+    object Kotlin {
+        val core = "1.3.0"
+        val coroutines = "1.0.1"
     }
 
     object Square {
@@ -106,11 +109,6 @@ object Dependencies {
             val processor = kapt("com.airbnb.android:epoxy-processor", Versions.Airbnb.epoxy)
             val runtime = "com.airbnb.android:epoxy"(Versions.Airbnb.epoxy)
         }
-    }
-
-    object Kotlin {
-        val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8"(Versions.kotlin)
-        val reflect = "org.jetbrains.kotlin:kotlin-reflect"(Versions.kotlin)
     }
 
     object AndroidX {
@@ -201,6 +199,23 @@ object Dependencies {
         object ButterKnife {
             val reflect = "com.jakewharton:butterknife-reflect"(Versions.JakeWharton.butterKnife)
             val runtime = "com.jakewharton:butterknife"(Versions.JakeWharton.butterKnife)
+        }
+    }
+
+    object Kotlin {
+        val stdlib = "org.jetbrains.kotlin:kotlin-stdlib-jdk8"(Versions.Kotlin.core)
+        val reflect = "org.jetbrains.kotlin:kotlin-reflect"(Versions.Kotlin.core)
+
+        val coroutines = Multiple(
+                Coroutines.core,
+                Coroutines.android,
+                Coroutines.rx2
+        )
+
+        object Coroutines {
+            val core = "org.jetbrains.kotlinx:kotlinx-coroutines-core"(Versions.Kotlin.coroutines)
+            val android = "org.jetbrains.kotlinx:kotlinx-coroutines-android"(Versions.Kotlin.coroutines)
+            val rx2 = "org.jetbrains.kotlinx:kotlinx-coroutines-rx2"(Versions.Kotlin.coroutines)
         }
     }
 

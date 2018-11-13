@@ -31,7 +31,7 @@ class MetadataExtractor @Inject constructor() {
             mediaMetadataRetriever.get()!!.run {
                 setDataSource(file.absolutePath)
                 AudioMetadata(
-                        cdTrackNumber = extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER),
+                        cdTrackNumber = extractMetadata(MediaMetadataRetriever.METADATA_KEY_CD_TRACK_NUMBER).toLongOrNull(),
                         album = extractMetadata(MediaMetadataRetriever.METADATA_KEY_ALBUM),
                         artist = extractMetadata(MediaMetadataRetriever.METADATA_KEY_ARTIST),
                         author = extractMetadata(MediaMetadataRetriever.METADATA_KEY_AUTHOR),

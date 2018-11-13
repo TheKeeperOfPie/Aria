@@ -4,6 +4,10 @@ import com.winsonchiu.aria.Modules
 import org.jetbrains.kotlin.gradle.dsl.KotlinJvmOptions
 import org.jetbrains.kotlin.gradle.internal.AndroidExtensionsExtension
 import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
+import com.android.build.gradle.ProguardFiles.getDefaultProguardFile
+import org.jetbrains.kotlin.cli.jvm.main
+import org.jetbrains.kotlin.config.KotlinCompilerVersion
+import org.gradle.internal.impldep.org.junit.experimental.categories.Categories.CategoryFilter.exclude
 
 apply {
     plugin("submodule")
@@ -30,6 +34,7 @@ Dependencies(this) {
 
     api(Dependencies.JakeWharton.butterKnife)
 
+    api(Dependencies.Kotlin.coroutines)
     api(Dependencies.Kotlin.stdlib)
     api(Dependencies.Kotlin.reflect)
 

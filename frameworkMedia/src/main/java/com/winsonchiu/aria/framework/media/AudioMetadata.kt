@@ -6,7 +6,7 @@ import kotlinx.android.parcel.IgnoredOnParcel
 import kotlinx.android.parcel.Parcelize
 
 interface AudioMetadataInterface {
-    val cdTrackNumber: String?
+    val cdTrackNumber: Long?
     val album: String?
     val artist: String?
     val author: String?
@@ -46,7 +46,7 @@ interface AudioMetadataInterface {
 
 @Parcelize
 data class AudioMetadata(
-        override val cdTrackNumber: String? = null,
+        override val cdTrackNumber: Long? = null,
         override val album: String? = null,
         override val artist: String? = null,
         override val author: String? = null,
